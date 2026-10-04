@@ -18,13 +18,15 @@ questions about models themselves (pricing, model choice).
 
 ## The knowledge base
 
-Three layers, one page per concept in each. Page names are identical
-across layers, so `<concept>` below is one of: `instructions`,
+An overview page plus four layers, one page per concept in each. Page
+names are identical across layers, so `<concept>` below is one of: `instructions`,
 `configuration`, `permissions-and-sandbox`, `mcp`, `skills`,
 `commands`, `subagents`, `hooks`, `plugins`, `automation`.
 
 | Need | Read |
 | --- | --- |
+| Which concept fits a goal, and when a concept is the wrong choice | `docs/overview.md` |
+| One concept end to end in condensed form: model, when to use and when not, key practices, security, checklist, portability | `docs/guide/<concept>.md` |
 | How the concept works in general, how the harnesses compare, how to write one setup for several harnesses | `docs/concepts/<concept>.md` |
 | Exact file names, fields, defaults and flags for one harness | `docs/vendors/<harness>/<concept>.md` (`claude-code`, `codex`, `opencode`) |
 | Which approach to choose, how to do it well, security, verification, review checklist | `docs/best-practices/<concept>.md` (no `commands` page; commands are covered in `skills`) |
@@ -36,9 +38,8 @@ one harness has. Check it before calling something portable.
 ## Procedure
 
 1. **Name the concepts and harnesses involved.** A goal like "stop the
-   agent from touching `.env`" spans several concepts; find the right
-   one in the "When to use it" section of the matching
-   `docs/best-practices/` page.
+   agent from touching `.env`" spans several concepts; `docs/overview.md`
+   says which concept fits and which one is the wrong choice.
 2. **Read the slice you need.** Pages run up to 500 lines. List a
    page's headings first and read the sections that answer the
    question. Read the vendor page when exact syntax matters.
@@ -59,7 +60,8 @@ one harness has. Check it before calling something portable.
    section that explains it.
 6. **Keep the knowledge base current.** When a fact turns out to be
    outdated or wrong, fix the vendor page with the new source and date,
-   then every concept and best-practices page that repeats it. Mention
+   then every page that repeats it (`docs/concepts/`,
+   `docs/best-practices/`, `docs/guide/`, `docs/overview.md`). Mention
    the update in the answer.
 
 ## Done when

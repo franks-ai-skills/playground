@@ -6,8 +6,10 @@ A scratch repository for trying things out in the
 ## Content
 
 - [`docs/`](docs/README.md): a knowledge base on configuring coding-agent
-  harnesses (Claude Code, Codex, OpenCode). It has three layers: a
-  reference per harness, vendor-neutral concepts, and best practices.
+  harnesses (Claude Code, Codex, OpenCode). Start with the
+  [overview](docs/overview.md); behind it are a condensed guide per
+  concept, the full concept and best-practice pages, and a reference
+  per harness.
 - [`AGENTS.md`](AGENTS.md) and the `agent-harness` skill in
   [`.agents/skills/`](.agents/skills/agent-harness/SKILL.md) make the
   knowledge base available to agents working in this repository.

@@ -10,13 +10,13 @@ coding-agent harnesses: Claude Code, Codex and OpenCode.
   files, settings, permissions, sandbox, MCP, skills, slash commands,
   subagents, hooks, plugins, headless or CI runs), load the
   `agent-harness` skill first. It maps each question to the page to
-  read. Without skill support, start at `docs/README.md`.
+  read. Without skill support, start at `docs/overview.md`.
 - The knowledge base reflects 2026-10-04 (Claude Code 2.1.289,
   codex-cli 0.159.2, OpenCode 1.18.34). Confirm version-sensitive
   details against the source a page cites before relying on them.
 - When a fact in `docs/` turns out outdated, fix the vendor page with
-  its new source, then every concept and best-practices page that
-  repeats it.
+  its new source, then every page that repeats it: `docs/concepts/`,
+  `docs/best-practices/`, `docs/guide/` and `docs/overview.md`.
 
 ## Repository layout rules
 

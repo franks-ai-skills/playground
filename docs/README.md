@@ -5,12 +5,17 @@ model that loads instructions, exposes tools, enforces permissions,
 runs subagents and hooks, and automates workflows. It covers Claude
 Code, OpenAI Codex and OpenCode as of 2026-10-04.
 
+Start with the [overview](overview.md): every concept on one page,
+with what it is used for, how and when to use it, and when not to.
+
 ## Layout
 
 | Directory | Content |
 | --- | --- |
+| [`overview.md`](overview.md) | Entry point: all concepts at a glance, with when to use each and when to use something else. |
+| [`guide/`](guide/) | One condensed page per concept, combining the generalized model and the best practices. |
 | [`best-practices/`](best-practices/) | How to apply each generalized concept: approaches, implementation in Claude Code and Codex, security, verification and a review checklist, with an evidence label on every practice. |
-| [`concepts/`](concepts/) | Vendor-neutral version of each concept: a comparison across harnesses, a generalized model, portability guidance and what was dropped. Start here. |
+| [`concepts/`](concepts/) | Vendor-neutral version of each concept: a comparison across harnesses, a generalized model, portability guidance and what was dropped. |
 | [`vendors/`](vendors/) | One reference section per harness. Every section has the same set of pages, so a concept can be compared by opening the same file name in each. |
 | [`research-notes/`](research-notes/) | The raw research notes behind the pages, with a source for each claim. |
 
