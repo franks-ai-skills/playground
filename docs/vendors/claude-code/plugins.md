@@ -169,6 +169,16 @@ Marketplace source types (in `extraKnownMarketplaces` and the policy lists): `gi
 - Pinning `version` freezes users until it changes ([plugin loading](https://code.claude.com/docs/en/plugins/loading)). Inference (from the research notes): omitting `version` lets users track commits; setting it makes updates explicit.
 - Auto-update is on by default only for official marketplaces and claude.ai-added ones; everything else is off. Toggle per marketplace in the `/plugin` Marketplaces tab. `FORCE_AUTOUPDATE_PLUGINS=1` forces updates even with `DISABLE_AUTOUPDATER` ([plugin install](https://code.claude.com/docs/en/plugins/install); [env vars](https://code.claude.com/docs/en/env-vars)).
 
+### Dependencies
+
+Verified against the live docs on 2026-10-04 ([plugin dependencies](https://code.claude.com/docs/en/plugin-dependencies)):
+
+- **Declared in** the `dependencies` array of `plugin.json` or of the marketplace entry. An entry is a plugin name, `"name@marketplace"`, or `{name, version, marketplace}` with a semver range such as `~2.1.0`.
+- **Installed automatically.** `claude plugin install` installs missing declared dependencies. So do `/reload-plugins`, auto-update of the dependent plugin's marketplace, re-running the install, and `claude plugin marketplace add`. A plugin with only `name` and `dependencies` works as a bundle: installing it installs the whole set.
+- **Same marketplace by default.** A dependency from another marketplace is installed only if the root marketplace lists that marketplace in `allowCrossMarketplaceDependenciesOn`, or if the user already has the dependency enabled at the same scope. Otherwise the install is refused (dependency declared in the marketplace entry), or the install completes without it and the plugin fails to load (dependency declared in `plugin.json`).
+- **Version ranges resolve against git tags** named `<plugin>--v<version>` (`claude plugin tag` creates them). For `npm`, `archive` and `command` sources the range is only checked at load time. Claude Code never installs a `command`-source dependency and never runs a dependency's `headersHelper`; users install those first.
+- **Conflicts:** several plugins constraining one dependency resolve to the highest version that satisfies all ranges; non-overlapping ranges make the second install fail. `claude plugin prune` removes auto-installed dependencies no plugin needs.
+
 ### Mods
 
 - v2.1.287 added "Claude Mods": plugins with JavaScript function hooks that can draw UI and answer `tool.check` ([changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md); [hooks reference](https://code.claude.com/docs/en/hooks)).
@@ -245,11 +255,12 @@ Add it with `claude plugin marketplace add ./path` or `owner/repo`, then run `cl
 - `force-for-plugin` in a plugin output style overrides the user's `outputStyle` ([output styles](https://code.claude.com/docs/en/output-styles)).
 - Recent changes: `claude plugin configure` and `install --config` arrived around v2.1.281–2.1.282; mods arrived in v2.1.287 ([changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)).
 - Doc URL change: the old URLs `/docs/en/plugins`, `/plugins-reference`, `/plugin-marketplaces`, and `/discover-plugins` now serve the new `/docs/en/plugins/*` pages (observed on 2026-10-04) ([plugins overview](https://code.claude.com/docs/en/plugins/overview)).
-- Gap (research notes): the plugin `components` page, the dependencies page, the mods reference, and the org-management page were not read in detail. The `userConfig` storage location (`pluginConfigs`) was confirmed only from the settings index.
+- Gap (research notes): the plugin `components` page, the mods reference, and the org-management page were not read in detail. The `userConfig` storage location (`pluginConfigs`) was confirmed only from the settings index.
 - Gap (research notes): the effects of `strictPluginOnlyCustomization`, `pluginTrustMessage`, and `disableCommandPluginSources` are not described in the notes beyond their names.
 
 ## Sources
 
+- https://code.claude.com/docs/en/plugin-dependencies
 - https://code.claude.com/docs/en/plugins/manifest-reference
 - https://code.claude.com/docs/en/plugins/marketplace-reference
 - https://code.claude.com/docs/en/plugins/install
