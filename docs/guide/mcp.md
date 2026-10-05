@@ -140,8 +140,8 @@ Do not use it when:
    - How: servers validate token audience; start with a minimal scope and step up; no static API keys in `.mcp.json` or `config.toml`.
    - Evidence: [Vendor] ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)).
 10. **Allowlist servers by identity and pin versions.**
-   - Why: a name is not a security control, and unpinned `npx -y` runs the latest release in every session, which is how the `postmark-mcp` change reached users.
-   - How: Claude Code `allowedMcpServers` by `serverUrl` or `serverCommand`, paired with `disableSideloadFlags` (which alone does not restrict `.mcp.json`, `claude mcp add` or SDK servers); Codex `requirements.toml` `identity`; pin `@x.y.z` or image digests.
+   - Why: a name is not a security control, and unpinned `npx -y` runs the latest release in every session. `postmark-mcp` became malicious only from version 1.0.16, so an unpinned install picked up the change.
+   - How: Claude Code `allowedMcpServers` by `serverUrl` or `serverCommand`, paired with `disableSideloadFlags` (which alone does not restrict `.mcp.json`, `claude mcp add` or SDK servers); Codex `requirements.toml` `identity`; pin `@x.y.z`.
    - Evidence: [Vendor] ([Claude Code plugins for orgs](https://code.claude.com/docs/en/plugins/org); [Codex managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)); [Advisory] ([OWASP MCP04](https://owasp.org/www-project-mcp-top-10/2025/MCP04-2025%E2%80%93Software-Supply-Chain-Attacks%26Dependency-Tampering)).
 11. **Never give one session private data, untrusted content and an exfiltration channel.**
    - Why: injection through tool results works even when the server is clean (GitHub MCP, May 2025, below).
@@ -173,8 +173,8 @@ Measured susceptibility: MCPTox tested 45 live servers and 1,348 malicious cases
 | Fixed 2025-06-17 | CVE-2025-6514, `mcp-remote` 0.0.5–0.1.15: OS command injection via a crafted `authorization_endpoint`; CVSS 9.6 ([GitLab](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/)) |
 | 2025 | CVE-2025-49596 (MCP Inspector < 0.14.1, RCE) and CVE-2025-58444 (Inspector, XSS to command execution, fixed 0.16.6) ([SentinelOne](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/); [GitLab](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)) |
 | Fixed 2025-08-20 | CVE-2025-61260, Codex CLI: a repository `.env` set `CODEX_HOME=./.codex`, and project `mcp_servers` commands ran at startup without a prompt; CVSS 9.8; fixed in v0.23.0 ([Check Point](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)) |
-| 2025-09-17 | `postmark-mcp` on npm: v1.0.16 added one line that BCC'd every sent email to the attacker; 1,643 downloads ([The Hacker News](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)) |
-| Fixes 2025-08-26 to 2025-12-28 | Claude Code project files: CVE-2025-59536 (hooks RCE), MCP consent bypass via `enableAllProjectMcpServers` in project settings, API key exfiltration via `ANTHROPIC_BASE_URL`. Sources disagree on which issue CVE-2026-21852 names ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)) |
+| 2025 | `postmark-mcp` on npm, the first malicious MCP server found in use: since version 1.0.16 it BCC'd every email to the attacker; reported by Koi Security ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)) |
+| Fixes 2025-08-26 to 2025-12-28 | Claude Code project files: CVE-2025-59536 (hooks RCE), MCP consent bypass via `enableAllProjectMcpServers` in project settings, API key exfiltration via `ANTHROPIC_BASE_URL` ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)) |
 
 Plan around current behaviour: Claude Code loads `.mcp.json` servers without asking in `-p`, SDK and cloud runs; Codex `trust_level = "untrusted"` turns project-local config off ([Codex security](https://learn.chatgpt.com/docs/agent-approvals-security)). Do not commit `enableAllProjectMcpServers`. For headless runs in untrusted checkouts, see [automation](automation.md).
 
@@ -193,7 +193,7 @@ Checklist:
 - [ ] Each server has a companion skill.
 - [ ] Only needed tools are enabled; output limits are set.
 - [ ] Outbound and write tools need approval; no auto-approved writes on servers that read untrusted content.
-- [ ] Commands pin versions or digests.
+- [ ] Commands pin versions.
 - [ ] No secrets in `.mcp.json`, `config.toml` or `opencode.json`; credential-bearing servers are in local or user scope.
 - [ ] The admin allowlist matches by command or URL.
 - [ ] Third-party servers were reviewed and are re-reviewed on update.
@@ -249,7 +249,7 @@ Traps:
 
 ## Open questions
 
-- The fetched Codex user docs do not describe tool search; only PR #29486 and practitioner blogs do. The Claude Code version from which tool search is on by default (v2.1.221) was not cross-checked.
+- The fetched Codex user docs do not describe tool search; only PR #29486 does.
 - No controlled study after deferred loading compares MCP and CLI across many tasks; Checkly is one task.
 - Codex's default `output_token_limit` is not documented, nor whether a server defined in user and project config is replaced or merged.
 - No vendor quantifies the ideal number of tools per server.
@@ -266,4 +266,4 @@ Vendor pages: [Claude Code: MCP](../vendors/claude-code/mcp.md), [Codex: MCP](..
 - Anthropic: [Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents), [Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use), [Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp); [Cloudflare Code Mode](https://blog.cloudflare.com/code-mode/)
 - MCP spec: [Tools](https://modelcontextprotocol.io/specification/draft/server/tools), [Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
 - Practitioner and empirical: [Zechner](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/), [Willison, skills](https://simonwillison.net/2025/Oct/16/claude-skills/), [Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), [Checkly](https://www.checklyhq.com/blog/mcp-vs-cli-token-efficiency/), [MCPTox](https://arxiv.org/html/2508.14925v1)
-- Advisories: [Invariant, tool poisoning](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks), [Invariant, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), [OWASP MCP Top 10](https://owasp.org/www-project-mcp-top-10/), [CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/), [CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/), [CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/), [CVE-2025-61260 (NVD)](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [postmark-mcp](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)
+- Advisories: [Invariant, tool poisoning](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks), [Invariant, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), [OWASP MCP Top 10](https://owasp.org/www-project-mcp-top-10/), [CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/), [CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/), [CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/), [CVE-2025-61260 (NVD)](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [postmark-mcp (CSO Online)](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)

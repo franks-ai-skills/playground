@@ -164,7 +164,6 @@ Sources: [Build plugins](https://developers.openai.com/codex/plugins/build); loc
 - **Gap:** `policy.authentication` values beyond `ON_INSTALL` were not captured; the docs mention "on install or first use".
 - **Gap:** no documented hard limits (plugin count, plugin size, number of MCP servers).
 - **Gap:** `[apps]` IDs and how to discover them are not covered in the pages read.
-- **Gap:** plugin "commands" are mentioned in the bundled self-knowledge reference but were not verified in the docs; see [commands.md](commands.md).
 
 ## Sources
 

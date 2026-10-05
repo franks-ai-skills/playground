@@ -179,7 +179,7 @@ Permissions decide whether a tool call runs. The sandbox limits what a running c
 
 - **Why:** CC auto-mode classifier, measured by Anthropic: on real traffic (n=10,000) full-pipeline false-positive rate 0.4%; on real overeager actions (n=52) false-negative rate 17%; on synthetic exfiltration (n=1,000) FNR 5.7%. The authors: "It is not a drop-in replacement for careful human review on high-stakes infrastructure." CC: "The classifier is a per-action control, not an isolation boundary." Codex: auto-review "is not a deterministic security guarantee" and should "complement, not replace, good sandbox design, monitoring, and organization-specific policy". Adaptive attacks bypassed 12 published prompt-injection defenses with success "above 90% for most" (2025).
 - **How:** Enable CC auto mode or Codex auto-review only with the sandbox on. For unattended runs, add outer isolation. Write a Codex `[auto_review].policy` (or org `guardian_policy_config`) that names your sensitive systems.
-- **Disagreement:** Press reports attribute to Anthropic a claim that humans catch only 13.6% of dangerous commands (5% after 50 prompts) versus 89% for the classifier ([letsdatascience](https://letsdatascience.com/news/anthropic-enables-auto-mode-for-claude-code-2be9e2b6)). The figure was not found in the primary engineering post; treat it as unverified. Willison argues that 95% capture rates are "very much a failing grade" in security (2025).
+- **Disagreement:** Willison argues that 95% capture rates are "very much a failing grade" in security (2025).
 - **Evidence:** [Empirical] [Anthropic engineering, auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode); [Vendor] [CC sandbox environments](https://code.claude.com/docs/en/sandbox-environments); [Vendor] [Codex auto-review](https://learn.chatgpt.com/codex/sandboxing/auto-review); [Empirical] (2025) "The Attacker Moves Second", summarized by [Simon Willison (Nov 2, 2025)](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/); [Practitioner] (2025) [Willison, The lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/).
 
 ### 12. Run bypass modes only inside outer isolation
@@ -233,9 +233,8 @@ Permissions decide whether a tool call runs. The sandbox limits what a running c
 
 | Threat | Advisory or source | Mitigation |
 | --- | --- | --- |
-| Prompt injection steers the agent (OWASP ASI01 Agent Goal Hijack) | (2025) [Lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/); (2025) [Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/); OWASP Top 10 for Agentic Applications, published Dec 2025, from secondary summaries ([Teleport](https://goteleport.com/blog/owasp-top-10-agentic-applications), [Palo Alto Networks](https://www.paloaltonetworks.com/blog/?p=349925); primary at [genai.owasp.org](https://genai.owasp.org/), not fetched) | Cut egress or secrets ([practice 14](#14-cut-a-leg-of-the-lethal-trifecta-instead-of-relying-on-detection)); least-privilege tools; human approval for sensitive operations |
-| Misuse of tools already granted, often within permissions (ASI02); inherited credentials (ASI03) | OWASP Agentic Top 10 (secondary summaries above) | Narrow allows; mask or deny credentials; scoped short-lived tokens |
-| Exfiltration through auto-approved "safe" commands | (2025) CVE-2025-55284: CC before 1.0.4 auto-approved `ping`, `nslookup`, `dig`; secrets could leave as DNS subdomains with no prompt. Fixed by removing them from the allowlist ([GitLab advisory](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/), [jmason.ie / Embrace The Red](https://jmason.ie/2025/08/25/161304a.html)) | Network isolation in the sandbox; do not trust command allowlists for exfiltration |
+| Prompt injection steers the agent | (2025) [Lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/); (2025) [Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/) | Cut egress or secrets ([practice 14](#14-cut-a-leg-of-the-lethal-trifecta-instead-of-relying-on-detection)) |
+| Exfiltration through auto-approved "safe" commands | (2025) CVE-2025-55284: CC before 1.0.4 auto-approved `ping`, `nslookup`, `dig`; secrets could leave as DNS subdomains with no prompt. Fixed by removing them from the allowlist ([GitLab advisory](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/), [Embrace The Red](https://embracethered.com/blog/posts/2025/claude-code-exfiltration-via-dns-requests/)) | Network isolation in the sandbox; do not trust command allowlists for exfiltration |
 | Model-chosen working directory widens the sandbox | (2025) CVE-2025-59532: Codex CLI 0.2.0 to 0.38.0 could treat a model-generated cwd as the writable root. Fixed in 0.39.0 (IDE extension 0.4.12) by canonicalizing the boundary to where the user started ([NVD](https://nvd.nist.gov/vuln/detail/CVE-2025-59532), [GitLab advisory](https://advisories.gitlab.com/pkg/npm/@openai/codex/CVE-2025-59532/)) | Keep Codex updated |
 | Malware invokes the agent CLI with bypass flags | (2025) s1ngularity/Nx npm compromise, Aug 26, 2025: a malicious postinstall ran local Claude, Gemini and Q CLIs with `--dangerously-skip-permissions`, `--yolo`, `--trust-all-tools`, searched for secrets and wallets, and exfiltrated to public GitHub repositories in victims' accounts ([Wiz](https://wiz.io/blog/s1ngularity-supply-chain-attack), [StepSecurity](https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware)) | `disableBypassPermissionsMode` (any scope); Codex `allowed_sandbox_modes`/`allowed_approval_policies` |
 | Compromised agent extension | (2025) Amazon Q Developer VS Code extension 1.84.0 shipped a wipe prompt after an attacker used an "inappropriately scoped GitHub token in their CodeBuild configuration"; it failed due to a syntax error. Fixed in 1.85.0; CVE-2025-8217 ([AWS-2025-015](https://aws.amazon.com/security/security-bulletins/AWS-2025-015/)) | Least privilege for the agent; outer isolation for unattended runs |
@@ -287,13 +286,11 @@ Re-run after harness upgrades; defaults and precedence change between versions (
 ## Open questions
 
 - **Independent evidence.** No non-vendor empirical study of approval-fatigue rates or classifier efficacy in coding agents was found; all numbers are vendor-measured.
-- **The 13.6% / 89% figure** could not be traced to a primary Anthropic source.
 - **Codex `approval_policy = "never"`:** what happens to a request that would need approval is not stated in the fetched pages.
 - **Codex default read scope** for legacy sandbox modes is not documented; permission profiles (beta) can deny paths.
 - **Sandbox strength.** No independent evaluation of Seatbelt or bubblewrap for coding agents, and no third-party sandbox-escape benchmark, was found.
 - **Conformance tests.** Neither lead ships a security self-check for permission and sandbox posture.
 - **OpenCode** has no documented OS sandbox and no incident data was found.
-- **OWASP Agentic Top 10** mitigations come from secondary summaries; a claimed separate "2026 LLM Top 10" (Aug 2026) could not be confirmed from a primary source.
 
 ## Sources
 
@@ -322,12 +319,8 @@ Re-run after harness upgrades; defaults and precedence change between versions (
 - [Simon Willison, Designing agentic loops (Sep 30, 2025)](https://simonwillison.net/2025/Sep/30/designing-agentic-loops/)
 - [Simon Willison, New prompt injection papers (Nov 2, 2025)](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/)
 - [Meta AI, Agents Rule of Two (Oct 31, 2025)](https://ai.meta.com/blog/practical-ai-agent-security/)
-- [letsdatascience: auto mode summary](https://letsdatascience.com/news/anthropic-enables-auto-mode-for-claude-code-2be9e2b6)
-- [OWASP GenAI Security Project](https://genai.owasp.org/)
-- [Teleport: OWASP Top 10 for Agentic Applications](https://goteleport.com/blog/owasp-top-10-agentic-applications)
-- [Palo Alto Networks: OWASP Agentic Top 10](https://www.paloaltonetworks.com/blog/?p=349925)
 - [GitLab advisory CVE-2025-55284](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/)
-- [jmason.ie / Embrace The Red on CVE-2025-55284](https://jmason.ie/2025/08/25/161304a.html)
+- [Embrace The Red: Claude Code exfiltration via DNS requests, CVE-2025-55284 (Aug 11, 2025)](https://embracethered.com/blog/posts/2025/claude-code-exfiltration-via-dns-requests/)
 - [NVD CVE-2025-59532](https://nvd.nist.gov/vuln/detail/CVE-2025-59532)
 - [GitLab advisory CVE-2025-59532](https://advisories.gitlab.com/pkg/npm/@openai/codex/CVE-2025-59532/)
 - [Wiz: s1ngularity supply-chain attack](https://wiz.io/blog/s1ngularity-supply-chain-attack)

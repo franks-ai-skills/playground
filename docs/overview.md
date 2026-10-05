@@ -276,7 +276,7 @@ your own application through an SDK.
 **When not:**
 - The diff fits in one sentence → a direct prompt, no plan or spec.
 - A rule that must hold on every tool call → a [hook](#hooks) or [permission rule](#permissions-and-sandbox).
-- Untrusted issue or PR text would reach a job with write tokens → a read-only agent job plus a separate write job. Prompt injection has exfiltrated keys from agent GitHub Actions.
+- Untrusted issue or PR text would reach a job with write tokens → a read-only agent job plus a separate write job. Researchers showed that text in a PR title or issue comment can make agents in GitHub Actions extract credentials.
 - Significant changes in parallel → serial work. Review capacity is the limit.
 - Batch work a shell loop over `-p` or `exec` can do → the CLI, not an SDK.
 

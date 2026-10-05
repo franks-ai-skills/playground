@@ -109,9 +109,9 @@ Invocation: `/prompts:draftpr FILES="..." PR_TITLE="..."`. Source: [Custom Promp
 ## Limits and gotchas
 
 - **Custom prompts are deprecated.** "Custom prompts are deprecated. Use skills for reusable instructions that Codex can invoke explicitly or implicitly." The llms.txt index labels the page "Deprecated. Use skills for reusable prompts" ([Custom Prompts](https://learn.chatgpt.com/docs/custom-prompts.md); [llms.txt](https://learn.chatgpt.com/llms.txt)).
-- **Possibly already removed (unverified).** The current CLI slash-command table does not list `/prompts:`. The installed 0.159.2 binary has no `codex/prompts` or `CustomPrompt` strings other than `OpenReviewCustomPrompt`, which is the `/review` custom-instructions picker in `tui/src/bottom_pane/custom_prompt_view/picker.rs` (local `strings` on the binary). Path strings could be built at runtime, so removal is not proven. **Gap:** the release that removed custom prompts, if any, was not found; GitHub search hit its rate limit, and no official removal note was found.
-- **No argument substitution in skills.** Skills have no `$1` or `KEY=value` substitution. The text after `$skill-name` is just part of the user message. Migrating a prompt that relies on placeholders needs the instructions rewritten.
-- **Gap: plugin commands.** Plugin "commands" are mentioned in the bundled self-knowledge reference but were not verified in the docs. No documented way exists to define new built-in-style slash commands.
+- **Not in the current command table.** The current CLI slash-command table does not list `/prompts:`. The installed 0.159.2 binary has no `codex/prompts` or `CustomPrompt` strings other than `OpenReviewCustomPrompt`, which is the `/review` custom-instructions picker in `tui/src/bottom_pane/custom_prompt_view/picker.rs` (local `strings` on the binary). **Gap:** the release that removed custom prompts, if any, was not found; GitHub search hit its rate limit, and no official removal note was found.
+- **Gap: argument substitution in skills.** No `$1` or `KEY=value` substitution is documented for skills.
+- **Gap:** no documented way exists to define new built-in-style slash commands.
 - The IDE extension's slash commands are on a separate page that the notes do not detail ([IDE slash commands](https://learn.chatgpt.com/docs/developer-commands.md?surface=ide)).
 
 ## Sources

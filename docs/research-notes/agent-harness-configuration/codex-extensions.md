@@ -97,7 +97,7 @@ Skills are the primary reusable-workflow mechanism in Codex. A skill is a folder
 
 ### Inferences
 - Codex reads only `name`, `description` and `metadata.short-description` from frontmatter. Other Agent Skills fields (`allowed-tools`, `license`, `compatibility`) are kept but have no effect. Codex-specific behavior such as invocation policy, UI and dependencies goes in `agents/openai.yaml`. So a skill written to the agentskills.io spec is portable to Codex, but Claude-specific frontmatter such as `disable-model-invocation` has to be rewritten as `policy.allow_implicit_invocation: false` in `agents/openai.yaml`.
-- The installed binary contains a SKILL.md-authoring prompt that mentions Claude-Code-style keys (`argument-hint`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `context: fork`, `$ARGUMENTS`). It looks like part of the memories/import extension, and the parser does not read those keys (local `strings` on the binary versus parser.rs). These keys should not be treated as Codex-supported.
+- The installed binary contains a SKILL.md-authoring prompt that mentions Claude-Code-style keys (`argument-hint`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `context: fork`, `$ARGUMENTS`). The parser does not read those keys (local `strings` on the binary versus parser.rs). These keys should not be treated as Codex-supported.
 - Codex is less strict than the spec. It does not enforce the spec's lowercase/hyphen name rule or the name-must-match-directory rule (it only checks length), and it accepts slightly malformed YAML.
 
 ### Gaps
@@ -108,7 +108,7 @@ Skills are the primary reusable-workflow mechanism in Codex. A skill is a folder
 ## Custom prompts / slash commands: ~/.codex/prompts, arguments, built-in slash commands, deprecation in favor of skills
 
 ### Takeaway
-Custom prompts (Markdown files in `~/.codex/prompts/` run as `/prompts:<name>`) are officially deprecated in favor of skills. The docs still describe their format, but the current CLI slash-command table does not list them, and the 0.159.2 binary has no `codex/prompts` string, so they may already be gone (unverified). Codex has no user-defined slash commands anymore. Skills invoked with `$name` or `/skills` take that role, and plugins add more. Built-in slash commands are a fixed list.
+Custom prompts (Markdown files in `~/.codex/prompts/` run as `/prompts:<name>`) are officially deprecated in favor of skills. The docs still describe their format, but the current CLI slash-command table does not list them, and the 0.159.2 binary has no `codex/prompts` string. Codex has no user-defined slash commands anymore. Skills invoked with `$name` or `/skills` take that role, and plugins add more. Built-in slash commands are a fixed list.
 
 ### Cited Findings
 - "Custom prompts are deprecated. Use skills for reusable instructions that Codex can invoke explicitly or implicitly." The llms.txt index labels the page "Deprecated. Use skills for reusable prompts". — [Custom Prompts](https://learn.chatgpt.com/docs/custom-prompts.md); [llms.txt](https://learn.chatgpt.com/llms.txt)
@@ -128,11 +128,12 @@ Custom prompts (Markdown files in `~/.codex/prompts/` run as `/prompts:<name>`) 
 - The installed 0.159.2 binary has no `codex/prompts` or `CustomPrompt` strings other than `OpenReviewCustomPrompt`, which is the `/review` custom-instructions picker in `tui/src/bottom_pane/custom_prompt_view/picker.rs`. — local `strings /opt/homebrew/Caskroom/codex/0.159.2/bin/codex`
 
 ### Inferences
-- `/prompts:` is missing from the built-in table, and the binary has no prompts-directory string. Together these suggest custom prompts are deprecated in the docs and possibly removed from the 0.159.2 TUI. Path strings could be built at runtime, so this is not proven. New work should use skills, with `policy.allow_implicit_invocation: false` to get prompt-like behavior that only runs explicitly. Skills have no `$1`/`KEY=value` argument substitution: the text after `$skill-name` is just part of the user message.
+- New work should use skills, with `policy.allow_implicit_invocation: false` to get prompt-like behavior that only runs explicitly.
 
 ### Gaps
 - The release in which custom prompts were removed (if they were) was not found, because GitHub search hit its rate limit. No official removal note was found.
-- No documented way to define new built-in-style slash commands, other than plugins (plugin "commands" are mentioned in the bundled self-knowledge reference but were not verified in the docs).
+- No documented way to define new built-in-style slash commands.
+- No documented `$1`/`KEY=value` argument substitution for skills.
 
 ## Subagents / multi-agent: built-in agents, custom agents, [agents] config, spawn tools, Codex as MCP server + Agents SDK, cloud parallel attempts
 

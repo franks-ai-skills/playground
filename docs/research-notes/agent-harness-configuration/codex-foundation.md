@@ -263,7 +263,7 @@ prefix_rule(pattern=["gh", "pr", "view"], decision="prompt", justification="View
 
 ### Gaps
 - No release date was found for the retirement of `approval_policy = "untrusted"` or the deprecation of `on-failure`. The changelog page fetched shows recent releases only.
-- The exact default when neither `sandbox_mode` nor `default_permissions` is set is described differently: "read-only (default)" in the sample config vs VCS-detected `Auto` in the security page. These likely refer to the config default vs the onboarding/trust-flow recommendation, but that isn't confirmed.
+- The exact default when neither `sandbox_mode` nor `default_permissions` is set is described differently: "read-only (default)" in the sample config vs VCS-detected `Auto` in the security page.
 - Discrepancy between the `codex sandbox <platform>` docs and the local 0.159.2 CLI help is unresolved.
 
 ---
@@ -359,7 +359,7 @@ Codex has a full plugin system shared with ChatGPT. A plugin bundles skills, MCP
 - Built-in `amazon-bedrock` provider: only `[model_providers.amazon-bedrock.aws] profile, region` can be overridden. Without a profile it uses the standard AWS credential chain — [Advanced config](https://developers.openai.com/codex/config-advanced)
 - OSS mode: `--oss` with `--local-provider ollama|lmstudio`, or `oss_provider` in config. If neither is set, the TUI prompts and `codex exec` errors — [Advanced config](https://developers.openai.com/codex/config-advanced)
 - Provider keys are user-level only (ignored in project config). Admins can enforce `model_provider` / `model_providers` via requirements, which replace whole providers per ID — [Advanced config](https://developers.openai.com/codex/config-advanced); [Config reference](https://developers.openai.com/codex/config-reference)
-- Change: `wire_api` accepts only `responses`. The docs note `model_verbosity` is ignored by "Chat Completions providers", which suggests Chat Completions wire support was dropped — [Config reference](https://developers.openai.com/codex/config-reference); [Advanced config](https://developers.openai.com/codex/config-advanced)
+- Change: `wire_api` accepts only `responses` — [Config reference](https://developers.openai.com/codex/config-reference); [Advanced config](https://developers.openai.com/codex/config-advanced)
 
 **Minimal examples**
 ```toml

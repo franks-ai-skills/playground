@@ -55,7 +55,6 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 | An instruction-file section "has grown into a procedure rather than a fact" | Moves recurring cost out of every session ([Claude Code skills](https://code.claude.com/docs/en/skills)) |
 | A procedure has side effects or timing (deploy, commit, send a message) | Make it user-invoked ([Approaches](#approaches)) |
 | An operation must be deterministic and is reinvented each run | Bundle a script in `scripts/` |
-| The team has a recurring kind of work: API reference, verification, data analysis, scaffolding, review, CI/CD, runbooks | Anthropic's internal skills cluster into these [Practitioner] ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)) |
 
 | Do not use it when | Use instead | Cost or risk of a skill |
 | --- | --- | --- |
@@ -87,7 +86,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 - **What:** a one-line pointer in `AGENTS.md` that tells the agent when to load the skill, or a compressed index in the instruction file instead of a skill.
 - **When it fits:** knowledge whose omission causes silently wrong output.
-- **How:** Vercel's 8 KB docs index in `AGENTS.md` scored 100% vs 53% for a default skill and 79% with explicit instructions. Wording mattered: "You MUST invoke the skill" anchored the agent on the docs; "Explore project first, then invoke skill" scored better ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)).
+- **How:** Vercel's 8 KB docs index in `AGENTS.md` scored 100%; skills reached at most 79% even with explicit instructions, against a 53% baseline without docs. Wording mattered: "You MUST invoke the skill" anchored the agent on the docs; "Explore project first, then invoke skill" scored better ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)).
 - **Trade-off:** costs instruction budget every session. Evidence is one framework with unnamed models.
 
 ### Script-backed skill
@@ -109,7 +108,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - **What:** project (committed), user (personal), plugin (shared across repos, versioned, namespaced) or admin (organization).
 - **When it fits:** project scope for anything tied to a repo or needed by CI and cloud runs, because Claude Code cloud sessions ignore `~/.claude/skills/`. User scope for personal workflow.
 - **How:** one canonical copy, symlinked into the other lead's root ([Portability](#portability)).
-- **Trade-off:** Codex's `$skill-installer` writes to the deprecated `$CODEX_HOME/skills`, invisible to Claude Code. Vercel's `npx skills` writes to `.codex/skills/`, which contradicts Codex's documented `.agents/skills` root ([third-party write-up](https://codex.danielvaughan.com/2026/05/31/codex-cli-vercel-skills-cli-npx-skills-open-agent-skills-ecosystem/)).
+- **Trade-off:** Codex's `$skill-installer` writes to the deprecated `$CODEX_HOME/skills`, invisible to Claude Code.
 
 ## Practices
 
@@ -155,11 +154,11 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
     - Evidence: [Empirical] ([SkillsBench](https://arxiv.org/html/2602.12670v1)); [Advisory] ([agentskills.io best practices](https://agentskills.io/skill-creation/best-practices.md)).
 11. **Keep the library small and curated.**
     - Why: both catalogs are 1–2% of context and truncate silently; with Codex's 8,000-character floor, about 16 skills at 500 characters fill it. Two to three skills per task gave +18.6 pp, four or more +5.9 pp.
-    - How: one coherent job per skill. Prune never-invoked skills (`/skill-doctor` in Claude Code). Turn rarely needed ones into user-invoked skills. Start new skills in a sandbox folder and promote them by PR.
-    - Evidence: [Vendor] ([Codex build skills](https://learn.chatgpt.com/docs/build-skills), [Claude Code skills](https://code.claude.com/docs/en/skills)); [Empirical] skills per task, not catalog size ([SkillsBench](https://arxiv.org/html/2602.12670v1)); [Practitioner] ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)).
+    - How: one coherent job per skill. Prune never-invoked skills (`/skill-doctor` in Claude Code). Turn rarely needed ones into user-invoked skills.
+    - Evidence: [Vendor] ([Codex build skills](https://learn.chatgpt.com/docs/build-skills), [Claude Code skills](https://code.claude.com/docs/en/skills)); [Empirical] skills per task, not catalog size ([SkillsBench](https://arxiv.org/html/2602.12670v1)).
 12. **Move rules that must hold every time into hooks.**
     - Why: skills are context and can drop out after compaction.
-    - How: a regular [hook](hooks.md) in both leads. Claude Code also supports hooks scoped to a skill while it is active (for example a `/careful` skill that blocks destructive commands).
+    - How: a regular [hook](hooks.md) in both leads. Claude Code also supports hooks scoped to a skill while it is active.
     - Evidence: [Vendor] "move rules into hooks if they must hold every time" ([Claude Code skills](https://code.claude.com/docs/en/skills)).
 
 ## Security
@@ -177,7 +176,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 - Read every file of a third-party skill, not only `SKILL.md`. Search for hidden directives ("do not mention"), remote fetch-and-run, base64, network and credential access in scripts.
 - Check Claude Code `allowed-tools`, `hooks` and `` !`cmd` ``; check Codex `agents/openai.yaml` `dependencies.tools`.
-- Pin by commit or hash and re-review on every update. [Advisory] "Hash-pin installed skills and monitor for unauthorized modifications" ([OWASP AST01](https://owasp.github.io/www-project-agentic-skills-top-10/ast01)).
+- Pin by commit or hash and re-review on every update. [Advisory] OWASP: "Hash-pin installed skills" and alert on modifications ([OWASP AST01](https://owasp.github.io/www-project-agentic-skills-top-10/ast01)).
 - Claude Code: `allowManagedPermissionRulesOnly` ignores skill `allowed-tools`; `disableSkillShellExecution` turns off `` !`cmd` ``. Codex: `approval_policy.granular.skill_approval` gates skill scripts.
 - Evaluate untrusted skills in a container or CI runner; running `claude plugin eval` "is the same trust decision as `claude --plugin-dir`" ([Claude Code plugin evals](https://code.claude.com/docs/en/plugin-evals)).
 - No vendor signing or provenance mechanism for skills exists in either lead.
@@ -189,7 +188,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - **Triggering, headless:** `claude -p "$query" --output-format json` and look for a `Skill` tool use; `codex exec --json` traces for Codex. Which Codex event marks an implicit skill load is undocumented.
 - **Claude Code evals:** `claude plugin eval` runs case directories with `tool_used`, `regex`, `llm` and `baseline` graders, three runs per arm, and reports `Δ` against a no-plugin arm; `--threshold` fails CI below it ([Claude Code plugin evals](https://code.claude.com/docs/en/plugin-evals)).
 - **Codex evals:** 10–20 prompts in a CSV covering explicit, implicit and should-not-trigger cases; traces from `codex exec --json`; a rubric via a second `codex exec --output-schema` ([OpenAI eval blog](https://developers.openai.com/blog/eval-skills)).
-- **In real use:** `/skill-doctor` reports context cost and never-invoked skills; a `PreToolUse` hook can log skill invocations.
+- **In real use:** `/skill-doctor` reports context cost and never-invoked skills.
 
 Checklist:
 
@@ -277,10 +276,8 @@ External:
 - https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals
 - https://arxiv.org/html/2602.12670v1
 - https://simonwillison.net/2025/Oct/16/claude-skills/
-- https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md
 - https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md
 - https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals
-- https://codex.danielvaughan.com/2026/05/31/codex-cli-vercel-skills-cli-npx-skills-open-agent-skills-ecosystem/
 - https://arxiv.org/abs/2601.10338
 - https://arxiv.org/abs/2602.06547
 - https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub

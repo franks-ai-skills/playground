@@ -36,7 +36,7 @@ Empirical data:
 - [Empirical] Version conflict in the Google study: the blog reports 180 configurations, 4 benchmarks, predictive model R² = 0.513, 87% correct architecture choice on unseen configurations — [Google Research blog](https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/); the arXiv listing (later version) reports 260 configurations, 6 benchmarks, cross-validated R² = 0.373, 87% on unseen tasks, and notes that systems improving monotonically with team size on static benchmarks behave differently on tasks with "sustained environmental interaction, where coordination overhead and error propagation dynamics dominate" — [arXiv 2512.08296](https://arxiv.org/abs/2512.08296)
 - [Empirical] MAST, "Why Do Multi-Agent LLM Systems Fail?" (Cemri et al., UC Berkeley; v1 March 2025, v3 Oct 26, 2025): 1,600+ annotated traces from 7 multi-agent frameworks, 14 failure modes in 3 categories (system design issues, inter-agent misalignment, task verification), inter-annotator κ = 0.88; "performance gains on popular benchmarks are often minimal" relative to single-agent baselines — [arXiv 2503.13657](https://arxiv.org/abs/2503.13657)
 - [Empirical] Yin et al. (Nov 2025), 7 agent frameworks on software development, vulnerability detection and program repair: the multi-agent AgentOrchestra had "the longest trajectories and the most correction attempts due to coordination overhead"; overall performance "moderate" — [arXiv 2511.00872](https://arxiv.org/abs/2511.00872)
-- [Empirical] "Long Live the Librarian!" (POSTECH, arXiv 2605.27787, May 28, 2026): in multi-agent SWE systems, agents "repeatedly explore overlapping repository regions", inflating output tokens, which cost "30 to 1,000 times more energy than an input or cached token"; a persistent shared search subagent cut per-episode GPU energy by up to 25% "while preserving task performance" — [ChatPaper summary of arXiv 2605.27787](https://chatpaper.com/chatpaper/paper/287528)
+- [Empirical] "Long Live the Librarian!" (Cho et al., arXiv 2605.27787, submitted May 27, 2026): in multi-agent SWE systems, agents "repeatedly re-explore overlapping repository regions", inflating output tokens, which cost "30 to 1,000 times more energy than an input or cached token"; a persistent search sub-agent cut per-episode GPU energy by 11–30% while preserving task performance — [arXiv 2605.27787](https://arxiv.org/abs/2605.27787)
 
 Practitioner opinion:
 - [Practitioner] Cognition (older, June 12, 2025), "Don't build multi-agents": two principles, "Share context, and share full agent traces, not just individual messages" and "Actions carry implicit decisions, and conflicting decisions carry bad results"; the Flappy Bird example (one subagent built a Super Mario style background, another a mismatched bird); recommends a "single-threaded linear agent" plus a history-compression model for long tasks; notes Claude Code then used subagents only to answer questions, not to write code in parallel — [Cognition: Don't build multi-agents](https://cognition.com/blog/dont-build-multi-agents)
@@ -48,9 +48,8 @@ Practitioner opinion:
 - Token cost is the first-order trade-off. Because both harnesses bill each subagent's own context, a fan-out of N read-heavy subagents costs roughly N full explorations plus the merged summaries; this is acceptable only when the task is valuable or the main context would otherwise overflow.
 
 ### Gaps
-- No controlled study found that compares Claude Code or Codex subagent use against single-agent runs on a coding benchmark (SWE-bench or similar) with token accounting. A search snippet claimed "multi-agent teams score 72.2% on SWE-bench Verified, a 7.2% improvement"; no primary source was found, so it is not used.
+- No controlled study found that compares Claude Code or Codex subagent use against single-agent runs on a coding benchmark (SWE-bench or similar) with token accounting.
 - MAST category percentages (share of failures per category) were not visible in the abstract fetched; not reported here.
-- The Google blog's "capability saturation" threshold (a single-agent baseline above which adding agents stops helping) is commonly quoted but was not confirmed in the fetched text.
 
 ## 2. Designing subagent definitions
 
@@ -199,7 +198,7 @@ Both leads ship a general worker and a read-only explorer, which covers most del
 - [Vendor] Claude Code: combined custom descriptions above 15,000 tokens trigger a warning; descriptions sit in context every session — [Claude Code: subagents](https://code.claude.com/docs/en/sub-agents)
 - [Vendor] OpenAI (older, 2025): overlapping tools (and by analogy overlapping agents) degrade selection more than raw count — [OpenAI: practical guide (PDF)](https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf)
 - [Vendor] Claude Code agent teams: "Three focused teammates often outperform five scattered ones" — [Claude Code: agent teams](https://code.claude.com/docs/en/agent-teams)
-- [Empirical] Redundant re-exploration of overlapping repo regions is a measured cost driver in multi-agent SWE systems; a shared persistent search agent reduced it — [ChatPaper summary of arXiv 2605.27787](https://chatpaper.com/chatpaper/paper/287528)
+- [Empirical] Redundant re-exploration of overlapping repo regions is a measured cost driver in multi-agent SWE systems; a persistent search sub-agent reduced it — [arXiv 2605.27787](https://arxiv.org/abs/2605.27787)
 - [Practitioner] Cognition (2026): code search and web search work as "readonly subagents" that "mostly resemble tool calls rather than true multi-agent collaboration" — [Cognition: Multi-Agents: What's Actually Working](https://cognition.com/blog/multi-agents-working)
 
 ### Inferences
@@ -227,7 +226,7 @@ Multi-agent runs are non-deterministic and fail in compounding ways, so they nee
 - [Vendor] Claude Code: deterministic gates (Stop hook running tests, `/goal` condition) let unattended runs finish correctly; "If you can't verify it, don't ship it" — [Claude Code: best practices](https://code.claude.com/docs/en/best-practices)
 - [Vendor] Claude Code agent teams: "Monitor and steer"; letting a team run unattended too long "increases the risk of wasted effort"; known limitations include lagging task status and leads stopping early — [Claude Code: agent teams](https://code.claude.com/docs/en/agent-teams)
 - [Vendor] Claude Code fan-out: pilot on 2-3 items, refine the prompt, then run on all — [Claude Code: best practices](https://code.claude.com/docs/en/best-practices)
-- [Empirical] SWE-Effi-style evaluation argues that leaderboards measuring only resolve rate ignore resources; evaluate accuracy together with tokens and time — [alphaXiv: SWE-Effi (arXiv 2509.09853)](https://alphaxiv.org/abs/2509.09853)
+- [Empirical] SWE-Effi (Fan et al.): leaderboards "focus solely on solution accuracy"; it defines effectiveness as the balance of accuracy and resources (tokens, time), so evaluate accuracy together with tokens and time — [arXiv 2509.09853](https://arxiv.org/abs/2509.09853)
 
 ### Inferences
 - Minimum observability for both leads: a `SubagentStart`/`SubagentStop` hook that logs agent type, start/stop time, and (where available) token use and result size; keep transcripts of subagent runs; record which delegation message produced which result.

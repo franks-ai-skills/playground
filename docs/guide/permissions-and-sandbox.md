@@ -150,7 +150,7 @@ Both parts are on one page because both leads couple them: Codex picks its appro
 9. **Use automated reviewers on top of a sandbox, not instead of one.**
    - Why: Anthropic measured the auto-mode classifier at 0.4% false positives on real traffic (n=10,000), 17% false negatives on real overeager actions (n=52), 5.7% on synthetic exfiltration (n=1,000). Codex: auto-review "is not a deterministic security guarantee". Adaptive attacks bypassed 12 published injection defenses at "above 90% for most" (2025).
    - How: Enable auto mode or auto-review only with the sandbox on; write a Codex `[auto_review].policy` that names your sensitive systems.
-   - Disagreement: Press reports a 13.6% human catch rate versus 89% for the classifier ([letsdatascience](https://letsdatascience.com/news/anthropic-enables-auto-mode-for-claude-code-2be9e2b6)); not found in the primary post. Willison calls 95% capture "very much a failing grade" in security.
+   - Disagreement: Willison calls 95% capture "very much a failing grade" in security.
    - Evidence: [Empirical] [Anthropic engineering, auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode); [Vendor] [Codex auto-review](https://learn.chatgpt.com/codex/sandboxing/auto-review); [Empirical] [Willison on "The Attacker Moves Second" (2025-11-02)](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/).
 
 10. **Run bypass modes only inside outer isolation, and lock them where not wanted.**
@@ -173,7 +173,7 @@ Both parts are on one page because both leads couple them: Codex picks its appro
 
 | Threat | Advisory or source | Mitigation |
 | --- | --- | --- |
-| Prompt injection steers the agent (OWASP ASI01) | Lethal trifecta, Rule of Two (2025); OWASP Agentic Top 10, Dec 2025, from secondary summaries ([Teleport](https://goteleport.com/blog/owasp-top-10-agentic-applications)) | Cut egress or secrets ([practice 11](#practices)) |
+| Prompt injection steers the agent | Lethal trifecta, Rule of Two (2025) | Cut egress or secrets ([practice 11](#practices)) |
 | Exfiltration through auto-approved "safe" commands | CVE-2025-55284: Claude Code before 1.0.4 auto-approved `ping`, `nslookup`, `dig`; secrets left as DNS subdomains ([GitLab](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/)) | Sandbox network isolation |
 | Model-chosen cwd widens the sandbox | CVE-2025-59532: Codex CLI 0.2.0 to 0.38.0; fixed in 0.39.0 ([NVD](https://nvd.nist.gov/vuln/detail/CVE-2025-59532)) | Keep Codex updated |
 | Malware runs the CLI with bypass flags | s1ngularity / Nx npm compromise, 2025-08-26 ([Wiz](https://wiz.io/blog/s1ngularity-supply-chain-attack), [StepSecurity](https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware)) | `disableBypassPermissionsMode`; Codex `allowed_sandbox_modes` |
@@ -244,12 +244,11 @@ Traps:
 
 ## Open questions
 
-- **Independent evidence.** All approval-fatigue and classifier numbers are vendor-measured; the 13.6% / 89% figure has no primary source.
+- **Independent evidence.** All approval-fatigue and classifier numbers are vendor-measured.
 - **Codex `never`:** what happens to a request that needs approval is not documented.
 - **Codex default read scope** for legacy sandbox modes is not documented.
 - **Sandbox strength.** No independent evaluation of Seatbelt or bubblewrap for coding agents and no escape benchmark found.
 - **Conformance.** Neither lead ships a self-check for permission and sandbox posture.
-- **OWASP Agentic Top 10** mitigations come from secondary summaries.
 
 ## Sources
 
@@ -259,5 +258,5 @@ Traps:
 - Anthropic engineering: [auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode), [sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)
 - Codex: [agent approvals & security](https://learn.chatgpt.com/codex/agent-approvals-security), [rules](https://learn.chatgpt.com/codex/rules), [sandboxing](https://learn.chatgpt.com/codex/sandboxing), [auto-review](https://learn.chatgpt.com/codex/sandboxing/auto-review), [cloud internet access](https://learn.chatgpt.com/codex/cloud/internet-access), [managed configuration](https://learn.chatgpt.com/codex/enterprise/managed-configuration)
 - OpenCode: [permissions](https://opencode.ai/docs/permissions/)
-- Practitioner and research: [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config), [Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), [Willison, agentic loops](https://simonwillison.net/2025/Sep/30/designing-agentic-loops/), [Willison, injection papers](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/), [Meta, Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/), [letsdatascience](https://letsdatascience.com/news/anthropic-enables-auto-mode-for-claude-code-2be9e2b6), [Teleport on OWASP](https://goteleport.com/blog/owasp-top-10-agentic-applications)
+- Practitioner and research: [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config), [Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), [Willison, agentic loops](https://simonwillison.net/2025/Sep/30/designing-agentic-loops/), [Willison, injection papers](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/), [Meta, Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/)
 - Advisories: [GitLab CVE-2025-55284](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/), [NVD CVE-2025-59532](https://nvd.nist.gov/vuln/detail/CVE-2025-59532), [Wiz s1ngularity](https://wiz.io/blog/s1ngularity-supply-chain-attack), [StepSecurity Nx](https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware), [AWS-2025-015](https://aws.amazon.com/security/security-bulletins/AWS-2025-015/)

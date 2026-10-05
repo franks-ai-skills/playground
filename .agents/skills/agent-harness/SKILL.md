@@ -59,7 +59,8 @@ one harness has. Check it before calling something portable.
    best-practices page and report each item that fails, with the page
    section that explains it.
 6. **Keep the knowledge base current.** When a fact turns out to be
-   outdated or wrong, fix the vendor page with the new source and date,
+   outdated or wrong, fix the vendor page with the new source and date
+   (the source rules in `AGENTS.md` apply),
    then every page that repeats it (`docs/concepts/`,
    `docs/best-practices/`, `docs/guide/`, `docs/overview.md`). Mention
    the update in the answer.

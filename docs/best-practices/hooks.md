@@ -156,7 +156,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 ### 6. Keep synchronous hooks fast with explicit timeouts and narrow matchers
 
 - **Why:** Synchronous hooks sit on the critical path. Defaults are long: CC 600 s for `command`, `http` and `mcp_tool` (30 s on `UserPromptSubmit`; `prompt` 30 s; `agent` 60 s; `SessionEnd` hooks share 1.5 s, raisable to 60 s); Codex 600 s (`SessionEnd`/`Interrupt` 1 s, max 3 s). "A timed-out `command`, `http`, or `mcp_tool` hook doesn't block the tool call", so a hang degrades to fail-open. Codex MCP hook "Errors, missing servers, and unavailable tools don't block the operation." (A CC Agent SDK callback hook on `PreToolUse` that times out does block.) "Without a matcher, a hook fires on every occurrence of its event."
-- **How:** Set `timeout` explicitly; for `PreToolUse` and `PermissionRequest` gates a small value such as 5 to 10 s, with gate logic that does not depend on slow network calls (inference; no vendor numbers). Filter in the matcher, not inside the script, because process spawn per tool call is the dominant cost for trivial checks (inference). CC: use the `if` field, which filters "by tool name and arguments together, so the hook process only spawns when the tool call matches". Portable: narrow matcher plus early `exit 0`. Formatters touch only the edited file. All matching handlers run concurrently in both leads; "one hook can't prevent another matching hook from starting" (Codex).
+- **How:** Set `timeout` explicitly and keep it short for `PreToolUse` and `PermissionRequest` gates, with gate logic that does not depend on slow network calls (inference). Filter in the matcher, not inside the script, so the hook process is not spawned for calls it ignores (inference). CC: use the `if` field, which filters "by tool name and arguments together, so the hook process only spawns when the tool call matches". Portable: narrow matcher plus early `exit 0`. Formatters touch only the edited file. All matching handlers run concurrently in both leads; "one hook can't prevent another matching hook from starting" (Codex).
 - **Evidence:** [Vendor] [CC hooks guide](https://code.claude.com/docs/en/hooks-guide); [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks); [Vendor] [Codex hooks](https://learn.chatgpt.com/docs/hooks). No published latency measurements exist for either lead.
 
 ### 7. Use async hooks for observation only
@@ -195,9 +195,9 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 
 ### 11. Match the capability, not a single tool
 
-- **Why:** In anthropics/claude-code#29709 (2026-03-01, closed as not planned), after a `PreToolUse:Edit` hook blocked edits three times, the agent wrote the file with Python through `Bash`: "Any PreToolUse:Edit|Write hook can be trivially bypassed this way." Codex: "Some specialized tool paths can opt out of the default hook path", and hosted tools such as `WebSearch` are never hooked. OpenCode issue #5894 reports that `tool.execute.before` does not intercept subagent tool calls (from a search snippet; status unverified).
+- **Why:** In anthropics/claude-code#29709 (2026-03-01, closed as not planned), after a `PreToolUse:Edit` hook blocked edits three times, the agent wrote the file with Python through `Bash`: "Any PreToolUse:Edit|Write hook can be trivially bypassed this way." Codex: "Some specialized tool paths can opt out of the default hook path", and hosted tools such as `WebSearch` are never hooked.
 - **How:** For anything that matters for security, enforce at the capability level with a deny rule or the sandbox. If a hook is used, match every tool that grants the capability (`Edit|Write|Bash|mcp__.*`) and accept that Bash parsing is best-effort; CC's `if` filter is best-effort too. Use command-string blocklists for steering against mistakes only; aliases, `python -c`, base64 and written-then-run scripts get around them (inference).
-- **Evidence:** [Practitioner] [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709); [Vendor] [Codex hooks](https://learn.chatgpt.com/docs/hooks); [Practitioner] [anomalyco/opencode#5894](https://github.com/anomalyco/opencode/issues/5894) (unverified); [Practitioner] "Guardrails, not walls" ([trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)).
+- **Evidence:** [Practitioner] [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709); [Vendor] [Codex hooks](https://learn.chatgpt.com/docs/hooks); [Practitioner] "Guardrails, not walls" ([trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)).
 
 ### 12. Put non-negotiable hooks in managed settings
 
@@ -216,7 +216,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 - **Why:** Both leads share the `hooks` JSON shape and eleven event names, but differ in tool input and paths. Codex `apply_patch` puts the patch in `tool_input.command`, so a hook keyed on `tool_input.file_path` sees nothing in Codex. CC `${CLAUDE_PROJECT_DIR}` stays at the session's start root after entering a worktree, while `cwd` follows Claude.
 - **How:** Keep the script in the repository and register it in `.claude/settings.json` and `.codex/hooks.json`. Resolve its path from the git root, as Codex recommends: `/usr/bin/python3 "$(git rev-parse --show-toplevel)/.codex/hooks/pre_tool_use_policy.py"`. Matchers: `Bash`, `Edit|Write`, `mcp__<server>__.*`; Codex maps `apply_patch` to `Edit`/`Write` and unified exec to `Bash`. Portable script skeleton (inference from both contracts):
   1. `input=$(cat)`; read `hook_event_name` and `tool_name`.
-  2. Target file: `jq -r '.tool_input.file_path // .tool_input.path // empty'`; if empty and `tool_name == "apply_patch"`, parse `*** Update File:` and `*** Add File:` lines from `.tool_input.command` (patch format inferred, not documented on the hooks page).
+  2. Target file: `jq -r '.tool_input.file_path // .tool_input.path // empty'`; if empty and `tool_name == "apply_patch"`, the target paths are inside the patch text in `.tool_input.command`, whose format the hooks page does not specify.
   3. Bash: `.tool_input.command` (same field in both leads).
   4. Decide; exit 0 silently, or print the reason to stderr and exit 2.
   5. On `Stop`, always print JSON on exit 0.
@@ -262,7 +262,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 | Same class through MCP config and endpoints | (2025) CVE-2025-59536 (MCP servers started before trust) and CVE-2026-21852 (API key exfiltration via project config, published 2026-01-21), same research ([Check Point Research](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)); (2025) Codex CVE-2025-61260: repository `.env` `CODEX_HOME=./.codex` plus `.codex/config.toml` MCP entries made Codex "invoke the declared command/args immediately at startup" ([Check Point Research](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)) | See [Configuration security](configuration.md#security) |
 | Harness-driven Git operations run repository Git hooks | CVE-2026-19590 (published 2026-09-01): Codex Desktop "could execute attacker-controlled Git hooks because automated Git operations trusted the repository's local core.hooksPath setting... The hook executes outside Codex's command sandbox, without user approval" ([NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-19590)). These are Git hooks, not agent hooks, but an agent or hook that runs `git commit` triggers them | Keep Codex updated; treat Git hooks in untrusted repositories as untrusted code (inference) |
 | Headless runs execute repository hooks | Documented CC behavior for `-p` and SDK ([CC hooks reference](https://code.claude.com/docs/en/hooks#workspace-trust)) | `--bare`, `disableAllHooks` via `--settings`; Codex per-hash trust without the bypass flag |
-| Hook bypass by switching tools | [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709); OpenCode subagent bypass [#5894](https://github.com/anomalyco/opencode/issues/5894) (unverified) | [Practice 11](#11-match-the-capability-not-a-single-tool) |
+| Hook bypass by switching tools | [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709) | [Practice 11](#11-match-the-capability-not-a-single-tool) |
 | Unhooked tool paths | Codex hosted tools such as `WebSearch` and some specialized tool paths ([Codex hooks](https://learn.chatgpt.com/docs/hooks)) | Network and sandbox limits; Codex web search `cached` mode |
 | A mod or project setting overrides a hook | CC mods handling `tool.check`; project `disableAllHooks` ([CC hooks guide](https://code.claude.com/docs/en/hooks-guide)) | Managed hooks plus `allowManagedHooksOnly` |
 | Prompt injection works around hooks | "Hooks are not a security boundary -- a prompt injection can work around them. They are structured prompt injection at opportune times" ([trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)) | Sandbox and deny rules for hard limits |
@@ -307,7 +307,6 @@ No advisory specific to the Codex hooks system (as distinct from its MCP config 
 - **Codex hook decisions vs approval policy and sandbox mode:** interaction is not documented beyond `permission_mode` being passed in the input.
 - **Codex debug log:** no hook execution log comparable to CC's.
 - **CC per-hook trust:** none documented; trust is per workspace only.
-- **OpenCode #5894** status is unverified.
 - **Evidence gaps:** no data on which hook use cases are most common or how much they help, no latency measurements, no comparison of bypass rates between hooks and rule or sandbox controls, and no Codex-published hooks best-practices page.
 
 ## Sources
@@ -326,7 +325,6 @@ No advisory specific to the Codex hooks system (as distinct from its MCP config 
 - [OpenCode plugins](https://opencode.ai/docs/plugins/)
 - [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)
 - [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709)
-- [anomalyco/opencode#5894](https://github.com/anomalyco/opencode/issues/5894)
 - [Galster et al., "Configuring Agentic AI Coding Tools: An Exploratory Study", arXiv:2602.14690](https://arxiv.org/abs/2602.14690)
 - [Check Point Research: CC project files, GHSA-ph6w-f82w-28w6, CVE-2025-59536, CVE-2026-21852](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
 - [Check Point Research: Codex CLI CVE-2025-61260](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)

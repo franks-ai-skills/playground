@@ -6,7 +6,7 @@ Commands are folded into [skills](skills.md) and are not a separate generalized 
 
 | Dimension | Claude Code | Codex | OpenCode |
 | --- | --- | --- | --- |
-| Status of user-defined commands | Legacy; merged into skills in v2.1.3; still work ([commands][cc-commands]) | Custom prompts deprecated; possibly already removed (unverified) ([commands][cx-commands]) | First-class ([commands][oc-commands]) |
+| Status of user-defined commands | Legacy; merged into skills in v2.1.3; still work ([commands][cc-commands]) | Custom prompts deprecated ([commands][cx-commands]) | First-class ([commands][oc-commands]) |
 | File location | `.claude/commands/<name>.md`; subdirectory → `/dir:name` ([commands][cc-commands]) | Top-level `.md` in `~/.codex/prompts/`; user scope only, not shareable through the repo ([commands][cx-commands]) | `.opencode/commands/`, `~/.config/opencode/commands/`, or the `command` config key ([commands][oc-commands]) |
 | Format | Skill frontmatter minus `name` and `paths` ([commands][cc-commands]) | `description`, `argument-hint` ([commands][cx-commands]) | `description`, `agent`, `subtask`, `model`, `variant`; body is the template ([commands][oc-commands]) |
 | Arguments | `$ARGUMENTS`, `$N` (0-based), named ([commands][cc-commands]) | `$1`–`$9`, `$ARGUMENTS`, `KEY=value` placeholders ([commands][cx-commands]) | `$ARGUMENTS`, `$1`, `$2`, … ([commands][oc-commands]) |
@@ -42,7 +42,7 @@ Why fold rather than keep a separate concept:
 - Write new procedures as skills and follow the [skills portability rules](skills.md#portability).
 - Migrate a Claude Code `.claude/commands/<name>.md` file to a skill directory `<name>/SKILL.md`, placed with the canonical-copy-plus-symlink layout in [skills.md](skills.md#directory-layout). Add `disable-model-invocation: true` for Claude Code and `agents/openai.yaml` with `policy.allow_implicit_invocation: false` for Codex.
 - Migrate a Codex `~/.codex/prompts/<name>.md` the same way. Codex skills do not substitute `$1` or `KEY=value`, so instructions that rely on placeholders need rewriting ([commands][cx-commands]).
-- Trap: Claude Code docs number arguments from `$0`. Older tutorials that used `$1` for the first argument may now address the second; the numbering change itself is unverified ([commands][cc-commands]).
+- Trap: Claude Code docs number arguments from `$0` ([commands][cc-commands]), while Codex prompts and OpenCode start at `$1` ([commands][cx-commands], [commands][oc-commands]).
 - Trap: in OpenCode a command with the same name as a skill wins the slash name, and the skill is not registered as a command ([commands][oc-commands]).
 
 ## Dropped from the generalization
@@ -50,7 +50,7 @@ Why fold rather than keep a separate concept:
 | Feature | Vendor | Reason |
 | --- | --- | --- |
 | Custom command files (`.claude/commands/`) | Claude Code | Legacy form of skills. |
-| Custom prompts (`~/.codex/prompts/`, `/prompts:<name>`) | Codex | Deprecated; possibly removed. |
+| Custom prompts (`~/.codex/prompts/`, `/prompts:<name>`) | Codex | Deprecated. |
 | Argument placeholders (`$ARGUMENTS`, `$N`, `KEY=value`) | Claude Code, Codex (prompts only), OpenCode | Codex skills, the surviving Codex mechanism, have no substitution. |
 | `` !`cmd` `` shell injection and `@path` inclusion in templates | Claude Code, OpenCode | No Codex counterpart. |
 | `agent` / `subtask` routing of a command to a subagent | OpenCode | No Codex counterpart; Claude Code's analogue (`context: fork`) is Claude-only as well. |

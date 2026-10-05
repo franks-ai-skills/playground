@@ -6,7 +6,7 @@ Commands are folded into [skills](skills.md) and are not a separate generalized 
 
 | Dimension | Claude Code | Codex | OpenCode |
 | --- | --- | --- | --- |
-| Status of user-defined commands | Legacy, still work ([CC][cc-commands]) | Custom prompts deprecated, possibly removed (unverified) ([Codex][cx-commands]) | First-class ([OC][oc-commands]) |
+| Status of user-defined commands | Legacy, still work ([CC][cc-commands]) | Custom prompts deprecated ([Codex][cx-commands]) | First-class ([OC][oc-commands]) |
 | Location | `.claude/commands/<name>.md` ([CC][cc-commands]) | `~/.codex/prompts/`, user scope only ([Codex][cx-commands]) | `.opencode/commands/`, `~/.config/opencode/commands/`, `command` config key ([OC][oc-commands]) |
 | Arguments | `$ARGUMENTS`, `$N` (0-based), named ([CC][cc-commands]) | `$1`–`$9`, `$ARGUMENTS`, `KEY=value` ([Codex][cx-commands]) | `$ARGUMENTS`, `$1`, `$2`, … ([OC][oc-commands]) |
 | Successor for user-only invocation | Skill with `disable-model-invocation: true` ([CC][cc-skills]) | Skill with `policy.allow_implicit_invocation: false` ([Codex][cx-commands]) | Command file ([OC][oc-commands]) |
@@ -41,7 +41,7 @@ Do not use it, and use instead:
 - Write new procedures as skills and follow the [skills portability rules](skills.md#portability).
 - Migrate `.claude/commands/<name>.md` or `~/.codex/prompts/<name>.md` to `<name>/SKILL.md` in the shared skill layout. Add `disable-model-invocation: true` and `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Codex skills do not substitute `$1` or `KEY=value`. Rewrite the body to read inputs from the user's message.
-- Claude Code numbers arguments from `$0`; older tutorials that used `$1` for the first argument may now address the second ([CC][cc-commands]).
+- Claude Code numbers arguments from `$0` ([CC][cc-commands]); Codex prompts and OpenCode start at `$1` ([Codex][cx-commands], [OC][oc-commands]).
 - In OpenCode a command with the same name as a skill wins the slash name ([OC][oc-commands]).
 
 ## Dropped from the generalization

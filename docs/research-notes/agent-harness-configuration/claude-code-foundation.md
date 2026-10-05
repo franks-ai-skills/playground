@@ -247,7 +247,7 @@ Scalar keys override; list keys such as `permissions.allow` merge across scopes.
 Source: [SREF](https://code.claude.com/docs/en/settings-reference)
 
 ### Inferences
-- Precedence differs between kinds of key, which is a common source of confusion. For scalar keys, project settings beat user settings, so a user `false` cannot override a project `true` for, say, `enabledPlugins` (use `settings.local.json` instead). For permission rules, deny beats allow regardless of which scope each came from.
+- Precedence differs between kinds of key. For scalar keys, project settings beat user settings, so a user `false` cannot override a project `true` for, say, `enabledPlugins` (use `settings.local.json` instead). For permission rules, deny beats allow regardless of which scope each came from.
 - Because so many keys are restricted to user or managed scope, a team cannot fully enforce behavior from a committed `.claude/settings.json`. Real enforcement needs managed settings.
 
 ### Gaps
@@ -491,7 +491,7 @@ Source: [MCP](https://code.claude.com/docs/en/mcp)
 ```
 
 ### Inferences
-- "Local scope" for MCP (`~/.claude.json`) is not the same as local settings (`.claude/settings.local.json`); the docs flag this explicitly. It is a frequent source of confusion.
+- "Local scope" for MCP (`~/.claude.json`) is not the same as local settings (`.claude/settings.local.json`); the docs flag this explicitly.
 - With tool search on by default, the per-server context cost is mostly the server instructions and tool names. `alwaysLoad` should be reserved for a few hot tools.
 
 ### Gaps
@@ -694,7 +694,7 @@ When explaining code, start with a Mermaid diagram...
 ```
 
 ### Inferences
-- Model aliases differ by provider (Bedrock and Vertex `sonnet` = Sonnet 4.5, Foundry `opus` = Opus 4.6). Docs and configs written for the Anthropic API may silently select older models on third-party providers unless `ANTHROPIC_DEFAULT_*_MODEL` pins them.
+- Model aliases differ by provider (Bedrock and Vertex `sonnet` = Sonnet 4.5). Docs and configs written for the Anthropic API may silently select older models on third-party providers unless `ANTHROPIC_DEFAULT_*_MODEL` pins them.
 - An output style replaces the coding instructions unless `keep-coding-instructions: true` is set. It is therefore a heavier lever than CLAUDE.md, suited to role changes rather than project conventions.
 
 ### Gaps

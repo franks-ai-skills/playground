@@ -106,7 +106,7 @@ You are a code reviewer. Report issues; do not edit files.
 
 ## Limits and gotchas
 
-- **`description` required vs optional (contradiction).** The docs say `description` is required; the schema has it optional. It is probably enforced only for agents meant to be selected automatically (subagents) (inference from the notes).
+- **`description` required vs optional (contradiction).** The docs say `description` is required; the schema has it optional.
 - **Default `mode` is `all`**, so an agent without `mode` is usable both as primary and as subagent.
 - **`permission.task` does not restrict the user.** Users can still `@`-invoke denied subagents.
 - **Nesting changed in v1.18.2:** `subagent_depth` defaults to `1`, so subagents cannot spawn subagents unless you raise it ([REL v1.18.2](https://github.com/anomalyco/opencode/releases/tag/v1.18.2)).

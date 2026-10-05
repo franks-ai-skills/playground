@@ -82,7 +82,7 @@ Running Codex from `<repo>/services/payments` loads `~/.codex/AGENTS.md`, then `
 - **Gap: truncation behavior.** Whether Codex cuts a file in the middle or drops whole files is not documented beyond "stops adding files".
 - **Inference: the nearest files are dropped first.** Concatenation runs root-first, so when the cap is hit, the files nearest the cwd are the ones left out. Large root files therefore push out more specific guidance.
 - **Inference: override replaces, it does not add.** Each directory contributes at most one file, so `AGENTS.override.md` replaces that directory's `AGENTS.md`. Across directories, files accumulate.
-- **Gap: project trust.** The docs gate project `.codex/` config, hooks and rules on project trust (see [configuration.md](configuration.md)). They say nothing about `AGENTS.md` and trust. Inference: untrusted projects may still load `AGENTS.md`; this is not confirmed.
+- **Gap: project trust.** The docs gate project `.codex/` config, hooks and rules on project trust (see [configuration.md](configuration.md)). They say nothing about `AGENTS.md` and trust.
 - `instructions` in `config.toml` is reserved and has no effect yet ([Config reference](https://developers.openai.com/codex/config-reference)).
 - Changes need a restart (or a new TUI session) because discovery runs once per run ([AGENTS guide](https://developers.openai.com/codex/guides/agents-md)).
 

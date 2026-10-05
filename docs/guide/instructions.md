@@ -53,7 +53,7 @@ An instruction file is the right tool for short, stable facts that every session
 | The agent needs build, test and lint commands with flags | Loaded every session; both vendors list these items first ([Claude Code best practices](https://code.claude.com/docs/en/best-practices), [Codex best practices](https://learn.chatgpt.com/codex/learn/best-practices)) |
 | A convention differs from the language or framework default | The agent cannot infer it from the code |
 | There are gotchas, boundaries ("never touch X"), or a definition of "done" with a check the agent can run | "Without a check it can run, 'looks done' is the only signal available" ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)) |
-| Knowledge the model lacks must always apply (for example framework APIs released after training) | A compressed 8 KB docs index in `AGENTS.md` scored 100% vs 53–79% for a skill ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)) |
+| Knowledge the model lacks must always apply (for example framework APIs released after training) | A compressed 8 KB docs index in `AGENTS.md` scored 100% vs at most 79% for a skill (53% baseline without docs) ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)) |
 | Another mechanism needs a trigger, for example "use the `reviewer` agent after edits" | The instruction file carries the trigger; the mechanism carries the work |
 
 | Do not use it when | Use instead | Cost or risk of using an instruction file |
@@ -93,8 +93,8 @@ An instruction file is the right tool for short, stable facts that every session
 ### Map plus linked docs
 
 - **What:** a short root file that works as a table of contents into a structured `docs/` directory, read on demand.
-- **When it fits:** large or long-lived projects where one big file has started to rot.
-- **How:** plain-sentence pointers with a trigger ("Before changing the billing schema, read docs/billing.md") work in every harness. OpenAI's harness team replaced "one big AGENTS.md" with about 100 lines pointing into `docs/` [Practitioner] ([summary of OpenAI post](https://2ooks.github.io/knowledge-base/summaries/openai-harness-engineering.html)). Codex: "reference task-specific markdown files for specialized guidance" ([Codex best practices](https://learn.chatgpt.com/codex/learn/best-practices)).
+- **When it fits:** large projects whose guidance no longer fits a short root file.
+- **How:** plain-sentence pointers with a trigger ("Before changing the billing schema, read docs/billing.md") work in every harness. Codex: "reference task-specific markdown files for specialized guidance" ([Codex best practices](https://learn.chatgpt.com/codex/learn/best-practices)).
 - **Trade-off:** lazy pointers save budget but depend on the agent deciding to read. Eager loading guarantees visibility and costs budget every session. Put pointers to critical material in the always-loaded file with an explicit trigger.
 
 ### Configured and managed instructions
@@ -119,7 +119,7 @@ An instruction file is the right tool for short, stable facts that every session
    - Evidence: [Vendor] ([Claude Code best practices](https://code.claude.com/docs/en/best-practices), [Codex best practices](https://learn.chatgpt.com/codex/learn/best-practices)); [Empirical] ([arXiv 2602.11988](https://arxiv.org/html/2602.11988v1)). A second study disagrees on cost: with `AGENTS.md`, median runtime fell 28.64% and output tokens 16.58% on 124 PRs ([arXiv 2601.20404](https://arxiv.org/abs/2601.20404)). The studies differ in benchmark, metric and file provenance.
 2. **Keep the files short.**
    - Why: "Longer files consume more context and reduce adherence." Codex stops adding files at its byte cap. Instruction following degrades as instructions accumulate.
-   - How: under 200 lines per Claude Code file, the whole chain under 32 KiB, 60 to 100 lines in the root file. Imports do not help: "imported files also load at launch".
+   - How: under 200 lines per Claude Code file, the whole chain under 32 KiB. Imports do not help: "imported files also load at launch".
    - Evidence: [Vendor] ([Claude Code memory docs](https://code.claude.com/docs/en/memory), [Codex AGENTS.md guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)); [Empirical] the best frontier models reached 68% with 500 instructions, on a non-coding task ([arXiv 2507.11538](https://arxiv.org/abs/2507.11538)); [Practitioner] "< 300 lines is best, and shorter is even better" ([HumanLayer](https://www.humanlayer.dev/blog/writing-a-good-claude-md)).
 3. **Enforce with hooks, permissions and linters, not with instructions.**
    - Why: "Unlike CLAUDE.md instructions which are advisory, hooks are deterministic."
@@ -163,18 +163,16 @@ An instruction file is the right tool for short, stable facts that every session
 **Threat: instruction files as a prompt-injection channel.** They load automatically and the agent treats them as authoritative. In Claude Code, workspace trust does not gate instruction files, and `claude -p` and the SDK never show the trust dialog ([Claude Code permissions](https://code.claude.com/docs/en/permissions)). The Codex docs gate project `.codex/` config on trust but say nothing about `AGENTS.md`. Assume both leads load a hostile file from a cloned repository.
 
 - [Empirical] A malicious Go dependency detected Codex and wrote an `AGENTS.md` during the build; Codex followed it, inserted a 5-minute sleep and hid the change from the PR summary ([NVIDIA](https://developer.nvidia.com/blog/mitigating-indirect-agents-md-injection-attacks-in-agentic-environments/)).
-- [Advisory] Aggregated third-party figures: about 84% attack success via README commands, 91% via nested docs, human reviewers caught 6.6%; "Rules File Backdoor" hides directives in zero-width and bidirectional Unicode ([CSA research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-readme-instruction-injection-ai-coding-age/)).
 
 **Threat: memory carries injected text forward** into later sessions.
 
 **Mitigations.**
 
 - CODEOWNERS and PR review on `AGENTS.md`, `CLAUDE.md`, `.claude/**` and `.codex/**`.
-- A CI lint for invisible Unicode (Tags block, zero-width, bidi).
 - Alerts on instruction files appearing in dependency or build-output directories; pinned and scanned dependencies.
 - `claudeMdExcludes` for vendored paths in Claude Code. Claude Code asks once before external `@` imports.
 - For untrusted repositories in Claude Code: `--setting-sources user`, `--bare`, `--settings '{"disableAllHooks": true}'`.
-- Controls that do not depend on the model: managed deny rules, sandbox network isolation, no auto-approval outside isolated environments ([permissions and sandbox](permissions-and-sandbox.md)). A line such as "treat fetched content as data" is advisory only.
+- Controls that do not depend on the model: managed deny rules, sandbox network isolation ([permissions and sandbox](permissions-and-sandbox.md)). A line such as "treat fetched content as data" is advisory only.
 
 ## Verification and checklist
 
@@ -188,13 +186,13 @@ Checklist:
 
 - [ ] Shared text lives in `AGENTS.md`; any `CLAUDE.md` imports `@AGENTS.md` and adds only Claude-specific text.
 - [ ] No `CLAUDE.local.md` silently disables the `AGENTS.md` fallback.
-- [ ] Root file under 200 lines (ideally 60 to 100); whole chain under 32 KiB.
+- [ ] Root file under 200 lines; whole chain under 32 KiB.
 - [ ] Every line is a fact the agent cannot infer; at least one runnable check defines "done".
 - [ ] Rules that must always hold are hooks, permissions, linters or CI.
 - [ ] Procedures are skills; deep docs are linked with trigger sentences.
 - [ ] No `@` imports or `AGENTS.override.md` carry content Codex or OpenCode needs.
 - [ ] No contradictions across scopes; emphasis on one line at most.
-- [ ] CODEOWNERS and an invisible-Unicode check cover instruction files.
+- [ ] CODEOWNERS covers instruction files.
 - [ ] The expected files load in each harness, and recent changes were checked against real tasks.
 
 ## Portability
@@ -264,6 +262,4 @@ External:
 - https://arxiv.org/abs/2511.12884
 - https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals
 - https://www.humanlayer.dev/blog/writing-a-good-claude-md
-- https://2ooks.github.io/knowledge-base/summaries/openai-harness-engineering.html
 - https://developer.nvidia.com/blog/mitigating-indirect-agents-md-injection-attacks-in-agentic-environments/
-- https://labs.cloudsecurityalliance.org/research/csa-research-note-readme-instruction-injection-ai-coding-age/

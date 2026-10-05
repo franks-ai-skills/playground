@@ -103,7 +103,7 @@ Traps:
 - **Both leads gate repository-supplied marketplaces on trust.** Claude Code `extraKnownMarketplaces` needs workspace trust; Codex reads project config only in trusted projects ([CC](../vendors/claude-code/plugins.md#governance-settings), [Codex](../vendors/codex/plugins.md#limits-and-gotchas)).
 - **Codex plugin hooks are not trusted on install.** The user reviews them with `/hooks` ([Codex](../vendors/codex/plugins.md#limits-and-gotchas)).
 - **Instructions do not travel in a plugin.** A `CLAUDE.md` at the plugin root is not loaded; put instructions in a skill ([CC](../vendors/claude-code/plugins.md#standard-layout)). The Codex pages list no instruction-file component either.
-- **Components outside the shared set are ignored by the other harness.** Inference: Codex documents no `agents/`, `commands/`, or output-style components, so a Claude Code plugin's agents and commands do nothing in Codex. Codex plugin "commands" are mentioned only in a bundled reference and are unverified ([Codex](../vendors/codex/plugins.md#limits-and-gotchas)).
+- **Components outside the shared set are ignored by the other harness.** Inference: Codex documents no `agents/`, `commands/`, or output-style components, so a Claude Code plugin's agents and commands do nothing in Codex ([Codex](../vendors/codex/plugins.md#limits-and-gotchas)).
 - **No plugins in the Codex IDE extension** ([Codex](../vendors/codex/plugins.md#limits-and-gotchas)).
 - **Admin allowlists must name each marketplace.** Codex does not implicitly allow even the OpenAI-curated catalog ([Codex](../vendors/codex/plugins.md#admin-controls-requirementstoml)).
 

@@ -101,8 +101,8 @@ Synchronous hooks sit on the agent's critical path, and the 600 s defaults are f
 - **[Vendor]** Anthropic's own `security-guidance` plugin runs its expensive reviews (the `Stop` diff review and the commit/push review) in the background and keeps only the per-edit pattern match synchronous. — [Claude Code security-guidance](https://code.claude.com/docs/en/security-guidance)
 
 ### Inferences
-- Practical budgets (inference, not vendor numbers): `PreToolUse`/`PermissionRequest` gates should finish in well under a second because they run before every matching tool call. Set `timeout` to a small value such as 5–10 s so a hang degrades quickly. Note that this degrades to fail-open, so the gate logic must not depend on slow network calls. `PostToolUse` formatters should touch only the edited file, never the whole repo. `Stop` gates may take longer but should run a fast subset. Full suites belong in CI.
-- Prefer filtering in the matcher over filtering inside the script, because process spawn per tool call is the dominant cost for trivial checks. In portable configs the `if` field is unavailable, so use a narrow matcher plus an early `exit 0` in the script.
+- Practical budgets (inference, not vendor numbers): `PreToolUse`/`PermissionRequest` gates should be fast because they run before every matching tool call. Set an explicit short `timeout` so a hang degrades quickly. Note that this degrades to fail-open, so the gate logic must not depend on slow network calls. `PostToolUse` formatters should touch only the edited file, never the whole repo. `Stop` gates may take longer but should run a fast subset. Full suites belong in CI.
+- Prefer filtering in the matcher over filtering inside the script, because each matching tool call spawns the hook process, and the `if` field exists to avoid that spawn overhead. In portable configs the `if` field is unavailable, so use a narrow matcher plus an early `exit 0` in the script.
 - Async hooks suit observation (audit, telemetry, slow tests that report back). They must never be used for enforcement in either lead.
 
 ### Gaps
@@ -129,7 +129,6 @@ Hooks are arbitrary code that runs with the user's full privileges outside the s
 - **[Vendor]** Codex calls hooks "a useful guardrail, not a complete enforcement boundary": "Some specialized tool paths can opt out of the default hook path", and hosted tools like `WebSearch` are never hooked. — [Codex hooks](https://learn.chatgpt.com/docs/hooks)
 - **[Practitioner]** "Hooks are not a security boundary -- a prompt injection can work around them. They are structured prompt injection at opportune times... Guardrails, not walls." — [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)
 - **[Practitioner]** Issue #29709 (2026-03-01, closed as not planned): after a `PreToolUse:Edit` hook blocked edits to review scripts three times, the agent wrote the file with Python through the `Bash` tool. "Any PreToolUse:Edit|Write hook can be trivially bypassed this way." — [anthropics/claude-code#29709](https://github.com/anthropics/claude-code/issues/29709)
-- **[Practitioner]** OpenCode issue #5894 reports that `tool.execute.before` plugin hooks do not intercept tool calls made by subagents spawned through the task tool, "allow[ing] security policies implemented via plugins to be completely bypassed". This comes from a search snippet; the issue page was not fetched and its current status is unverified. — [anomalyco/opencode#5894](https://github.com/anomalyco/opencode/issues/5894)
 - **[Vendor]** OpenCode's own `.env` protection example blocks only `input.tool === "read"` where `filePath.includes(".env")`, by throwing. It does not cover shell reads, which is the same Bash-bypass shape as above. Its docs also show a `tool.execute.before` example that escapes the bash command with `shescape`. — [OpenCode plugins](https://opencode.ai/docs/plugins/)
 - **[Vendor]** Claude Code: a `PreToolUse` deny "blocks the tool even in `bypassPermissions` mode or with `--dangerously-skip-permissions`". However, an installed mod handling `tool.check` "can approve a call that your PreToolUse hook blocked, unless the hook is in managed settings". Hooks that must not be overridden belong in managed settings, together with `allowManagedHooksOnly`. — [Claude Code hooks guide](https://code.claude.com/docs/en/hooks-guide); [permissions](https://code.claude.com/docs/en/permissions#extend-permissions-with-hooks)
 
@@ -169,7 +168,7 @@ Keep one script in the repo and register it in both `.claude/settings.json` and 
 ### Inferences
 - Portable script skeleton (inference from both contracts):
   1. `input=$(cat)`. Read `hook_event_name` and `tool_name`.
-  2. Get the target with `jq -r '.tool_input.file_path // .tool_input.path // empty'`. If that is empty and `tool_name == "apply_patch"`, parse the `*** Update File:`/`*** Add File:` lines out of `.tool_input.command`. The patch-header format is inferred from Codex's `apply_patch` convention and is not documented on the hooks page.
+  2. Get the target with `jq -r '.tool_input.file_path // .tool_input.path // empty'`. If that is empty and `tool_name == "apply_patch"`, the target paths are inside the patch text in `.tool_input.command`, whose format the hooks page does not specify (see Gaps).
   3. For Bash, read `.tool_input.command` (same field in both leads).
   4. Decide, then either exit 0 silently, or print the reason to stderr and exit 2.
   5. On `Stop`, always print JSON, even `{}`, on exit 0.

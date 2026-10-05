@@ -209,7 +209,7 @@ Other variables mentioned elsewhere in the notes: `OPENCODE_DISABLE_PROJECT_CONF
 
 ## Limits and gotchas
 
-- **Arrays other than `instructions` are probably replaced, not extended (inference from the notes).** `mergeDeep` replaces arrays except for `instructions` and the special `plugin` handling. A project `watcher.ignore` or `disabled_providers` array therefore probably replaces the global one.
+- **Gap: array merging.** Only `instructions` (concatenated and deduplicated) and `plugin` (deduplicated by plugin identity) have documented merge behavior across layers. How other arrays, such as `watcher.ignore` or `disabled_providers`, merge is not documented.
 - **Docs and source differ on layer 5 (inference from the notes).** The docs list `.opencode` directories before `OPENCODE_CONFIG_CONTENT`. In source, `OPENCODE_CONFIG_DIR` and `~/.opencode` are also scanned at that step. The docs do not mention `~/.opencode`; treat it as an implementation detail.
 - **OpenCode Console org config** (`<console-url>/api/config`) is a source-only layer not in the documented precedence list.
 - **Deprecated keys:** `reference` (use `references`, since v1.17.1), `autoshare` (use `share`), `mode` (use `agent`), `layout` (stretch layout always used), `tools` (use `permission`, since v1.1.1), and `theme` / `keybinds` / `tui` in `opencode.json` (moved to `tui.json`).

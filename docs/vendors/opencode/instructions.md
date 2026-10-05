@@ -55,7 +55,7 @@ An array of strings. Entries are combined with the `AGENTS.md` files ([Rules](ht
 
 Resolution source: [SRC session/instruction.ts](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/session/instruction.ts). Timeout: [Rules](https://opencode.ai/docs/rules/).
 
-Across config layers, `instructions` arrays are concatenated and deduplicated, unlike other arrays ([SRC config/config.ts](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/config/config.ts)). See [configuration.md](configuration.md#merge-semantics).
+Across config layers, `instructions` arrays are concatenated and deduplicated ([SRC config/config.ts](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/config/config.ts)). See [configuration.md](configuration.md#merge-semantics).
 
 ## Loading and invocation
 

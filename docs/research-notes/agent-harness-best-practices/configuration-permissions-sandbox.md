@@ -31,7 +31,7 @@ Put personal preferences and **personal secret-protection denies** in the user l
 
 **Keeping secrets out of committed config and subprocess environments**
 - [Vendor] CC's `env` block passes variables to the session and subprocesses. To strip credentials from all subprocesses, set `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB`. Inside the sandbox, `sandbox.credentials.envVars` with `deny` unsets variables before each sandboxed command, and `mask` swaps the value for a per-session sentinel that the proxy replaces on requests to allowed hosts — [CC sandboxing](https://code.claude.com/docs/en/sandboxing)
-- [Vendor] Codex `[shell_environment_policy]`: `inherit` (`core`/`all`/`none`), `ignore_default_excludes`, `exclude`/`filters`, `set`, `include_only`. "Includes don't restore variables that were already excluded" — [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced). **Conflict:** the fetched summary of that page says the default removes names containing KEY/SECRET/TOKEN, while this repo's vendor notes record `ignore_default_excludes` defaulting to `true`, so those names **pass through** unless set to `false` ([local Codex config notes](../../vendors/codex/configuration.md)). Set `ignore_default_excludes = false` explicitly rather than relying on the default.
+- [Vendor] Codex `[shell_environment_policy]`: `inherit` (`core`/`all`/`none`), `ignore_default_excludes`, `exclude`/`filters`, `set`, `include_only`. "Includes don't restore variables that were already excluded" — [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced). This repo's vendor notes record `ignore_default_excludes` defaulting to `true`, so names containing KEY/SECRET/TOKEN **pass through** unless set to `false` ([local Codex config notes](../../vendors/codex/configuration.md)). Set `ignore_default_excludes = false` explicitly rather than relying on the default.
 - [Vendor] Dev containers: "Avoid mounting host secrets such as `~/.ssh` or cloud credential files into the container; prefer repository-scoped or short-lived tokens". Pass cloud credentials through `containerEnv`, Codespaces secrets or workload identity — [CC devcontainer](https://code.claude.com/docs/en/devcontainer)
 - [Practitioner] Trail of Bits' public CC config keeps secret-path denies and global MCP servers in the **user** layer, and keeps only project-specific MCP servers in `.mcp.json` with `enableAllProjectMcpServers: false`, because "Project `.mcp.json` files live in git, so a compromised repo could ship malicious MCP servers". API keys come from 1Password, not config files — [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)
 
@@ -54,7 +54,6 @@ Put personal preferences and **personal secret-protection denies** in the user l
 
 ### Gaps
 - No vendor doc found that prescribes CODEOWNERS or branch protection for harness config directories specifically. This is inference from the CVE history.
-- The Codex `ignore_default_excludes` default is contradictory between sources (see above). Not resolved.
 - Codex array-merge semantics across layers are not documented in general (per the local concept page).
 
 ---
@@ -76,7 +75,7 @@ Design rules as **deny for secrets and clearly destructive actions, ask for exte
 - [Vendor] CC: a Bash rule "covers the invocation Claude usually produces and isn't a security boundary around the program". `Bash(curl *)` doesn't stop `/usr/bin/curl ...` or `sh -c 'curl ...'`; `Bash(git push *)` doesn't stop `git -C . push`, `git -c push.default=current push`, `git 'push'`. "For filesystem and network enforcement that doesn't depend on the command text, use sandboxing" — [CC permissions](https://code.claude.com/docs/en/permissions)
 - [Vendor] CC: argument-constraining patterns are fragile. `Bash(curl http://github.com/ *)` misses options-first, `https`, redirects and variables. The suggested alternative is to deny curl/wget and use `WebFetch(domain:...)`, paired with the sandbox network allowlist; or a PreToolUse hook. Also: "using WebFetch alone doesn't prevent network access. If Bash is allowed, Claude can still use `curl`" — [CC permissions](https://code.claude.com/docs/en/permissions)
 - [Practitioner] Trail of Bits: hooks (e.g. block `rm -rf`, block push to main) are "guardrails, not walls". They are more reliable than CLAUDE.md instructions ("can be forgotten or overridden by context pressure") but not a defense against prompt injection — [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)
-- [Advisory] (2025) CVE-2025-55284: CC before 1.0.4 auto-approved `ping`, `nslookup`, `dig` as "safe", so a prompt injection could exfiltrate secrets as DNS subdomains with no prompt. Fixed by removing them from the allowlist. Lesson: "read-only" allowlists can be exfiltration channels — [GitLab advisory](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/), [writeup via jmason.ie / Embrace The Red](https://jmason.ie/2025/08/25/161304a.html)
+- [Advisory] (2025) CVE-2025-55284: CC before 1.0.4 auto-approved `ping`, `nslookup`, `dig` as "safe", so a prompt injection could exfiltrate secrets as DNS subdomains with no prompt. Fixed by removing them from the allowlist. Lesson: "read-only" allowlists can be exfiltration channels — [GitLab advisory](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/), [Embrace The Red (Aug 11, 2025)](https://embracethered.com/blog/posts/2025/claude-code-exfiltration-via-dns-requests/)
 
 **Deny lists for secrets and destructive commands**
 - [Practitioner] Trail of Bits' user-level deny list (Read/Edit): `~/.ssh/**`, `~/.gnupg/**`, `~/.aws/**`, `~/.azure/**`, `~/.kube/**`, `~/.docker/config.json`, `~/.npmrc`, `~/.npm/**`, `~/.pypirc`, `~/.gem/credentials`, `~/.git-credentials`, `~/.config/gh/**`, `~/Library/Keychains/**`, crypto-wallet app data. Edits to `~/.bashrc`, `~/.zshrc` are blocked — [trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)
@@ -86,7 +85,6 @@ Design rules as **deny for secrets and clearly destructive actions, ask for exte
 **Approval fatigue: data**
 - [Empirical] "Claude Code users approve 93% of permission prompts" — [Anthropic engineering, auto mode (Mar 25, 2026)](https://www.anthropic.com/engineering/claude-code-auto-mode)
 - [Empirical] (2025) Sandboxing "safely reduces permission prompts by 84%" in Anthropic's internal usage — [Anthropic engineering, sandboxing (Oct 20, 2025)](https://www.anthropic.com/engineering/claude-code-sandboxing)
-- [Empirical, secondary only] Press reports attribute to Anthropic the claim that "humans catch only 13.6% of dangerous commands (5% after 50 prompts) versus 89% for the classifier". **Not found in the primary engineering post** as fetched. Treat as unverified — [letsdatascience summary](https://letsdatascience.com/news/anthropic-enables-auto-mode-for-claude-code-2be9e2b6)
 
 **Reducing prompts safely: sandbox auto-allow**
 - [Vendor] CC sandbox auto-allow mode: sandboxed commands run without prompts. Explicit deny rules, content-scoped ask rules (e.g. `Bash(git push *)`) and critical-path `rm` still apply. A bare `Bash` ask rule is skipped for sandboxed commands (not in plan mode). Commands outside the sandbox (via `excludedCommands` or an unsandboxed retry) go through the regular flow — [CC sandboxing](https://code.claude.com/docs/en/sandboxing)
@@ -120,7 +118,6 @@ Design rules as **deny for secrets and clearly destructive actions, ask for exte
 ### Gaps
 - No independent (non-vendor) empirical study of approval-fatigue rates or classifier efficacy in coding agents was found. Only vendor numbers.
 - Codex: what `approval_policy = "never"` does to a request that would need approval is not stated clearly in the fetched pages (also noted in the concept page).
-- The "13.6% / 89%" human-vs-classifier figure could not be traced to a primary Anthropic source.
 
 ---
 
@@ -190,7 +187,7 @@ The core threat is that an agent with **private data access + untrusted content 
 **Frameworks**
 - [Practitioner] (2025) Lethal trifecta: "Access to your private data", "Exposure to untrusted content", "The ability to externally communicate". Users mixing tools "must simply prevent these three elements from coexisting". MCP mix-and-match makes this easy to assemble by accident — [Simon Willison (Jun 16, 2025)](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)
 - [Practitioner/Vendor research] (2025) Meta "Agents Rule of Two": within a session an agent should satisfy no more than two of [A] processes untrustworthy inputs, [B] accesses sensitive systems or private data, [C] changes state or communicates externally. If all three are needed, require human-in-the-loop or a fresh context — [Meta AI (Oct 31, 2025)](https://ai.meta.com/blog/practical-ai-agent-security/), summarized by [Willison](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/)
-- [Practitioner/standards] OWASP Top 10 for Agentic Applications (published Dec 2025 by the OWASP GenAI Security Project's Agentic Security Initiative): ASI01 Agent Goal Hijack, ASI02 Tool Misuse and Exploitation (misusing tools already granted, often within permissions), ASI03 Identity and Privilege Abuse (inherited credentials, delegation chains). Mitigations: least-privilege tools, human approval for sensitive operations — secondary summaries: [Teleport](https://goteleport.com/blog/owasp-top-10-agentic-applications), [Palo Alto Networks](https://www.paloaltonetworks.com/blog/?p=349925); primary at [genai.owasp.org](https://genai.owasp.org/) (not fetched directly)
+- [Practitioner/standards] The OWASP GenAI Security Project published the OWASP Top 10 for Agentic Applications on 2025-12-09 — [OWASP](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
 - [Vendor] CC best practices for untrusted content: review commands before approval, "Avoid piping untrusted content directly to Claude", verify changes to critical files, "Use virtual machines (VMs) to run scripts and make tool calls, especially when interacting with external web services". WebFetch returns a model summary rather than the raw page — [CC security](https://code.claude.com/docs/en/security)
 
 **Malicious repository configuration: CVEs in both leads**
@@ -214,8 +211,6 @@ The core threat is that an agent with **private data access + untrusted content 
 - Keep harness versions current and auto-updating, except where pinned in a container on purpose. Several fixes were delivered by forced updates (e.g. CC deprecating versions before 1.0.24 per the CVE-2025-55284 advisory text).
 
 ### Gaps
-- The OWASP Agentic Top 10 primary document was not fetched; mitigations are from secondary summaries.
-- Could not confirm a separate CSA/OWASP "2026 LLM Top 10" (claimed published Aug 2026 in one search result) from a primary source. Treat as unverified.
 - No incident data found specific to OpenCode.
 
 ---
@@ -239,7 +234,7 @@ Deliver policy through channels that repository files cannot change (MDM, server
 - [Vendor] Admin `prefix_rules` can only be `prompt`/`forbidden` (per the local concept page) — [local concept page](../../concepts/permissions-and-sandbox.md)
 
 **Audit logging / OpenTelemetry**
-- [Vendor] CC OTel: enable with `CLAUDE_CODE_ENABLE_TELEMETRY=1` + OTLP exporters. Events include `claude_code.tool_decision` (decision and source: config, hook, user_permanent, user_temporary, user_abort, user_reject), `claude_code.tool_result`, `claude_code.user_prompt` (prompt text redacted by default), `claude_code.api_request`. Content gates `OTEL_LOG_USER_PROMPTS`, `OTEL_LOG_TOOL_DETAILS`, `OTEL_LOG_TOOL_CONTENT` are off by default. Setting endpoint/headers in managed settings removes conflicting developer-set variables so telemetry can't be redirected. `tool_use_id` and `prompt.id` correlate decisions with results — [CC monitoring](https://code.claude.com/docs/en/monitoring-usage). (The fetched summary also listed a `permission_mode_changed` event; verify against the page before relying on it.)
+- [Vendor] CC OTel: enable with `CLAUDE_CODE_ENABLE_TELEMETRY=1` + OTLP exporters. Events include `claude_code.tool_decision` (decision and source: config, hook, user_permanent, user_temporary, user_abort, user_reject), `claude_code.tool_result`, `claude_code.user_prompt` (prompt text redacted by default), `claude_code.api_request`. Content gates `OTEL_LOG_USER_PROMPTS`, `OTEL_LOG_TOOL_DETAILS`, `OTEL_LOG_TOOL_CONTENT` are off by default. Setting endpoint/headers in managed settings removes conflicting developer-set variables so telemetry can't be redirected. `tool_use_id` and `prompt.id` correlate decisions with results — [CC monitoring](https://code.claude.com/docs/en/monitoring-usage)
 - [Vendor] Codex `[otel]` is opt-in (`otlp-http`/`otlp-grpc`/`none`). Events: `codex.tool_decision` (approved/denied + decision source), `codex.tool_result`, `codex.user_prompt` (redacted unless `log_user_prompt = true`), `codex.api_request`. Local history in `~/.codex/history.jsonl` (`[history] persistence = "none"` to disable) — [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced); guidance to "route telemetry to controlled collectors only; apply retention limits" — [Codex agent approvals & security](https://learn.chatgpt.com/codex/agent-approvals-security)
 - [Vendor] CC cloud sessions: "All operations in cloud sessions are logged for compliance and audit purposes" — [CC security](https://code.claude.com/docs/en/security)
 

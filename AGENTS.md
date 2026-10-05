@@ -14,6 +14,13 @@ coding-agent harnesses: Claude Code, Codex and OpenCode.
 - The knowledge base reflects 2026-10-04 (Claude Code 2.1.289,
   codex-cli 0.159.2, OpenCode 1.18.34). Confirm version-sensitive
   details against the source a page cites before relying on them.
+- Every claim in `docs/` needs a reliable source that was fetched and
+  says what is cited: vendor documentation or source code, standards,
+  security advisories, papers, or a named practitioner's first-hand
+  report. Mirrors, aggregators, search snippets, news rewrites and the
+  X platform are not sources. Drop a claim that cannot be verified
+  instead of marking it unverified. A labelled inference stays only if
+  it follows from sourced facts on the same page.
 - When a fact in `docs/` turns out outdated, fix the vendor page with
   its new source, then every page that repeats it: `docs/concepts/`,
   `docs/best-practices/`, `docs/guide/` and `docs/overview.md`.

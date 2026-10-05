@@ -113,7 +113,7 @@ Return a list of findings, each with file:line, severity and a suggested fix. Ma
 - **What:** the main session splits a task into independent read-only parts, spawns one worker per part, waits, and merges.
 - **When it fits:** breadth-first questions; multi-file reviews by dimension.
 - **How:** Claude Code: "Research the authentication, database, and API modules in parallel using separate subagents." Codex: one agent per review dimension (security, quality, tests, maintainability), consolidated into one response. Scale effort to the question: "Simple fact-finding requires just 1 agent with 3-10 tool calls" ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system), older).
-- **Trade-off:** fan-in blocks on the slowest worker, and workers re-explore overlapping files. Centralized coordination amplified errors 4.4 times versus 17.2 times for independent agents [Empirical] ([Google Research](https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/)).
+- **Trade-off:** fan-in blocks on the slowest worker, and workers re-explore overlapping files [Empirical] ([arXiv 2605.27787](https://arxiv.org/abs/2605.27787)). Centralized coordination amplified errors 4.4 times versus 17.2 times for independent agents [Empirical] ([Google Research](https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/)).
 
 ### Chain
 
@@ -185,7 +185,7 @@ Return a list of findings, each with file:line, severity and a suggested fix. Ma
 12. **Measure delegation against a single-agent baseline.**
     - Why: runs are non-deterministic, and judging only success hides cost.
     - How: 10–20 representative tasks, single agent versus delegated, same model, several runs; compare success, total tokens across agents, wall time and peak main-context use. Pilot fan-out on 2–3 items.
-    - Evidence: [Empirical] older, "about 20 queries representing real usage patterns" ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)); evaluate accuracy with tokens and time ([SWE-Effi](https://alphaxiv.org/abs/2509.09853)); [Vendor] pilot on 2–3 items ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)).
+    - Evidence: [Empirical] older, "about 20 queries representing real usage patterns" ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)); evaluate accuracy with tokens and time ([SWE-Effi](https://arxiv.org/abs/2509.09853)); [Vendor] pilot on 2–3 items ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)).
 
 ## Security
 
@@ -272,7 +272,8 @@ External:
 - https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/
 - https://arxiv.org/abs/2512.08296
 - https://arxiv.org/abs/2503.13657
-- https://alphaxiv.org/abs/2509.09853
+- https://arxiv.org/abs/2509.09853
+- https://arxiv.org/abs/2605.27787
 - https://cognition.com/blog/dont-build-multi-agents
 - https://cognition.com/blog/multi-agents-working
 

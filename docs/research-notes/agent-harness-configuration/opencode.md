@@ -188,9 +188,9 @@ Source: [CLI – Environment variables](https://opencode.ai/docs/cli/)
 
 ### Inferences
 - The docs list `.opencode` directories (5) before `OPENCODE_CONFIG_CONTENT` (6). In the source, the `OPENCODE_CONFIG_DIR` dir and `~/.opencode` are also scanned at step 5. The docs do not mention `~/.opencode`, so treat it as an implementation detail.
-- `mergeDeep` replaces arrays except for `instructions` (and the special plugin handling). A project `watcher.ignore` or `disabled_providers` array therefore probably replaces the global one rather than extending it.
 
 ### Gaps
+- Only `instructions` (concatenated and deduplicated) and `plugin` (deduplicated by plugin identity) have documented array merge behavior. How other arrays, such as `watcher.ignore` or `disabled_providers`, merge across layers is not documented.
 - I did not fetch the generated `https://opencode.ai/config.json` itself; the key list comes from the Effect schema source.
 - The full built-in keybind list (about 100 entries in keybinds.mdx) is not reproduced here.
 - I could not find the release where LSP and formatters became opt-in (disabled unless configured). The current docs and schema both say "Omit or set to false to disable", but no release note in the v1.0–v1.18 notes I searched matched.
@@ -389,7 +389,7 @@ You are a code reviewer. Report issues; do not edit files.
 ```
 
 ### Inferences
-- `description` is "required" in the docs but optional in the schema. It is probably enforced only for agents meant to be selected automatically (subagents).
+- `description` is "required" in the docs but optional in the schema.
 
 ### Gaps
 - None of the sources document Scout's default model, permission set, or cache location beyond "managed cache".

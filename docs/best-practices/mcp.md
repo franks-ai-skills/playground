@@ -100,7 +100,7 @@ tools.get_page.output_token_limit = 8000
 - **Practice:** when the model knows a CLI for the system and a sandboxed shell exists, use the CLI and document conventions in a skill.
 - **Why:** the CLI path runs inside the command sandbox and the bash permission rules; MCP servers do not. CLI output can be filtered before it enters the context; MCP results cannot unless the server paginates or filters (inference in the notes).
 - **How:** tell the agent which CLI to use; allow its subcommands with prefix rules; put team conventions in a skill.
-- **Evidence:** [Vendor] "CLI tools are the most context-efficient way to interact with external services" ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). [Empirical, Aug 2025, older] MCP and CLI both reached 100% success on 3 tasks × 10 runs; tool design mattered more than protocol ([Zechner](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/)). [Practitioner, Oct 2025, older] Willison prefers skills to MCP for coding agents and notes GitHub's MCP server "consumes tens of thousands of tokens of context" ([Willison](https://simonwillison.net/2025/Oct/16/claude-skills/)). [Practitioner, Aug 2025, older] Playwright MCP at ~13,700 tokens replaced by bash tools and a ~225-token README ([conffab summary](https://conffab.com/elsewhere/what-if-you-dont-need-mcp-at-all/)).
+- **Evidence:** [Vendor] "CLI tools are the most context-efficient way to interact with external services" ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). [Empirical, Aug 2025, older] MCP and CLI both reached 100% success on 3 tasks × 10 runs; tool design mattered more than protocol ([Zechner](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/)). [Practitioner, Oct 2025, older] Willison prefers skills to MCP for coding agents and notes GitHub's MCP server "consumes tens of thousands of tokens of context" ([Willison](https://simonwillison.net/2025/Oct/16/claude-skills/)). [Practitioner, Nov 2025, older] Playwright MCP's 21 tools use 13.7k tokens (6.8% of Claude's context), replaced by bash tools and a 225-token README ([Zechner, What if you don't need MCP at all?](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/)).
 - **Disagreement:** the 2025 context-cost arguments assumed eager loading. A Jul 30 2026 single-task test found near-equal context use with deferred loading (48–50k tokens MCP vs 45–48k CLI plus skill): "There's no big difference in using CLIs or MCPs these days" ([Checkly](https://www.checklyhq.com/blog/mcp-vs-cli-token-efficiency/), [Empirical/Practitioner], small n). The remaining reasons to prefer a CLI are sandboxing, output filtering and portability, not definition size.
 
 #### 2. Pair each server with a skill
@@ -128,7 +128,7 @@ tools.get_page.output_token_limit = 8000
   - Claude Code: tool search is on by default; only tool names and server instructions load at start. It is off with a customized `ANTHROPIC_BASE_URL`, `ENABLE_TOOL_SEARCH=false`, or pre-4.5 models. Check per-tool tokens with `/context all` ([Claude Code MCP](https://code.claude.com/docs/en/mcp)).
   - Codex: since PR #29486 (merged 2026-06-22) all effective MCP tools are deferred when `tool_search` and namespaced tools are supported. The `tool_search_always_defer_mcp_tools` flag is ignored. Older model/provider combinations load all tools eagerly ([openai/codex PR #29486](https://github.com/openai/codex/pull/29486)). The fetched Codex user docs do not describe tool search.
   - OpenCode: loads all definitions eagerly; keep tool sets small there ([MCP concept page](../concepts/mcp.md)).
-- **Evidence:** [Vendor] as above. For API-level tool use, Anthropic advises tool search when definitions exceed 10K tokens or 10+ tools, and to "keep your three to five most-used tools always loaded, defer the rest" ([Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)). [Practitioner, Jun 2026, unverified] 40–60 MCP tools cost 8,000–24,000 tokens without deferral ([codex.danielvaughan.com](https://codex.danielvaughan.com/2026/06/25/codex-cli-mcp-tool-search-default-livemcpbench-retrieval-bottleneck-scalable-discovery/)).
+- **Evidence:** [Vendor] as above. For API-level tool use, Anthropic advises tool search when definitions exceed 10K tokens or 10+ tools, and to "keep your three to five most-used tools always loaded, defer the rest" ([Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)).
 
 #### 5. Bound tool output
 
@@ -157,7 +157,7 @@ tools.get_page.output_token_limit = 8000
 - **Practice:** build "a few thoughtful tools targeting specific high-impact workflows" instead of one tool per endpoint, namespaced under a service prefix.
 - **Why:** consolidated tools need fewer calls and less context; overlapping tools confuse selection.
 - **How:** `schedule_event` instead of `list_users` + `list_events` + `create_event`. Prefix related tools (`asana_search`, `jira_search`); whether prefix or suffix works better "varies by LLM", so test it. Tool names: 1–128 characters from `A-Za-z0-9_-.`, unique per server; return tools in a deterministic order (helps caching). Keep the server name stable: it becomes part of `mcp__<server>__<tool>`, which permission rules and hook matchers use.
-- **Evidence:** [Vendor, Sep 2025] ([Anthropic, Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)). No vendor gives a number of tools per server beyond "few"; the notes suggest 3–15 for a cross-harness server (inference).
+- **Evidence:** [Vendor, Sep 2025] ([Anthropic, Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)). No vendor gives a number of tools per server beyond "few".
 
 #### 8. Write descriptions for a new team member
 
@@ -208,12 +208,12 @@ Further server rules from the same sources:
 
 #### 12. Allowlist servers by identity and pin versions
 
-- **Practice:** admins allowlist servers by command or URL, not only by name; users pin package versions or image digests.
-- **Why:** a name is not a security control. Unpinned `npx -y` / `uvx` runs the latest release in every session, which is how the `postmark-mcp` change reached users.
+- **Practice:** admins allowlist servers by command or URL, not only by name; users pin package versions.
+- **Why:** a name is not a security control. Unpinned `npx -y` / `uvx` runs the latest release in every session. `postmark-mcp` became malicious only from version 1.0.16, so an unpinned install picked up the change.
 - **How:**
   - Claude Code: `allowedMcpServers` / `deniedMcpServers` by `serverUrl` (wildcards), `serverCommand` or name; `managed-mcp.json` / `managedMcpServers` for exclusive control (an empty map disables MCP) ([Claude Code MCP](https://code.claude.com/docs/en/mcp)). `disableSideloadFlags` does not restrict `.mcp.json`, `claude mcp add` or SDK servers: "Pair it with `allowedMcpServers`". `strictPluginOnlyCustomization: ["mcp"]` blocks servers not from a plugin, managed settings or built-ins ([Claude Code plugins for orgs](https://code.claude.com/docs/en/plugins/org)).
   - Codex: `requirements.toml` `[mcp_servers.<id>] identity` by command or URL with exact, prefix or regex matchers; name and identity must both match; an empty table disables all servers; the same shapes apply to plugin servers ([Codex managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)).
-  - Pin `@x.y.z`, use an internal mirror or registry, and pin hosted images by digest (`@sha256:`). Avoid "latest".
+  - Pin `@x.y.z` and use an internal mirror or registry. Avoid "latest".
 - **Evidence:** [Vendor] as cited; [Practitioner/standards body] OWASP MCP04 ([OWASP MCP04](https://owasp.org/www-project-mcp-top-10/2025/MCP04-2025%E2%80%93Software-Supply-Chain-Attacks%26Dependency-Tampering)); [Advisory] pin tools and packages by hash against rug pulls ([Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks)).
 
 #### 13. Split untrusted reads from writes and exfiltration
@@ -247,7 +247,7 @@ Further server rules from the same sources:
 | Relying on per-connection state | Explicit handles, re-authorized each call |
 | Static API keys in `.mcp.json` or `config.toml`; secrets as `x-mcp-header` parameters | Environment variables, OAuth, header helpers ([6](#6-put-shared-servers-in-project-scope-and-personal-ones-in-user-or-local-scope), [11](#11-authenticate-with-minimal-scopes-and-no-committed-secrets)) |
 | Requesting every OAuth scope up front | Minimal scope, step-up |
-| `npx -y <pkg>` / `uvx <pkg>` without a version | `@x.y.z`, internal mirror, or image digest ([12](#12-allowlist-servers-by-identity-and-pin-versions)) |
+| `npx -y <pkg>` / `uvx <pkg>` without a version | `@x.y.z` or an internal mirror ([12](#12-allowlist-servers-by-identity-and-pin-versions)) |
 | Allowlisting by server name only | Match command or URL identity |
 | Committing `enableAllProjectMcpServers` | Approve servers individually; admin allowlist |
 | `-p` or CI in untrusted checkouts with repository MCP config | Claude Code `--bare` (or `--strict-mcp-config` to limit a run to command-line servers); Codex project trust off; see [automation](./automation.md) |
@@ -279,8 +279,8 @@ Incidents and advisories:
 | 2025 | CVE-2025-49596, MCP Inspector < 0.14.1 [Advisory] | No auth between Inspector client and proxy; RCE over stdio ([SentinelOne](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/)) |
 | 2025 | CVE-2025-58444, MCP Inspector, fixed 0.16.6 [Advisory] | XSS via a redirect URL from a malicious server, leading to command execution ([GitLab advisory](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)) |
 | Fixed 2025-08-20 | CVE-2025-61260, Codex CLI [Advisory] | A repository `.env` set `CODEX_HOME=./.codex`; project `mcp_servers` commands ran at startup without a prompt; CVSS 9.8; fixed in v0.23.0 ([Check Point](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/); [NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260)) |
-| 2025-09-17 | `postmark-mcp` on npm [Advisory] | First malicious MCP server seen in the wild; v1.0.16 added one line BCC'ing every sent email to the attacker; 1,643 downloads before removal; reported by Koi Security ([The Hacker News](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)) |
-| Fixes 2025-08-26, 2025-09-22, 2025-12-28 | Claude Code project files, Check Point [Advisory] | CVE-2025-59536 RCE through hooks in repository `.claude/settings.json`; MCP consent bypass via `enableAllProjectMcpServers` / `enabledMcpjsonServers` in project settings; API key exfiltration via a project-set `ANTHROPIC_BASE_URL` before the trust dialog. Sources disagree on which issue CVE-2026-21852 names ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/); [vpncentral](https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/)) |
+| 2025 | `postmark-mcp` on npm [Advisory] | First malicious MCP server found in use; since version 1.0.16 it BCC'd every email to the attacker; reported by Koi Security (Idan Dardikman) ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)) |
+| Fixes 2025-08-26, 2025-09-22, 2025-12-28 | Claude Code project files, Check Point [Advisory] | CVE-2025-59536 RCE through hooks in repository `.claude/settings.json`; MCP consent bypass via `enableAllProjectMcpServers` / `enabledMcpjsonServers` in project settings; API key exfiltration via a project-set `ANTHROPIC_BASE_URL` before the trust dialog ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)) |
 
 Current harness behaviour to plan around:
 
@@ -305,7 +305,7 @@ Current harness behaviour to plan around:
 - [ ] Each server has a companion skill.
 - [ ] Only needed tools are enabled (`enabled_tools` / bare `deny` rules / `permission` deny).
 - [ ] Outbound and write tools need approval; no auto-approved writes on servers that read untrusted content.
-- [ ] Commands pin versions or digests; no bare `npx -y` / `uvx`.
+- [ ] Commands pin versions; no bare `npx -y` / `uvx`.
 - [ ] No secrets in `.mcp.json`, `config.toml` or `opencode.json`; secrets come from environment variables or OAuth.
 - [ ] Credential-bearing servers are in local or user scope, not project scope.
 - [ ] Admin allowlist matches by command or URL; `disableSideloadFlags` is paired with `allowedMcpServers`.
@@ -317,8 +317,7 @@ Current harness behaviour to plan around:
 
 ## Open questions
 
-- Claude Code docs say tool search is on by default from v2.1.221; that version came from a page summary and was not cross-checked.
-- The fetched Codex user docs do not describe tool search; only the PR and practitioner blogs do. No documented Codex equivalent of `alwaysLoad`.
+- The fetched Codex user docs do not describe tool search; only the PR does. No documented Codex equivalent of `alwaysLoad`.
 - No controlled study after deferred loading compares MCP and CLI across many tasks; Checkly is one task.
 - Codex's default `output_token_limit` is not documented on the fetched pages.
 - No vendor guidance quantifies the ideal number of tools per server beyond "few" and the tool-search thresholds.
@@ -326,8 +325,6 @@ Current harness behaviour to plan around:
 - Not re-verified whether Claude Code reads `readOnlyHint` / `destructiveHint` annotations for approval.
 - Neither lead documents rug-pull detection (alerting on description changes after approval). Treat it as absent.
 - No MCPTox-style attack-success data for 2026 Claude or GPT-5-class models.
-- CVE-2026-21852's scope differs between Check Point and secondary coverage.
-- Secondary blogs claim "30 CVEs in 60 days" (early 2026); unverified and not used.
 - Codex does not document whether a server defined in user and project config is replaced or merged per key ([MCP concept page](../concepts/mcp.md)).
 
 ## Sources
@@ -349,12 +346,11 @@ Current harness behaviour to plan around:
 - [MCP spec, Tools (draft)](https://modelcontextprotocol.io/specification/draft/server/tools)
 - [MCP Security Best Practices (draft)](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
 - [Zechner, MCP vs CLI](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/)
-- [conffab summary of "What if you don't need MCP at all?"](https://conffab.com/elsewhere/what-if-you-dont-need-mcp-at-all/)
+- [Zechner, What if you don't need MCP at all?](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/)
 - [Willison, Claude Skills](https://simonwillison.net/2025/Oct/16/claude-skills/)
 - [Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)
 - [Willison, MCP prompt injection](https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/)
 - [Checkly, MCP vs CLI token efficiency](https://www.checklyhq.com/blog/mcp-vs-cli-token-efficiency/)
-- [codex.danielvaughan.com, MCP tool search default](https://codex.danielvaughan.com/2026/06/25/codex-cli-mcp-tool-search-default-livemcpbench-retrieval-bottleneck-scalable-discovery/)
 - [Invariant Labs, tool poisoning](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks)
 - [Invariant Labs, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability)
 - [MCPTox, arXiv 2508.14925](https://arxiv.org/html/2508.14925v1)
@@ -363,9 +359,8 @@ Current harness behaviour to plan around:
 - [GitLab advisory CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/)
 - [SentinelOne CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/)
 - [GitLab advisory CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)
-- [The Hacker News, first malicious MCP server](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)
+- [CSO Online, squatted Postmark connector](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
 - [Check Point Research, Claude Code project files](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
-- [vpncentral summary](https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/)
 - [Check Point Research, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)
 - [NVD CVE-2025-61260](https://nvd.nist.gov/vuln/detail/cve-2025-61260)
 - Repo: [MCP concept page](../concepts/mcp.md), [concept index](../concepts/README.md)

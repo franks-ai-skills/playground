@@ -144,7 +144,7 @@ Configuration stores every other control. The decision is mostly which layer hol
    - Evidence: [Vendor] [CC permissions](https://code.claude.com/docs/en/permissions), [Codex managed configuration](https://learn.chatgpt.com/codex/enterprise/managed-configuration); [Advisory] [Wiz on s1ngularity](https://wiz.io/blog/s1ngularity-supply-chain-attack).
 
 5. **Filter secrets from subprocess environments explicitly.**
-   - Why: Claude Code sandboxed commands inherit variables "including any secrets". The Codex sources disagree: the docs summary says names containing KEY, SECRET or TOKEN are removed by default; the [vendor notes](../vendors/codex/configuration.md#shell_environment_policy) record `ignore_default_excludes` defaulting to `true`, so they pass through.
+   - Why: Claude Code sandboxed commands inherit variables "including any secrets". For Codex, the [vendor notes](../vendors/codex/configuration.md#shell_environment_policy) record `ignore_default_excludes` defaulting to `true`, so names containing KEY, SECRET or TOKEN pass through.
    - How: Claude Code `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB`, no secrets in the `env` block; Codex set `ignore_default_excludes = false` and `exclude`/`include_only` filters ("Includes don't restore variables that were already excluded").
    - Evidence: [Vendor] [CC sandboxing](https://code.claude.com/docs/en/sandboxing), [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced).
 
@@ -248,7 +248,6 @@ Traps:
 
 ## Open questions
 
-- **Codex secret filtering default.** The docs summary and the vendor notes disagree; set it explicitly.
 - **Codex array merging** across layers is undocumented.
 - **CODEOWNERS for harness config** is inference from the CVE history; no vendor prescribes it.
 - **CVE-2025-61260 fixed version.** One research note lists affected versions as "≤ 0.23.0", another "fixed in 0.23.0 (2025-08-20)". Check [NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260).

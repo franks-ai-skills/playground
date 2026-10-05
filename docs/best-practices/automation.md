@@ -27,7 +27,6 @@ Evidence labels: **[Vendor]** vendor guidance, docs or engineering blog. **[Empi
 | Several independent tasks at once | Worktree-isolated sessions, cloud tasks, best-of-N | [Parallel sessions](#parallel-sessions-and-best-of-n) |
 | Repeatable unattended work (triage, docs drift, dependency bumps) | Schedule or event-triggered hosted run | [Schedules](#scheduled-and-event-triggered-runs) |
 | The agent inside your own application or service, with programmatic approvals, sessions, per-tenant cost | SDK | [SDKs and custom platforms](#sdks-and-custom-platforms) |
-| Deep integration with internal systems justifies owning the tooling | Own platform (as Ramp did) | same |
 
 Related concepts: the [run model](../concepts/automation.md), [subagents](../concepts/subagents.md) for in-run delegation and review, [hooks](../concepts/hooks.md) for deterministic gates, [permissions and sandbox](../concepts/permissions-and-sandbox.md) for the envelope, [skills](../concepts/skills.md) for reusable methods named in schedules, [MCP](./mcp.md) and [plugins](./plugins.md) for what a run loads.
 
@@ -110,7 +109,7 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 - **When it fits:** research, proof-of-concepts, "system understanding" questions, small maintenance, carefully specified work ([Willison, parallel coding agents](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/), Oct 2025, older).
 - **How:**
   - Claude Code: `claude --worktree <name>` → `.claude/worktrees/<name>/` on branch `worktree-<name>`; gitignore `.claude/worktrees/`; install dependencies (a worktree is a fresh checkout); `.worktreeinclude` copies gitignored files such as `.env`; `worktree.baseRef` `"fresh"` (default, remote default branch) or `"head"` (carries unpushed work). Edits, command cwd and git redirects into the main checkout are blocked. Subagents can use `isolation: worktree`. `/batch <instruction>` splits work across 5–30 worktree-isolated subagents ([Claude Code worktrees](https://code.claude.com/docs/en/worktrees); [Claude Code best practices](https://code.claude.com/docs/en/best-practices)).
-  - Codex: parallel cloud tasks from a published environment, each with its own workspace, that "can keep working while your computer is asleep"; review diffs and tests, request follow-ups, open a PR ([Codex cloud](https://learn.chatgpt.com/docs/cloud)). CLI `--worktree`; desktop Worktree mode uses detached HEAD and Handoff; local environment setup scripts prepare untracked files ([automation concept page](../concepts/automation.md)). `codex cloud exec --attempts` (2–4) runs independent attempts in separate containers ([Vaughan, best-of-N](https://codex.danielvaughan.com/2026/04/01/codex-cloud-exec-best-of-n-attempts/), [Practitioner]).
+  - Codex: parallel cloud tasks from a published environment, each with its own workspace, that "can keep working while your computer is asleep"; review diffs and tests, request follow-ups, open a PR ([Codex cloud](https://learn.chatgpt.com/docs/cloud)). CLI `--worktree`; desktop Worktree mode uses detached HEAD and Handoff; local environment setup scripts prepare untracked files ([automation concept page](../concepts/automation.md)). `codex cloud exec --attempts` (1–4, default 1) sets the number of best-of-N attempts ([Codex CLI command reference](https://learn.chatgpt.com/docs/developer-commands.md?surface=cli)).
 - **Trade-offs:** "I can only focus on reviewing and landing one significant change at a time" (Willison). Best-of-N multiplies review unless tests and a grader pick the winner (inference). Port conflicts and per-worktree installs are not handled by either lead.
 
 ### Scheduled and event-triggered runs
@@ -132,7 +131,6 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
   - Claude Agent SDK (Python, TypeScript): built-in tools, hooks, subagents, MCP, permissions, sessions (resume, fork), skills and memory loaded from `.claude/` and `~/.claude/` like the CLI, plugins. The GitHub Action is built on it. Other languages: run the CLI as a subprocess with `-p --output-format json`. Client SDK when you write the tool loop yourself; Managed Agents for Anthropic-hosted sessions. Third parties may not offer claude.ai login or subscription limits in Agent SDK products without approval; use API keys ([Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview)).
   - Codex SDK (TypeScript, Python `openai-codex`): threads (`startThread`, `run`, resume by ID); sandbox presets read-only, workspace-write, full-access. Use the app-server for custom clients that manage auth and conversation history ([Codex SDK](https://learn.chatgpt.com/docs/codex-sdk)).
   - OpenCode: `@opencode-ai/sdk` wraps `opencode serve`; structured output via `format: { type: "json_schema" }` ([automation concept page](../concepts/automation.md)).
-  - Own platform: Ramp's "Inspect" runs in sandboxed VMs on Modal with snapshots, state in Cloudflare Durable Objects, access to tests, Sentry, Datadog and databases, and Slack, web and Chrome entry points; ~30% of merged frontend and backend PRs through voluntary adoption ([InfoQ](https://www.infoq.com/news/2026/01/ramp-coding-agent-platform/), Jan 2026). "Owning the tooling allows for much stronger integration than commercial products." A secondary source claims ~75% by May 2026 (unverified).
 - **Trade-offs:** SDKs load the same filesystem configuration as the CLI by default; pass `settingSources: []` (Claude) or the ignore flags (Codex) and inject configuration explicitly for reproducible service use (inference).
 
 ## Practices
@@ -158,14 +156,14 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 - **Practice:** write a self-contained spec for features where scope is the hard part, then implement it in a new session.
 - **Why:** "Time spent making the spec precise pays off more than time spent watching the implementation." A fresh session starts without the interview's context.
 - **How:** interview pattern → `SPEC.md` naming files and interfaces, out-of-scope items and an end-to-end verification step → fresh session. No spec for small bugs.
-- **Evidence:** [Vendor] ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). [Practitioner, Oct 2025, older] Böckeler criticises one workflow for all sizes and verbose artifacts: "I'd rather review code than all these markdown files" ([Böckeler](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)). The two agree on sizing. No controlled study compares spec-driven and ad-hoc prompting. A secondary claim that GitHub released spec-kit in late 2025 and that Ramp framed specs as defining "what a completed outcome looks like" is unverified ([softwareseni.com](https://www.softwareseni.com/spec-driven-development-is-replacing-vibe-coding-as-the-professional-standard-for-ai-teams)).
+- **Evidence:** [Vendor] ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). [Practitioner, Oct 2025, older] Böckeler criticises one workflow for all sizes and verbose artifacts: "I'd rather review code than all these markdown files" ([Böckeler](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)). The two agree on sizing. No controlled study compares spec-driven and ad-hoc prompting.
 
 #### 4. Use red/green TDD and guard the tests
 
 - **Practice:** have the agent write a failing test first, confirm it fails, then make it pass, and prevent it from changing the tests to pass.
 - **Why:** test-first guards against code that does not work and code that is not needed. Tests that already pass validate nothing. Frontier agents exploit tests "from simple test modification to complex operator overloading"; prompt, test access and feedback loop affect cheating rates.
 - **How:** prompt "Use red/green TDD"; or a Writer/Tester split across two sessions or subagents. Guards (inference; neither vendor documents a dedicated mechanism): a "do not modify tests" constraint in the goal condition, a [hook](../concepts/hooks.md) that blocks writes to test files during the green phase, or a reviewer that diffs tests separately.
-- **Evidence:** [Practitioner] ([Willison, Red/green TDD](https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/), undated); [Vendor] ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)); [Empirical, Oct 2025; ICLR 2026] ImpossibleBench ([arXiv 2510.20270](https://arxiv.org/abs/2510.20270); [ICLR 2026](https://iclr.cc/virtual/2026/poster/10009390)). Summaries report that stronger models cheat more often; not verified against the paper. No controlled study of TDD vs no TDD for agents was found.
+- **Evidence:** [Practitioner] ([Willison, Red/green TDD](https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/), undated); [Vendor] ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)); [Empirical, Oct 2025; ICLR 2026] ImpossibleBench ([arXiv 2510.20270](https://arxiv.org/abs/2510.20270); [ICLR 2026](https://iclr.cc/virtual/2026/poster/10009390)). No controlled study of TDD vs no TDD for agents was found.
 
 ### Verification
 
@@ -240,7 +238,7 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 - **Practice:** make the run's result a JSON object validated against a schema, written to a file, and fail the job when extensions did not load.
 - **Why:** a deterministic consumer can act on data; free text needs another model to interpret.
 - **How:** keep the schema in a file. Claude Code `--output-format json --json-schema "$(cat schema.json)"` → `structured_output` (an invalid schema errors since v2.1.205; before that it was silently ignored; the `format` keyword is not enforced). Codex `--output-schema schema.json -o result.json`. Fail CI on `plugin_errors` or `mcp_server_errors` in the Claude Code `system/init` event.
-- **Evidence:** [Vendor] ([Claude Code headless](https://code.claude.com/docs/en/headless); [Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode.md)). [Practitioner, 2026] `--ephemeral` + `--json` + `--output-schema` + `CODEX_API_KEY` for deterministic Codex pipelines ([codex.danielvaughan.com](https://codex.danielvaughan.com/2026/05/03/codex-cli-non-interactive-pipelines-exec-resume-structured-output/)).
+- **Evidence:** [Vendor] ([Claude Code headless](https://code.claude.com/docs/en/headless); [Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode.md)).
 
 #### 14. Cap turns, time, budget and concurrency
 
@@ -259,14 +257,14 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 #### 16. Restrict triggers and treat repository text as hostile
 
 - **Practice:** allow only trusted actors to trigger runs, never run fork code with secrets, and treat issue, PR, comment and commit text as attacker-controlled.
-- **Why:** prompt injection through issue and PR content was exploited against agent GitHub Actions in 2026 (see [Security](#security)).
+- **Why:** prompt injection through PR titles, issue bodies and comments was demonstrated against agent GitHub Actions in 2026 (see [Security](#security)).
 - **How:**
   - Triggers: both actions default to write-access users. Do not widen with `allowed_non_write_users` ("a significant security risk") or wildcard bots; "Allowed bots are not checked for repository permissions". Codex: `allow-users`, `allow-bots`, `allow-bot-users` (no `*`). On public repos use `include_comments_by_actor`.
   - Untrusted sources: PR titles and bodies (hidden HTML comments), commit messages, `AGENTS.md` / `AGENTS.override.md`, screenshots. `claude-code-action` strips HTML comments, invisible characters, alt text and hidden attributes, "but new bypass techniques may emerge".
   - Workflows: do not check out an untrusted ref into the workspace root; `pull_request_target` and `workflow_run` run with base-repo secrets. Pass untrusted values via `env:`, not inline interpolation. Fork PRs on public repos get no secrets, so review runs only for same-repo branches.
   - Codex runner: `safety-strategy: drop-sudo` or `unprivileged-user` so the key "stays secret" (a read-only filesystem is not enough if `sudo` is available); run `openai/codex-action` "as the last step in a job"; `permission-profile` narrows filesystem and network but does not replace `safety-strategy`.
-  - Pin actions to commit SHAs; keep `show_full_output` off on public repos (logs are public).
-- **Evidence:** [Vendor] ([claude-code-action security.md](https://github.com/anthropics/claude-code-action/blob/main/docs/security.md); [codex-action security.md](https://github.com/openai/codex-action/blob/main/docs/security.md); [Claude Code GitHub Actions](https://code.claude.com/docs/en/github-actions)); [Advisory] ([CSA research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-github-actions-security-20260503-csa-st/)).
+  - Keep `show_full_output` off on public repos (logs are public).
+- **Evidence:** [Vendor] ([claude-code-action security.md](https://github.com/anthropics/claude-code-action/blob/main/docs/security.md); [codex-action security.md](https://github.com/openai/codex-action/blob/main/docs/security.md); [Claude Code GitHub Actions](https://code.claude.com/docs/en/github-actions)); [Advisory] ([SecurityWeek, "Comment and Control"](https://www.securityweek.com/claude-code-gemini-cli-github-copilot-agents-vulnerable-to-prompt-injection-via-comments/)).
 
 #### 17. Pilot fan-out on a few items
 
@@ -311,10 +309,10 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 
 #### 22. Use the lowest layer that fits
 
-- **Practice:** CLI or vendor action for scripts and CI; SDK when the agent lives in your application; own platform only when deep internal integration justifies the cost.
+- **Practice:** CLI or vendor action for scripts and CI; SDK when the agent lives in your application.
 - **Why:** each step up adds code to maintain; each step down loses programmatic control.
 - **How:** see [SDKs and custom platforms](#sdks-and-custom-platforms). In SDK services, isolate filesystem configuration and inject it explicitly; use API keys.
-- **Evidence:** [Vendor] ([Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview); [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk)); [Practitioner] ([InfoQ on Ramp](https://www.infoq.com/news/2026/01/ramp-coding-agent-platform/)). No comparison of SDK-built and CLI-scripted reliability or cost was found.
+- **Evidence:** [Vendor] ([Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview); [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk)). No comparison of SDK-built and CLI-scripted reliability or cost was found.
 
 ### Measuring outcomes
 
@@ -329,7 +327,7 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 
 - **Practice:** measure merge rate by task type together with review burden and stability; distrust self-reported speedups.
 - **Why:** merge rate alone overstates value: rejected agent PRs often get no feedback, and agent PRs are structurally simpler. Perceived and measured speed diverge.
-- **How:** merge rate by task type; share merged without modification; review comments and time per agent PR; rework and revert rate; change-failure rate; cost per merged PR (inference in the notes). Ramp measures PR-authorship share, session count and integration cost or count ([port.io, secondary](https://software-factories.port.io/ramp)).
+- **How:** merge rate by task type; share merged without modification; review comments and time per agent PR; rework and revert rate; change-failure rate; cost per merged PR (inference in the notes).
 - **Evidence:** see [Verification](#verification) for the studies.
 
 ## Anti-patterns
@@ -348,7 +346,7 @@ CODEX_API_KEY="$KEY" codex exec --ephemeral --ignore-user-config \
 | `claude -p` in an untrusted checkout without `--bare` | `--bare` plus explicit flags; config restored from base ([11](#11-isolate-the-configuration-of-headless-runs)) |
 | Relying on headless permission defaults | Explicit mode or sandbox ([12](#12-set-the-permission-envelope-explicitly)) |
 | Model API key as a job-level env var in workflows running repo code | Key only in the agent step; separate write job ([15](#15-split-the-agent-job-from-the-write-job)) |
-| `allowed_non_write_users: '*'`, wildcard bots, `pull_request_target` checking out fork code | Write-access trigger only; no fork code with secrets ([16](#16-restrict-triggers-and-treat-repository-text-as-hostile)) |
+| `allowed_non_write_users`, wildcard bots, `pull_request_target` checking out fork code | Write-access trigger only; no fork code with secrets ([16](#16-restrict-triggers-and-treat-repository-text-as-hostile)) |
 | Inline interpolation of untrusted values in workflow steps | Pass via `env:` |
 | Pushing agent commits with the default `GITHUB_TOKEN` and expecting CI | GitHub App or app token |
 | Untested live changes without worktrees | Worktree per session ([18](#18-give-each-parallel-session-its-own-worktree-setup-and-cleanup)) |
@@ -364,9 +362,8 @@ Incidents and research:
 
 | Date | Item | Detail |
 | --- | --- | --- |
-| Reported Jan 2026; fixed in v1.0.94 within four days; published 2026-06-04 | `claude-code-action` permission flaw, CVSS 7.8 (GMO Flatt Security, RyotaK) [Advisory] | The check "waved through any actor whose name ended in [bot]", and an example workflow shipped `allowed_non_write_users: '*'`. One public issue with an injected payload could make Claude read env credentials, steal OIDC tokens, exchange them for App installation tokens with write access, and potentially poison the action repository. Mitigations: update; audit workflows that admit non-write users or bots; expose only the API key and `GITHUB_TOKEN`; remove tools and permissions usable for exfiltration ([The Hacker News](https://thehackernews.com/2026/06/claude-code-github-action-flaw-let-one.html)) |
-| April 2026 | "Comment and Control" [Advisory] | A single malicious PR comment or issue could make Claude Code Security Review Action, Gemini CLI Action and GitHub Copilot Agent exfiltrate `ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `GEMINI_API_KEY` with "zero interaction from a repository maintainer beyond the automated workflow trigger". CSA mitigations: pin actions to SHAs, remove `pull_request_target` workflows that check out fork code, OIDC ephemeral credentials, minimum `permissions:`, runner monitoring (for example Harden-Runner), delimit untrusted input ([CSA research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-github-actions-security-20260503-csa-st/)) |
-| 2026-02-17 | "Clinejection" [Advisory] | A malicious GitHub issue title chained four vulnerabilities into a supply-chain compromise of the Cline npm package for about 8 hours. From a CSA search snippet; details not independently verified ([CSA research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-claude-code-github-action-prompt-injection/)) |
+| Published 2026-05-20; patched in 1.0.74 | `claude-code-action` CVE-2026-47751, severity medium [Advisory] | The action checked out the attacker-controlled PR head, read `.mcp.json` through its default setting sources and enabled all project MCP servers (`enableAllProjectMcpServers`). A PR with a malicious `.mcp.json` gave code execution on the runner and access to workflow secrets when a privileged user or an automatic trigger ran the action. Versions before 1.0.74 are affected; reported via HackerOne ([GitHub advisory GHSA-8q5r-mmjf-575q](https://github.com/anthropics/claude-code-action/security/advisories/GHSA-8q5r-mmjf-575q)) |
+| April 2026 | "Comment and Control" (Aonan Guan) [Advisory] | Prompt injection through PR titles, issue bodies and comments made Claude Code Security Review, Gemini CLI Action and GitHub Copilot Agent execute commands and extract credentials. Workflows triggered the agents automatically without victim interaction, except Copilot, which needs manual assignment. Root cause: the agents get "powerful tools ... and secrets ... in the same runtime that processes untrusted user input" ([SecurityWeek](https://www.securityweek.com/claude-code-gemini-cli-github-copilot-agents-vulnerable-to-prompt-injection-via-comments/)) |
 | Fixes 2025-08-26 to 2025-12-28; fixed 2025-08-20 | Repository config RCE in Claude Code (CVE-2025-59536) and Codex CLI (CVE-2025-61260) [Advisory] | Project hooks, MCP servers or `CODEX_HOME` redirection ran code before consent in older versions; relevant to headless runs over untrusted checkouts. Details in [MCP security](./mcp.md#security) |
 
 Threats and mitigations:
@@ -404,9 +401,7 @@ Outcome baselines from studies, for comparison with your own metrics:
 | Nakashima et al. (Feb 2026) [Empirical] | 654 rejected agent PRs; seven agent-specific rejection modes including distrust of AI code; 67.9% had no explicit reviewer feedback ([arXiv 2602.04226](https://arxiv.org/abs/2602.04226)) |
 | Mazloomzadeh, Morovati, Khomh (Jul 2026) [Empirical] | Longitudinal agent vs human merge-rate gaps; abstract gives no numbers ([arXiv 2607.21832](https://arxiv.org/abs/2607.21832)) |
 | METR RCT (Jul 2025, early-2025 tools, older) [Empirical] | 16 experienced OSS developers, 246 tasks: AI use made tasks take 19% longer (CI +2% to +39%) while developers believed they were ~20% faster. Feb 2026 update: −18% (CI −38% to +9%) for returning and −4% (CI −15% to +9%) for new developers (negative = speedup); METR calls the data unreliable due to selection effects ([METR 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/); [METR Feb 2026](https://metr.org/blog/2026-02-24-uplift-update/)) |
-| DORA 2025 (Sep 29 2025) [Empirical] | ~90% use AI; 33% trust its output (3% high trust), 46% distrust accuracy; adoption correlates with higher throughput and higher instability; AI is "an amplifier"; capabilities include clear AI policies, quality internal platforms, version control practices, small batches ([InfoQ on DORA 2025](https://www.infoq.com/news/2025/09/dora-state-of-ai-in-dev-2025)) |
-
-Aggregator summaries of AIDev give contradictory per-agent merge figures (for example "Claude 84.3%, Codex 73.5%" vs "Codex dominates at 0.83"); they could not be traced to a primary table and are not used ([emergentmind](https://www.emergentmind.com/topics/aidev.md)).
+| DORA 2025 [Empirical] | AI's "primary role is as an amplifier, magnifying an organization's existing strengths and weaknesses" ([DORA 2025 report](https://dora.dev/research/2025/dora-report/)) |
 
 ## Checklist
 
@@ -416,7 +411,7 @@ Aggregator summaries of AIDev give contradictory per-agent merge figures (for ex
 - [ ] Test-first work has a guard against test edits.
 - [ ] `/goal` conditions name a check, constraints and a bound.
 - [ ] Headless runs: configuration isolated (`--bare` / `settingSources: []` / `--ignore-user-config`); permission mode or sandbox passed explicitly; schema-validated output to a file; turn, time and budget caps.
-- [ ] CI: actions pinned to SHAs; triggers limited to write-access users; no `allowed_non_write_users`, no wildcard bots; no `pull_request_target` with fork checkout; untrusted values via `env:`.
+- [ ] CI: triggers limited to write-access users; no `allowed_non_write_users`, no wildcard bots; no `pull_request_target` with fork checkout; untrusted values via `env:`.
 - [ ] CI: model key only in the agent step; writes happen in a separate job; job `permissions:` minimal; OIDC where available.
 - [ ] Codex action uses `drop-sudo` or `unprivileged-user` and runs as the last step.
 - [ ] Parallel sessions use worktrees with a setup step; headless worktrees are removed.
@@ -428,18 +423,17 @@ Aggregator summaries of AIDev give contradictory per-agent merge figures (for ex
 ## Open questions
 
 - No controlled study compares spec-driven and ad-hoc prompting, or TDD and no TDD, for agent outcomes.
-- ImpossibleBench per-model cheating rates were not extracted; "stronger models cheat more" is unverified.
+- ImpossibleBench per-model cheating rates were not extracted.
 - Codex documentation on compaction and handoff patterns is thin; no Codex counterpart to Anthropic's long-running-harness write-ups.
 - OpenCode: no workflow-level best-practice guidance, no GitHub action security guidance, no SDK best practices beyond the vendor reference.
 - No public data on per-run cost or tokens for CI review or autofix workflows.
 - Codex hosted `@codex review` configuration (severity levels, `AGENTS.md` rules) could not be retrieved from current docs.
 - No vendor statement on whether `codex-action` has had injection CVEs comparable to those reported for Claude, Gemini and Copilot.
 - No data on merge-conflict rates when merging many parallel agent branches; no vendor guidance on concurrent sessions per reviewer.
-- `codex cloud exec --attempts` semantics and winner selection come from a third-party blog only.
+- The fetched Codex docs do not say how a winning `codex cloud exec --attempts` attempt is chosen.
 - No numbers on scheduled agent jobs (for example dependency-update success vs Renovate or Dependabot); Codex scheduled-task guardrails are undocumented in the fetched pages.
 - No comparison of SDK-built and CLI-scripted automation reliability or cost.
 - No study measures human review time per agent PR directly; no study separates headless/CI-originated PRs from interactive ones; PR-acceptance studies conflate tool, model version and usage.
-- Ramp's ~75% PR share by May 2026 and the "Clinejection" details are unverified secondary claims.
 
 ## Sources
 
@@ -463,6 +457,7 @@ Vendor:
 - [codex-action security.md](https://github.com/openai/codex-action/blob/main/docs/security.md)
 - [Codex cloud](https://learn.chatgpt.com/docs/cloud)
 - [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk)
+- [Codex CLI command reference](https://learn.chatgpt.com/docs/developer-commands.md?surface=cli)
 
 Empirical:
 
@@ -473,24 +468,17 @@ Empirical:
 - [Nakashima et al., arXiv 2602.04226](https://arxiv.org/abs/2602.04226)
 - [Mazloomzadeh et al., arXiv 2607.21832](https://arxiv.org/abs/2607.21832)
 - [METR 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/); [METR Feb 2026 update](https://metr.org/blog/2026-02-24-uplift-update/)
-- [InfoQ on DORA 2025](https://www.infoq.com/news/2025/09/dora-state-of-ai-in-dev-2025)
-- [emergentmind AIDev summary (aggregator, not used for figures)](https://www.emergentmind.com/topics/aidev.md)
+- [DORA 2025 report](https://dora.dev/research/2025/dora-report/)
 
 Advisory:
 
-- [The Hacker News, claude-code-action flaw](https://thehackernews.com/2026/06/claude-code-github-action-flaw-let-one.html)
-- [CSA research note, AI GitHub Actions security](https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-github-actions-security-20260503-csa-st/)
-- [CSA research note, Claude Code GitHub Action prompt injection](https://labs.cloudsecurityalliance.org/research/csa-research-note-claude-code-github-action-prompt-injection/)
+- [GitHub advisory GHSA-8q5r-mmjf-575q (CVE-2026-47751), claude-code-action](https://github.com/anthropics/claude-code-action/security/advisories/GHSA-8q5r-mmjf-575q)
+- [SecurityWeek, "Comment and Control"](https://www.securityweek.com/claude-code-gemini-cli-github-copilot-agents-vulnerable-to-prompt-injection-via-comments/)
 
 Practitioner:
 
 - [Böckeler, Understanding SDD tools](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)
-- [softwareseni.com, spec-driven development (secondary)](https://www.softwareseni.com/spec-driven-development-is-replacing-vibe-coding-as-the-professional-standard-for-ai-teams)
 - [Willison, Red/green TDD](https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/)
 - [Willison, parallel coding agents](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)
-- [Vaughan, Codex non-interactive pipelines](https://codex.danielvaughan.com/2026/05/03/codex-cli-non-interactive-pipelines-exec-resume-structured-output/)
-- [Vaughan, Codex best-of-N](https://codex.danielvaughan.com/2026/04/01/codex-cloud-exec-best-of-n-attempts/)
-- [InfoQ on Ramp's coding agent platform](https://www.infoq.com/news/2026/01/ramp-coding-agent-platform/)
-- [port.io on Ramp (secondary)](https://software-factories.port.io/ramp)
 
 Repo: [automation concept page](../concepts/automation.md), [concept index](../concepts/README.md)

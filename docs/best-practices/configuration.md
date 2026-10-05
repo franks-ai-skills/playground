@@ -147,12 +147,12 @@ Configuration stores every other control: permission rules, sandbox policy, hook
 
 ### 5. Filter secrets from subprocess environments explicitly
 
-- **Why:** CC sandboxed commands inherit environment variables "including any secrets". For Codex the sources disagree: the fetched Codex docs summary says the default removes names containing KEY, SECRET or TOKEN, while this repository's vendor notes record `ignore_default_excludes` defaulting to `true`, so those names pass through ([Codex configuration](../vendors/codex/configuration.md)).
+- **Why:** CC sandboxed commands inherit environment variables "including any secrets". For Codex, this repository's vendor notes record `ignore_default_excludes` defaulting to `true`, so names containing KEY, SECRET or TOKEN pass through ([Codex configuration](../vendors/codex/configuration.md)).
 - **How:**
   - CC: set `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` to strip credentials from all subprocesses. Inside the sandbox, `sandbox.credentials.envVars` with `deny` unsets a variable before each sandboxed command, and `mask` replaces it with a per-session sentinel that the proxy swaps back only on requests to allowed hosts.
   - Codex: set `ignore_default_excludes = false` explicitly under `[shell_environment_policy]`, and use `exclude`/`filters` or `include_only`. "Includes don't restore variables that were already excluded."
   - Do not put secrets in the CC `env` block; it passes them to the session and every subprocess.
-- **Evidence:** [Vendor] [CC sandboxing](https://code.claude.com/docs/en/sandboxing); [Vendor] [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced). The two Codex sources disagree.
+- **Evidence:** [Vendor] [CC sandboxing](https://code.claude.com/docs/en/sandboxing); [Vendor] [Codex advanced config](https://learn.chatgpt.com/codex/config-advanced); [Vendor] via the [Codex vendor notes](../vendors/codex/configuration.md).
 
 ### 6. Use task profiles instead of editing the base config
 
@@ -245,11 +245,9 @@ Several fixes were delivered by forced updates (CC deprecated versions before 1.
 
 ## Open questions
 
-- **Codex secret filtering default.** The fetched Codex docs summary says KEY/SECRET/TOKEN names are removed by default; the repository's vendor notes say `ignore_default_excludes` defaults to `true`, so they pass through. Unresolved; set it explicitly.
 - **Codex array merging** across layers is not documented.
 - **CODEOWNERS or branch protection** for harness config is inference from the CVE history; no vendor document prescribes it.
 - **CVE-2025-61260 fixed version.** The configuration research lists affected versions as "≤ 0.23.0"; the hooks research records "Fixed in 0.23.0 (2025-08-20)". Check [NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260) before relying on a version boundary.
-- **CC `permission_mode_changed` telemetry event** appeared in a fetched summary but was not confirmed on the monitoring page.
 - **Adoption and outcomes** of managed settings and requirements: no public data found.
 - **SIEM detection content** over `tool_decision` events: none found from vendors.
 

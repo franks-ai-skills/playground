@@ -157,7 +157,7 @@ Claude Code also has judgement hooks (`prompt`, `agent`), which Codex skips; Ope
 
 5. **Keep synchronous hooks fast with explicit timeouts and narrow matchers.**
    - Why: Defaults are 600 s, and "a timed-out `command`, `http`, or `mcp_tool` hook doesn't block the tool call", so a hang fails open. Without a matcher a hook fires on every occurrence.
-   - How: Set `timeout` explicitly, for example 5 to 10 s on gates (inference; no vendor numbers); no slow network calls in gate logic; filter in the matcher, then exit 0 early. Claude Code's `if` field avoids spawning the process at all.
+   - How: Set `timeout` explicitly and keep it short on gates (inference); no slow network calls in gate logic; filter in the matcher, then exit 0 early. Claude Code's `if` field avoids spawning the process at all.
    - Evidence: [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks), [Codex hooks](https://learn.chatgpt.com/docs/hooks). No latency measurements exist.
 
 6. **Use async hooks for observation only.**
@@ -239,7 +239,7 @@ No advisory specific to the Codex hooks system was found as of 2026-10-04.
 **Script skeleton** (inference from both contracts):
 
 1. Read stdin; take `hook_event_name` and `tool_name`.
-2. Target file: `.tool_input.file_path // .tool_input.path`; if empty and `tool_name == "apply_patch"`, parse `*** Update File:` and `*** Add File:` lines from `.tool_input.command`.
+2. Target file: `.tool_input.file_path // .tool_input.path`; if empty and `tool_name == "apply_patch"`, the target paths are inside the patch text in `.tool_input.command`, whose format is not specified.
 3. Bash command: `.tool_input.command` in both leads.
 4. Exit 0 silently, or print the reason to stderr and exit 2. On `Stop`, print JSON.
 5. Resolve paths with `$(git rev-parse --show-toplevel)` or the input `cwd`, not `${CLAUDE_PROJECT_DIR}`.
@@ -277,7 +277,6 @@ Traps:
 - **Codex `apply_patch` grammar** inside `tool_input.command` and **matcher anchoring** for `Edit|Write` are not specified.
 - **Codex async timeouts** and the interaction of hook decisions with approval policy are not documented.
 - **Claude Code per-hook trust:** none; trust is per workspace.
-- **OpenCode** issue [#5894](https://github.com/anomalyco/opencode/issues/5894) (subagent tool calls not intercepted) is unverified.
 - **Evidence gaps:** no data on common hook use cases or their benefit, no latency measurements, no bypass-rate comparison with rules or sandbox. A study of 2,926 repositories found hooks mostly in settings files but gives no counts ([Galster et al., arXiv:2602.14690](https://arxiv.org/abs/2602.14690)).
 
 ## Sources

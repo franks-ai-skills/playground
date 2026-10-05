@@ -209,7 +209,7 @@ From the [hooks reference](https://code.claude.com/docs/en/hooks):
 - An AGENTS.md loaded through the "Project instructions" setting does not fire `InstructionsLoaded` ([memory](https://code.claude.com/docs/en/memory)).
 - Mods (v2.1.287+) answering `tool.check` can override ask rules and non-managed hook blocks ([permissions](https://code.claude.com/docs/en/permissions)).
 - Version history: HTTP hooks added in v2.1.63; `mcp_tool` hooks in v2.1.118; `MessageDisplay` in v2.1.152; `DirectoryAdded` in v2.1.219; `PreModelSwitch`/`PostModelSwitch` in v2.1.251 ([changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)).
-- Inference (from the research notes), common mistakes: exit 1 instead of 2 for a policy gate; non-JSON noise on stdout (e.g. shell-profile output); matching `mcp__server` without `__.*`; treating `if` as a security boundary; assuming `-p` respects workspace trust.
+- Inference (from the research notes), common mistakes: exit 1 instead of 2 for a policy gate; matching `mcp__server` without `__.*`; treating `if` as a security boundary; assuming `-p` respects workspace trust.
 - Best practices from the docs: validate input, quote variables, block path traversal, use absolute paths, skip sensitive files ([hooks reference](https://code.claude.com/docs/en/hooks)).
 - Gap (research notes): not every per-event input schema was read in full (PreModelSwitch naming, FileChanged watch semantics, Elicitation fields, MessageDisplay output).
 - Gap (research notes): the hooks guide (`/docs/en/hooks-guide`) was only skimmed through the reference, and the mods docs (JavaScript function hooks) were not read beyond the one-line description.

@@ -30,7 +30,6 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 | Access to an external system or data | [MCP server](../concepts/mcp.md); a skill teaches what to do with it. "MCP connects to data; Skills teach Claude what to do with that data" | [Anthropic blog](https://claude.com/blog/skills-explained) |
 | Deterministic, repeatable transformation | A script, usually bundled in the skill's `scripts/` | [Codex build skills](https://learn.chatgpt.com/docs/build-skills) |
 | Two or more skills, or a skill plus a connector, shared across repos | [Plugin](../concepts/plugins.md) | [Codex build skills](https://learn.chatgpt.com/docs/build-skills) |
-| A recurring kind of team work. Anthropic's internal skills cluster into library/API reference, product verification, data fetching and analysis, business process automation, code scaffolding, code quality and review, CI/CD and deployment, runbooks, infrastructure operations | Skill | [Practitioner] [Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md) |
 | A one-step request the model handles alone | Nothing; agents "typically only consult skills for tasks that require knowledge or capabilities beyond what they can handle alone" | [agentskills.io](https://agentskills.io/skill-creation/optimizing-descriptions.md) |
 
 ## Approaches
@@ -69,7 +68,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **When it fits.** Knowledge whose omission causes silently wrong output.
 
-**How.** Vercel's 8 KB pipe-delimited docs index in `AGENTS.md` scored 100% vs 53% for a default skill and 79% for a skill with explicit instructions. Wording mattered: "You MUST invoke the skill" anchored the agent on the docs and missed project context; "Explore project first, then invoke skill" scored better ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)). See [Instructions: practice 4](./instructions.md#4-move-situational-guidance-out-of-the-always-loaded-file).
+**How.** Vercel's 8 KB pipe-delimited docs index in `AGENTS.md` scored 100%; skills reached at most 79% even with explicit instructions, against a 53% baseline without docs. Wording mattered: "You MUST invoke the skill" anchored the agent on the docs and missed project context; "Explore project first, then invoke skill" scored better ([Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)). See [Instructions: practice 4](./instructions.md#4-move-situational-guidance-out-of-the-always-loaded-file).
 
 **Trade-offs.** The pointer or index costs instruction budget every session. Evidence is one framework, January 2026, models not published.
 
@@ -79,7 +78,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **When it fits.** Fragile, deterministic or repeatedly reinvented operations; when traces show the agent rewriting the same helper each run ([agentskills.io](https://agentskills.io/skill-creation/best-practices.md)).
 
-**How.** See [practice 6](#6-put-deterministic-logic-in-tested-scripts). State whether to execute or read each script. [Practitioner] Thariq (Anthropic) stores a skill's setup in a `config.json` inside the skill and persists data (append-only logs, JSON, SQLite) in `${CLAUDE_PLUGIN_DATA}` (Claude Code plugins) ([mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)). Skills depend on filesystem access and command execution ([Simon Willison](https://simonwillison.net/2025/Oct/16/claude-skills/)). Pre-approval differs: Claude Code can pre-approve scripts through `allowed-tools`; Codex gates skill scripts through `approval_policy.granular.skill_approval`; there is no shared mechanism ([concept: body](../concepts/skills.md#body)).
+**How.** See [practice 6](#6-put-deterministic-logic-in-tested-scripts). State whether to execute or read each script. Skills depend on filesystem access and command execution ([Simon Willison](https://simonwillison.net/2025/Oct/16/claude-skills/)). Pre-approval differs: Claude Code can pre-approve scripts through `allowed-tools`; Codex gates skill scripts through `approval_policy.granular.skill_approval`; there is no shared mechanism ([concept: body](../concepts/skills.md#body)).
 
 **Trade-offs.** "Prefer instructions over scripts unless you need deterministic behavior or external tooling" ([Codex build skills](https://learn.chatgpt.com/docs/build-skills)). Scripts are code that must be maintained and reviewed. Only their output consumes context ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
@@ -105,7 +104,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **How.** For Claude Code plus Codex, keep one canonical copy in `.agents/skills/<name>/` and symlink `.claude/skills/<name>` to it; both leads follow symlinked skill folders. Repeat at user scope with `~/.agents/skills/` and `~/.claude/skills/` ([concept: directory layout](../concepts/skills.md#directory-layout)). Codex needs a restart after installing ([openai/skills](https://github.com/openai/skills)).
 
-**Trade-offs.** OpenCode reads both directories and may see the skill twice; `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS=1` stops it reading Claude Code skills. Codex's `$skill-installer` writes to the deprecated `$CODEX_HOME/skills`, invisible to Claude Code. Vercel's `npx skills` CLI writes to `.codex/skills/`, which contradicts Codex's documented `.agents/skills` project root ([third-party write-up](https://codex.danielvaughan.com/2026/05/31/codex-cli-vercel-skills-cli-npx-skills-open-agent-skills-ecosystem/)). The `openai/skills` repository is marked deprecated in favor of OpenAI's plugins repository ([openai/skills](https://github.com/openai/skills)).
+**Trade-offs.** OpenCode reads both directories and may see the skill twice; `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS=1` stops it reading Claude Code skills. Codex's `$skill-installer` writes to the deprecated `$CODEX_HOME/skills`, invisible to Claude Code. The `openai/skills` repository is marked deprecated in favor of OpenAI's plugins repository ([openai/skills](https://github.com/openai/skills)).
 
 ## Practices
 
@@ -140,7 +139,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - [Vendor] Third person, naming rules ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); Claude "undertriggers", be "a little bit pushy" ([Anthropic skill-creator](https://raw.githubusercontent.com/anthropics/skills/main/skills/skill-creator/SKILL.md)).
 - [Vendor] "front-load the key use case and trigger words"; descriptions "may be shortened when many skills exist" ([Codex build skills](https://learn.chatgpt.com/docs/build-skills)); name and description "are the primary signals Codex uses" ([OpenAI eval blog](https://developers.openai.com/blog/eval-skills)); all "when to use" information belongs in the description ([OpenAI skill-creator](https://raw.githubusercontent.com/openai/skills/main/skills/.system/skill-creator/SKILL.md)).
 - [Vendor] Example, truncation, troubleshooting ([Claude Code skills](https://code.claude.com/docs/en/skills)).
-- [Practitioner] "Description = When to Use, NOT What the Skill Does" and the two-reviews failure ([superpowers writing-skills](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)); "The description field is for the model" (Thariq Shihipar, Anthropic, 2026-03-17, [mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md) of [X post](https://x.com/trq212/status/2033949937936085378)).
+- [Practitioner] "Description = When to Use, NOT What the Skill Does" and the two-reviews failure ([superpowers writing-skills](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)).
 - [Practitioner] Scott Spence (2026-02-08; ~250 sandboxed runs, Sonnet 4.5): when Claude activates a skill "it always picks correctly", so the problem is activation frequency; explicit keywords gave ~100% activation, conceptual phrasings ~0% ([Scott Spence](https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals)). Small sample, one author.
 
 ### 3. Keep `SKILL.md` lean and put gotchas first
@@ -149,13 +148,13 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **Why.** "The context window is a public good." "Every line is a recurring token cost once the skill loads." In Claude Code only the first 5,000 tokens per skill (25,000 combined) are re-attached after compaction, and older skills may drop entirely. Measured data favors focused skills over comprehensive ones.
 
-**How.** Ask of each paragraph: "Does this paragraph justify its token cost?" Do not explain what the model knows. Keep the gotchas in `SKILL.md`, not in a reference, because the agent "may not recognize the trigger" to open it. Do not add README.md or CHANGELOG.md to the skill. Avoid time-sensitive statements; put old patterns in a collapsed "Old patterns" section. Use consistent terminology. Start small: "Most of ours began as a few lines and a single gotcha."
+**How.** Ask of each paragraph: "Does this paragraph justify its token cost?" Do not explain what the model knows. Keep the gotchas in `SKILL.md`, not in a reference, because the agent "may not recognize the trigger" to open it. Do not add README.md or CHANGELOG.md to the skill. Avoid time-sensitive statements; put old patterns in a collapsed "Old patterns" section. Use consistent terminology.
 
 **Evidence.**
 - [Advisory] Under 500 lines, < 5,000 tokens; gotchas are "the highest-value content in many skills"; "Concise, stepwise guidance with a working example tends to outperform exhaustive documentation" ([specification](https://agentskills.io/specification), [best practices](https://agentskills.io/skill-creation/best-practices.md)).
 - [Vendor] Public good, token-cost question, "Default assumption: Claude is already very smart" ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); recurring cost, standing instructions, compaction limits ([Claude Code skills](https://code.claude.com/docs/en/skills)); no README/CHANGELOG, imperative form ([OpenAI skill-creator](https://raw.githubusercontent.com/openai/skills/main/skills/.system/skill-creator/SKILL.md)).
 - [Empirical] "Moderate-length Skills outperform comprehensive ones": detailed +18.8 pp vs comprehensive −2.9 pp ([SkillsBench](https://arxiv.org/html/2602.12670v1)).
-- [Practitioner] Thariq (Anthropic): "Don't state the obvious"; gotchas are the highest-signal content ([mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)). superpowers: frequently loaded skills "<200 words total" ([superpowers](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)).
+- [Practitioner] superpowers: frequently loaded skills "<200 words total" ([superpowers](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)).
 
 ### 4. Disclose detail progressively with explicit triggers
 
@@ -182,7 +181,6 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 **Evidence.**
 - [Vendor] Degrees of freedom, checklist, feedback loops, plan-validate-execute, templates, defaults with escape hatch ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); same model in [OpenAI skill-creator](https://raw.githubusercontent.com/openai/skills/main/skills/.system/skill-creator/SKILL.md).
 - [Advisory] "Provide defaults, not menus"; "Favor procedures over declarations" ([agentskills.io best practices](https://agentskills.io/skill-creation/best-practices.md)).
-- [Practitioner] "Avoid railroading Claude" ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)).
 
 ### 6. Put deterministic logic in tested scripts
 
@@ -200,7 +198,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - Paths relative to the skill root. Refer to MCP tools by fully qualified name.
 - In the body, reference `--help` instead of documenting flags.
 
-**Evidence.** [Vendor] Scripts guidance ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); scripts when code is "repeatedly rewritten or deterministic reliability is needed" ([OpenAI skill-creator](https://raw.githubusercontent.com/openai/skills/main/skills/.system/skill-creator/SKILL.md)). [Advisory] Interface rules ([agentskills.io using scripts](https://agentskills.io/skill-creation/using-scripts.md)). [Practitioner] Ship scripts so the agent "spend[s] its turns on composition" ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)); reference `--help` ([superpowers](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)).
+**Evidence.** [Vendor] Scripts guidance ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); scripts when code is "repeatedly rewritten or deterministic reliability is needed" ([OpenAI skill-creator](https://raw.githubusercontent.com/openai/skills/main/skills/.system/skill-creator/SKILL.md)). [Advisory] Interface rules ([agentskills.io using scripts](https://agentskills.io/skill-creation/using-scripts.md)). [Practitioner] Reference `--help` ([superpowers](https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md)).
 
 ### 7. Explain the why before adding hard rules
 
@@ -224,7 +222,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **How.**
 - Set `disable-model-invocation: true` (Claude Code) and `policy.allow_implicit_invocation: false` in `agents/openai.yaml` (Codex) ([concept](../concepts/skills.md#invocation-policy-in-both-leads)).
-- Write "The user names the issue number in their message; if missing, ask." Treat `$ARGUMENTS`, `$0`/`$1` and named arguments as Claude Code-only. Claude Code numbers arguments from `$0`; older tutorials using `$1` may address the second argument ([concept: commands](../concepts/commands.md#portability)).
+- Write "The user names the issue number in their message; if missing, ask." Treat `$ARGUMENTS`, `$0`/`$1` and named arguments as Claude Code-only. Claude Code numbers arguments from `$0`, Codex prompts and OpenCode from `$1` ([concept: commands](../concepts/commands.md#portability)).
 - Still write a good description: it appears in menus and in the Codex `/skills` list.
 - Keep a skill model-invocable if a Claude Code schedule must run it.
 - Claude Code-only: `user-invocable: false` hides background knowledge from the menu; it does not generalize.
@@ -267,13 +265,12 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **Why.** Both catalogs are 1–2% of context and truncate silently. With Codex's 8,000-character floor, about 16 skills at 500 characters fill it (inference). Too narrow skills load together with conflicting instructions; too broad ones are "hard to activate precisely". Two to three skills per task helped far more than four or more.
 
-**How.** Count catalog characters per harness. Use `/skill-doctor` (Claude Code) for context cost and never-invoked skills; `skillOverrides` (`off`, `name-only`) or Codex `[[skills.config]] enabled = false` to disable without deleting. Start new skills in a sandbox folder and promote them by PR after they prove useful. Test triggering per harness, because budgets differ.
+**How.** Count catalog characters per harness. Use `/skill-doctor` (Claude Code) for context cost and never-invoked skills; `skillOverrides` (`off`, `name-only`) or Codex `[[skills.config]] enabled = false` to disable without deleting. Test triggering per harness, because budgets differ.
 
 **Evidence.**
 - [Vendor] Budgets and overflow ([Codex build skills](https://learn.chatgpt.com/docs/build-skills), [concept](../concepts/skills.md#comparison)); `/skill-doctor`, `skillOverrides` ([Claude Code skills](https://code.claude.com/docs/en/skills)); "Keep each skill focused on one job" ([Codex build skills](https://learn.chatgpt.com/docs/build-skills)).
 - [Empirical] 2–3 skills per task +18.6 pp vs 4+ skills +5.9 pp ([SkillsBench](https://arxiv.org/html/2602.12670v1)). This measures skills per task, not catalog size.
 - [Advisory] "Coherent units" ([agentskills.io best practices](https://agentskills.io/skill-creation/best-practices.md)).
-- [Practitioner] Sandbox folder, promotion by PR, "Curation prevents skill redundancy"; Anthropic has "hundreds of them in active use" ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)).
 
 ### 12. Keep one canonical copy with portable frontmatter
 
@@ -296,9 +293,9 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **Why.** Skills are context. After compaction only the most recent invocation of each skill is re-attached, and older skills "may drop entirely".
 
-**How.** Claude Code: "move rules into hooks if they must hold every time"; skill-scoped `hooks` frontmatter (for example a `/careful` skill that blocks destructive commands while invoked). Codex has no skill-scoped hooks; use a regular hook ([concept: hooks](../concepts/hooks.md)).
+**How.** Claude Code: "move rules into hooks if they must hold every time"; skill-scoped `hooks` frontmatter. Codex has no skill-scoped hooks; use a regular hook ([concept: hooks](../concepts/hooks.md)).
 
-**Evidence.** [Vendor] ([Claude Code skills](https://code.claude.com/docs/en/skills)). [Practitioner] On-demand hooks such as `/careful` and `/freeze` ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)).
+**Evidence.** [Vendor] ([Claude Code skills](https://code.claude.com/docs/en/skills)).
 
 ## Anti-patterns
 
@@ -345,7 +342,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
   - Check Claude Code `allowed-tools`, `hooks` and `` !`cmd` ``; check Codex `agents/openai.yaml` `dependencies.tools` (MCP).
   - Check that the source repository is maintained.
   - Pin by commit or hash; re-review on every update.
-- [Advisory] OWASP Agentic Skills Top 10 (incubator, v0.0.0, March 2026), AST01 Malicious Skills (Critical; cites ClawHavoc, 1,184 malicious skills, January 2026): verify publisher, install count and scan status; "Reject auto-execution of Prerequisites sections without explicit review"; "Hash-pin installed skills and monitor for unauthorized modifications" ([OWASP AST01](https://owasp.github.io/www-project-agentic-skills-top-10/ast01)).
+- [Advisory] OWASP Agentic Skills Top 10 (incubator, v0.0.0, March 2026), AST01 Malicious Skills (Critical; cites the "ClawHavoc campaign (Jan 2026): 1,184 malicious skills across 12 publisher accounts"): "Display skill publisher trust level, install count, and scan status"; "Never auto-execute 'Prerequisites' sections"; "Hash-pin installed skills" and alert on modifications ([OWASP AST01](https://owasp.github.io/www-project-agentic-skills-top-10/ast01)).
 - Claude Code controls: review `allowed-tools` in unfamiliar repositories; `allowManagedPermissionRulesOnly` makes the harness ignore skill `allowed-tools`; `disableSkillShellExecution` turns off `` !`cmd` ``; claude.ai-synced skills never run injected commands (v2.1.228+) ([Claude Code skills](https://code.claude.com/docs/en/skills)).
 - Codex control: `approval_policy.granular.skill_approval` gates skill scripts ([concept](../concepts/skills.md#body)).
 - Evaluate untrusted skills in isolation. Running `claude plugin eval` on a plugin "is the same trust decision as `claude --plugin-dir`"; with hooks or MCP servers you did not write, "treat its scores as advisory unless you ran it in an isolated environment such as a container or CI runner" ([Claude Code plugin evals](https://code.claude.com/docs/en/plugin-evals)).
@@ -368,8 +365,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 
 **In real use.**
 - `/skill-doctor` (v2.1.252+): per-skill context cost, invocation frequency, never-invoked skills ([Claude Code skills](https://code.claude.com/docs/en/skills)).
-- [Practitioner] Log skill invocations with a `PreToolUse` hook to find popular and under-triggering skills ([Thariq mirror](https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md)).
-- [Practitioner] A `UserPromptSubmit` "forced-eval" hook that makes the model state YES/NO per skill reached 100% activation on standard prompts and 75% accuracy with 100% true negatives on hard prompts, at ~10.7 s added latency; an LLM pre-classifier hook had 80% false positives ([Scott Spence](https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals)). One author, small sample.
+- [Practitioner] A `UserPromptSubmit` "forced-eval" hook that makes the model state YES/NO per skill reached 100% activation on standard prompts and 75% accuracy with 100% true negatives on hard prompts, at 10.7 s average latency vs 8.7 s without a hook (Run 1); an LLM pre-classifier hook had 80% false positives ([Scott Spence](https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals)). One author, small sample.
 - Ask the team whether the skill activates when expected ([Anthropic best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
 **Minimal portable test kit per skill** (synthesis in the [research notes](../research-notes/agent-harness-best-practices/skills.md)): `evals/trigger_queries.json` (20 labeled prompts with near-misses), `evals/evals.json` (behavior cases with assertions), a runner per harness, at least 3 runs each, a pinned model, and a baseline arm. Re-run on every skill change and model upgrade.
@@ -402,7 +398,7 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - No data on how catalog size affects trigger accuracy in either lead; no vendor guidance on skill versioning or deprecation.
 - Whether OpenCode deduplicates symlinked duplicate skills is unrecorded.
 - Prevalence of malicious skills ranges from 0.52% to 46.8% flagged depending on method; numbers are not comparable. No vendor signing or provenance mechanism exists.
-- Not read in the research: AEVAL (arXiv 2607.16345), Phil Schmid's skill-testing guide, OWASP AST02–AST10, the Cloud Security Alliance note on skill-scanner bypass (June 2026).
+- Not read in the research: AEVAL (arXiv 2607.16345), Phil Schmid's skill-testing guide, OWASP AST02–AST10.
 
 ## Sources
 
@@ -429,11 +425,8 @@ External:
 - https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals
 - https://arxiv.org/html/2602.12670v1
 - https://simonwillison.net/2025/Oct/16/claude-skills/
-- https://x.com/trq212/status/2033949937936085378
-- https://gitea.maison43.duckdns.org/gilles/claude-code-best-practice/src/branch/main/tips/claude-thariq-tips-17-mar-26.md
 - https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md
 - https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals
-- https://codex.danielvaughan.com/2026/05/31/codex-cli-vercel-skills-cli-npx-skills-open-agent-skills-ecosystem/
 - https://arxiv.org/abs/2601.10338
 - https://arxiv.org/abs/2602.06547
 - https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub

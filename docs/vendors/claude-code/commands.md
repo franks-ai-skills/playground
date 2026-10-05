@@ -101,7 +101,7 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 - `https://code.claude.com/docs/en/slash-commands.md` returns byte-identical content to the skills page (verified with `cmp` on 2026-10-04). The Agent SDK "slash-commands" page likewise returns the SDK skills page ([slash-commands](https://code.claude.com/docs/en/slash-commands); [Agent SDK skills](https://code.claude.com/docs/en/agent-sdk/skills)).
 - Command files do not support `name` or `paths` ([skills](https://code.claude.com/docs/en/skills)).
 - `/name` after plain text only grants permission; it does not invoke ([skills](https://code.claude.com/docs/en/skills)).
-- Inference (from the research notes): tutorials that treat `.claude/commands/` as a separate feature with its own frontmatter semantics are outdated. In current docs `$0` is the first argument, so older tutorials that used `$1` for the first argument may now mean the second. Gap: how `$1` was numbered before the merge was not found; the claim that numbering changed is unverified.
+- Inference (from the research notes): tutorials that treat `.claude/commands/` as a separate feature with its own frontmatter semantics are outdated. Gap: how `$1` was numbered before the merge was not found.
 - `/fork` meaning changed: on v2.1.161–2.1.211 it started a conversation fork, now done by `/subtask` (v2.1.212+); `/fork` now copies the session into a new background session ([subagents](https://code.claude.com/docs/en/sub-agents); [run agents in parallel](https://code.claude.com/docs/en/agents)).
 
 ## Sources

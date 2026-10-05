@@ -214,9 +214,9 @@ A plugin is code and instructions with your user privileges. Hooks, MCP servers 
 
 Advisories that apply to plugin-enabling configuration:
 
-- [Advisory] Claude Code, Check Point: CVE-2025-59536 (RCE through hooks in repository `.claude/settings.json`), an MCP consent bypass via `enableAllProjectMcpServers` / `enabledMcpjsonServers` in project settings, and API key exfiltration via a project-set `ANTHROPIC_BASE_URL` before the trust dialog. Fixes shipped 2025-08-26, 2025-09-22 and 2025-12-28. The primary article and secondary coverage disagree on which issue CVE-2026-21852 names ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/); [vpncentral](https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/)).
+- [Advisory] Claude Code, Check Point: CVE-2025-59536 (RCE through hooks in repository `.claude/settings.json`), an MCP consent bypass via `enableAllProjectMcpServers` / `enabledMcpjsonServers` in project settings, and API key exfiltration via a project-set `ANTHROPIC_BASE_URL` before the trust dialog. Fixes shipped 2025-08-26, 2025-09-22 and 2025-12-28 ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)).
 - [Advisory] Codex CLI CVE-2025-61260 (CVSS 9.8): a repository `.env` set `CODEX_HOME=./.codex`, and project `mcp_servers` commands ran at startup without a prompt. Fixed in v0.23.0 (2025-08-20) ([Check Point](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/); [NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260)).
-- [Advisory] `postmark-mcp` (2025-09-17) shows the update path risk for packages a plugin might reference: one added line BCC'd every sent email to the attacker ([The Hacker News](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)). See [MCP security](./mcp.md#security).
+- [Advisory] `postmark-mcp` on npm shows the update path risk for packages a plugin might reference: since version 1.0.16 it BCC'd every email to the attacker ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)). See [MCP security](./mcp.md#security).
 
 No plugin supply-chain incident (as opposed to MCP package incidents) was found as of October 2026.
 
@@ -265,8 +265,7 @@ No plugin supply-chain incident (as opposed to MCP package incidents) was found 
 - [Codex Build plugins](https://developers.openai.com/codex/plugins/build.md)
 - [Codex managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)
 - [Check Point Research, Claude Code project files](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
-- [vpncentral summary](https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/)
 - [Check Point Research, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)
 - [NVD CVE-2025-61260](https://nvd.nist.gov/vuln/detail/cve-2025-61260)
-- [The Hacker News, first malicious MCP server](https://thehackernews.com/2025/09/first-malicious-mcp-server-found.html)
+- [CSO Online, squatted Postmark connector](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
 - Repo: [plugins concept page](../concepts/plugins.md), [concept index](../concepts/README.md)

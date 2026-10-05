@@ -161,10 +161,10 @@ Fix GitHub issue $ARGUMENTS following our coding standards.
 (Field set and semantics per [Skills](https://code.claude.com/docs/en/skills).)
 
 ### Inferences
-- Any tutorial that treats `.claude/commands/` as a distinct feature with its own frontmatter (e.g. a separate `allowed-tools` semantic or 1-based `$1` as the first argument) should be treated as outdated. In current docs `$0` is the first argument, so tutorials predating the merge that used `$1` for the first argument may now mean the second one.
+- Any tutorial that treats `.claude/commands/` as a distinct feature with its own frontmatter (e.g. a separate `allowed-tools` semantic) should be treated as outdated.
 
 ### Gaps
-- I did not find documentation of how `$1` was numbered before the merge (0- or 1-based). The claim that this changed is unverified.
+- I did not find documentation of how `$1` was numbered before the merge (0- or 1-based).
 
 ## Subagents (`.claude/agents`, frontmatter, built-ins, Agent tool, isolation, nesting, `--agents`, teams, background, forking)
 
@@ -507,7 +507,6 @@ Control flows through exit codes (2 = block on blockable events) and JSON stdout
 ### Inferences
 - The most common bugs readers will hit:
   - Using exit 1 instead of 2 for a policy gate.
-  - Printing non-JSON noise to stdout, such as shell-profile output.
   - Matching `mcp__server` without `__.*`.
   - Expecting `if` to be a hard security boundary.
   - Assuming `-p` respects workspace trust.
@@ -679,7 +678,6 @@ return audits.filter(Boolean)
   - Agent teams: a lead agent.
   - Workflows: a script.
   - Routines and loops: a scheduler.
-- The workflows page's comparison table is the best single source for that framing.
 - For CI the safest baseline is `--bare` + explicit `--allowedTools` / `--settings`, because default `-p` loads repo hooks and MCP servers without trust prompts.
 
 ### Gaps

@@ -157,7 +157,7 @@ From [checkpointing](https://code.claude.com/docs/en/checkpointing):
 - `/batch`: 5–30 worktree-isolated background subagents ([commands](https://code.claude.com/docs/en/commands)).
 - Channels (research preview): MCP servers that push events into a running session ([channels](https://code.claude.com/docs/en/channels)).
 - Background sessions: `claude --bg`, `/background`, managed in agent view (`claude agents`) ([agent view](https://code.claude.com/docs/en/agent-view)). See [subagents.md](subagents.md#other-parallel-features).
-- Inference (from the research notes): the orchestration options differ by who holds the plan: Claude turn by turn (skills, subagents), a lead agent (agent teams), a script (workflows), or a scheduler (routines, loops). The workflows page's comparison table is the best single source for this framing.
+- Inference (from the research notes): the orchestration options differ by who holds the plan: Claude turn by turn (skills, subagents), a lead agent (agent teams), a script (workflows), or a scheduler (routines, loops).
 
 ## Example
 

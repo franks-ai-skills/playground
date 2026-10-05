@@ -93,7 +93,7 @@ OpenCode takes the name from the file path, so name the file after the agent.
 - Codex: one agent per review dimension (security, code quality, tests, maintainability), consolidated by category; Codex "waits until all requested results are available" and returns one consolidated response ([Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents)).
 - Scale effort to the question. Anthropic's lead prompt: "Simple fact-finding requires just 1 agent with 3-10 tool calls, direct comparisons might need 2-4 subagents with 10-15 calls each"; the lead "spins up 3-5 subagents in parallel" ([Anthropic: multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), older, 2025).
 
-**Trade-offs.** [Empirical] Centralized coordination amplified errors 4.4 times versus 17.2 times for independent agents; "orchestrators function as validation checkpoints" ([Google Research](https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/)). Synchronous fan-in blocks on the slowest worker ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)). Workers re-explore overlapping parts of the repository; a persistent shared search subagent cut per-episode GPU energy by up to 25% without losing task performance ([summary of arXiv 2605.27787](https://chatpaper.com/chatpaper/paper/287528)).
+**Trade-offs.** [Empirical] Centralized coordination amplified errors 4.4 times versus 17.2 times for independent agents; "orchestrators function as validation checkpoints" ([Google Research](https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/)). Synchronous fan-in blocks on the slowest worker ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)). Workers re-explore overlapping parts of the repository; a persistent search sub-agent cut per-episode GPU energy by 11–30% while preserving task performance ([arXiv 2605.27787](https://arxiv.org/abs/2605.27787)).
 
 ### Chain and explore-plan-implement
 
@@ -282,7 +282,7 @@ OpenCode takes the name from the file path, so name the file after the agent.
 
 **How.** See [Verification](#verification). Pilot on 2–3 items before a large fan-out.
 
-**Evidence.** [Empirical] Older: start with "about 20 queries representing real usage patterns" ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system), 2025); evaluate accuracy together with tokens and time ([SWE-Effi](https://alphaxiv.org/abs/2509.09853)). [Vendor] Pilot on 2–3 items ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). No study validates the ~20-task heuristic for coding agents.
+**Evidence.** [Empirical] Older: start with "about 20 queries representing real usage patterns" ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system), 2025); evaluate accuracy together with tokens and time, since leaderboards "focus solely on solution accuracy" ([SWE-Effi](https://arxiv.org/abs/2509.09853)). [Vendor] Pilot on 2–3 items ([Claude Code best practices](https://code.claude.com/docs/en/best-practices)). No study validates the ~20-task heuristic for coding agents.
 
 ## Anti-patterns
 
@@ -358,8 +358,8 @@ OpenCode takes the name from the file path, so name the file after the agent.
 
 ## Open questions
 
-- No controlled study compares Claude Code or Codex subagent use with single-agent runs on a coding benchmark with token accounting. A claim of "72.2% on SWE-bench Verified, a 7.2% improvement" had no primary source and is not used.
-- The Google study's blog and arXiv versions differ in size and fit (180 vs 260 configurations; R² 0.513 vs 0.373). Its "capability saturation" threshold was not confirmed in the fetched text. MAST per-category failure shares were not visible.
+- No controlled study compares Claude Code or Codex subagent use with single-agent runs on a coding benchmark with token accounting.
+- The Google study's blog and arXiv versions differ in size and fit (180 vs 260 configurations; R² 0.513 vs 0.373). MAST per-category failure shares were not visible.
 - No comparison of per-agent model routing on quality or cost; no comparison of small versus large custom-agent catalogs.
 - Codex documents no default for `agents.max_concurrent_threads_per_session`, no nesting limit, no authority labeling of results, no cross-thread injection handling and no per-subagent token accounting. No Codex custom-agent example catalog was retrievable beyond the review-dimension example.
 - No published comparison of a reviewer subagent with self-review; Cognition's bug-catch figures have no published method.
@@ -394,7 +394,7 @@ External:
 - https://arxiv.org/abs/2512.08296
 - https://arxiv.org/abs/2503.13657
 - https://arxiv.org/abs/2511.00872
-- https://chatpaper.com/chatpaper/paper/287528
-- https://alphaxiv.org/abs/2509.09853
+- https://arxiv.org/abs/2605.27787
+- https://arxiv.org/abs/2509.09853
 - https://cognition.com/blog/dont-build-multi-agents
 - https://cognition.com/blog/multi-agents-working
