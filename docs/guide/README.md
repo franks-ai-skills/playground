@@ -7,6 +7,11 @@ comparison, model, when to use it and when not, approaches, key
 practices with evidence labels, security, verification checklist,
 portability and dropped features.
 
+For security decisions, start with [security.md](security.md): attacks
+across all ten concepts, defenses, proposed benign verification and
+recovery. The [research audit](../research-notes/agent-harness-security.md)
+explains what was already covered and what the deeper review added.
+
 Start with the [overview](../overview.md) to choose a concept. The
 condensed detail is still available in `../concepts/`,
 `../best-practices/`, `../vendors/` and `../research-notes/`.

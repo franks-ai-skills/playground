@@ -183,7 +183,16 @@ Both parts are on one page because both leads couple them: Codex picks its appro
 | Sandbox escape via Docker socket, `$PATH` writes, excluded interpreters | [CC sandboxing](https://code.claude.com/docs/en/sandboxing) | [Practice 6](#practices) |
 | MCP servers and hooks outside the sandbox | Both leads | Sandbox runtime or container; MCP allowlist |
 
-Every CVE above exploited something that ran before or outside the permission system (inference). Test those paths, not only the rule lists.
+The cited cases span pre-trust execution, execution outside the command sandbox and unsafe approval decisions. Verify startup, approval and executor boundaries separately; checking rule lists alone misses these different failure modes (inference from the advisories above).
+
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C5–C7: approval scope, all executors and outbound query data. These
+checks are recommendations, not a completed
+deployment evaluation.
 
 ## Verification and checklist
 

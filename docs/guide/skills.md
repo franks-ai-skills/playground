@@ -181,6 +181,15 @@ A skill fits a recurring procedure or specialized knowledge that the model lacks
 - Evaluate untrusted skills in a container or CI runner; running `claude plugin eval` "is the same trust decision as `claude --plugin-dir`" ([Claude Code plugin evals](https://code.claude.com/docs/en/plugin-evals)).
 - No vendor signing or provenance mechanism for skills exists in either lead.
 
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C4/C5: helper execution and approvals after code changes. These
+checks are recommendations, not a completed
+deployment evaluation.
+
 ## Verification and checklist
 
 - **Structure:** `claude plugin validate .claude/skills`; `skills-ref validate ./my-skill` for the spec; `scripts/quick_validate.py` from the Codex skill-creator.

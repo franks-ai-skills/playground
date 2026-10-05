@@ -60,7 +60,7 @@ MCP (Model Context Protocol) servers are external processes or remote endpoints 
 4. Each tool call passes the permission pipeline. A server can mark a tool so that it always needs approval.
 5. Results longer than the output limit are truncated or saved to a file.
 
-**Trust boundary.** MCP servers run outside the command sandbox. Their access is limited only by which servers are allowed and which tool calls are approved.
+**Trust boundary.** MCP server processes are not confined by the command sandbox. Tool-call approval does not constrain independently running server code ([Claude plugin security](https://code.claude.com/docs/en/plugins/security), [Codex limits](../vendors/codex/mcp.md#limits-and-gotchas)). Their actual access also depends on process identity, downstream authorization and outer isolation (inference). Read-only calls can disclose private data in arguments ([OpenAI deep research security](https://developers.openai.com/api/docs/guides/deep-research)).
 
 | Generalized term | Claude Code | Codex | OpenCode |
 | --- | --- | --- | --- |
@@ -137,6 +137,25 @@ Traps:
 - **Exact OAuth client registration details, CIMD** (Codex): the Claude Code OAuth subsections were not researched in detail, so no comparison is possible.
 - **`--strict-mcp-config`** (Claude Code): Codex has no flag that limits a run to command-line servers.
 - **`opencode mcp debug`** (OpenCode): no lead counterpart.
+
+## Protocol revision and security checks
+
+[Specification] These references use MCP 2026-07-28, the
+[current revision](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning).
+They do not establish which revision a deployed harness negotiates.
+For HTTP, validate present Origin (invalid values receive 403); local
+binding and authentication add protection
+([transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http)).
+Authorization also needs resource/audience binding, PKCE, response-issuer
+checks and per-client consent; discovery needs SSRF defenses
+([authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization),
+[security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations),
+[security guidance](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)).
+
+The [security guide](../guide/security.md#mcp-authorization-and-transport)
+connects those requirements to deployment checks and historical SDK
+advisories. Do not conflate current application state handles with
+legacy protocol sessions.
 
 ## Sources
 

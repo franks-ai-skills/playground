@@ -36,6 +36,16 @@ Do not use it, and use instead:
 | A rule must hold every time | [Hooks](hooks.md) | It runs only when someone invokes it |
 | A Claude Code schedule must run it | A model-invocable [skill](skills.md) | In Claude Code the flag also blocks scheduled tasks and subagent preloading |
 
+## Security
+
+User invocation selects a procedure; it does not authorize every action
+that injected content could add to it. Check executable contents,
+arguments, destination and caller authority at the action boundary
+([security research](../research-notes/agent-harness-security.md#4-remembered-approvals-and-output-links-broaden-disclosure),
+[Inference]). See the [security guide](security.md) and proposed
+[canary checks](security.md#verification-with-benign-canaries) C5/C14
+for changed helpers and unsafe output consumption.
+
 ## Portability
 
 - Write new procedures as skills and follow the [skills portability rules](skills.md#portability).

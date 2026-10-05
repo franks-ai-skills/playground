@@ -111,7 +111,7 @@ Per-event decisions:
 | Event | Supported output | Unsupported |
 |---|---|---|
 | `PreToolUse` | Deny with `hookSpecificOutput.permissionDecision: "deny"` plus `permissionDecisionReason`, legacy `{"decision":"block","reason":...}`, or exit 2 with the reason on stderr. Rewrite the call with `permissionDecision: "allow"` plus `updatedInput` (Bash and `apply_patch` need a string `command`). Add context with `additionalContext` | `"ask"`, `decision:"approve"`, `continue:false`, `stopReason`: the hook run is marked failed and the tool call proceeds |
-| `PermissionRequest` | `decision.behavior` `allow` or `deny` (with `message`). Any deny wins. No decision: the normal approval prompt appears | `updatedInput`, `updatedPermissions`, `interrupt` "fail closed today" |
+| `PermissionRequest` | `hookSpecificOutput.decision.behavior` `allow` or `deny` (with `message`). Any deny wins. No decision: the normal approval prompt appears | `updatedInput`, `updatedPermissions`, `interrupt` "fail closed today" |
 | `PostToolUse` | `decision:"block"` or exit 2 replaces the tool result with your feedback (it cannot undo side effects). `continue:false` stops normal processing of the result. `additionalContext` | `updatedMCPToolOutput` not supported yet |
 | `UserPromptSubmit` | Block with `decision:"block"` or exit 2, or add context | |
 | `Stop`, `SubagentStop` | `decision:"block"` plus `reason` (or exit 2): Codex continues with `reason` as a new prompt. `continue:false` from any hook wins | |

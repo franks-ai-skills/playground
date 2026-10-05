@@ -11,6 +11,8 @@ with what it is used for, how and when to use it, and when not to.
 The [security research](research-notes/agent-harness-security.md), dated
 2026-10-05, audits the existing security coverage and extends it with
 attacks across concepts, defensive controls and proposed canary checks.
+Use the [security guide](guide/security.md) to apply the findings across
+the concepts; the proposed adversarial checks have not yet been run.
 
 ## Layout
 

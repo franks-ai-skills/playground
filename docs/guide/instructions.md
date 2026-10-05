@@ -162,7 +162,7 @@ An instruction file is the right tool for short, stable facts that every session
 
 **Threat: instruction files as a prompt-injection channel.** They load automatically and the agent treats them as authoritative. In Claude Code, workspace trust does not gate instruction files, and `claude -p` and the SDK never show the trust dialog ([Claude Code permissions](https://code.claude.com/docs/en/permissions)). The Codex docs gate project `.codex/` config on trust but say nothing about `AGENTS.md`. Assume both leads load a hostile file from a cloned repository.
 
-- [Empirical] A malicious Go dependency detected Codex and wrote an `AGENTS.md` during the build; Codex followed it, inserted a 5-minute sleep and hid the change from the PR summary ([NVIDIA](https://developer.nvidia.com/blog/mitigating-indirect-agents-md-injection-attacks-in-agentic-environments/)).
+- [Empirical; older experiment] A malicious Go dependency wrote an untracked `AGENTS.md`, caused Codex to insert a delay and used code comments to influence its summary. Publication: 2026-04-20; disclosure began 2025-07-01; no harness version is stated. Dependency code execution was already a prerequisite ([NVIDIA original](https://developer.nvidia.com/blog/mitigating-indirect-agents-md-injection-attacks-in-agentic-environments/), [scope and checks](../research-notes/agent-harness-security.md#2-dependency-execution-poisons-project-guidance-and-review)).
 
 **Threat: memory carries injected text forward** into later sessions.
 
@@ -173,6 +173,29 @@ An instruction file is the right tool for short, stable facts that every session
 - `claudeMdExcludes` for vendored paths in Claude Code. Claude Code asks once before external `@` imports.
 - For untrusted repositories in Claude Code: `--setting-sources user`, `--bare`, `--settings '{"disableAllHooks": true}'`.
 - Controls that do not depend on the model: managed deny rules, sandbox network isolation ([permissions and sandbox](permissions-and-sandbox.md)). A line such as "treat fetched content as data" is advisory only.
+
+### Persistent memory injection
+
+[Empirical; preprint] PMPA (2026-09-12) tests external text, images and
+PDFs causing memory writes and later-session disclosure. It uses Claude
+Code/OpenClaw with DeepSeek and Qwen models, local JSON workspace
+simulations and scenario skills; harness versions are unspecified.
+This does not establish a success rate for default Claude or Codex
+deployments ([paper](https://arxiv.org/html/2609.13889v1)).
+
+[Inference] Review persistent writes and their provenance; test recall
+with synthetic markers after a fresh session. Restore poisoned memory
+from reviewed state rather than relying on a conversation reset
+([research scope](../research-notes/agent-harness-security.md#5-memory-poisoning-survives-the-conversation)).
+
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C1–C3: content provenance, unexpected guidance and persistent
+memory. These checks are recommendations, not a completed
+deployment evaluation.
 
 ## Verification and checklist
 

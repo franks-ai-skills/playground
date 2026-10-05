@@ -63,7 +63,7 @@ Details per cell: [Claude Code hooks][cc-hooks], [Codex hooks][cx-hooks], [OpenC
 | `hookSpecificOutput.permissionDecision: "deny"` + `permissionDecisionReason` | Deny a tool call (`PreToolUse`) |
 | `permissionDecision: "allow"` + `updatedInput` | Rewrite the tool input |
 | `{"decision": "block", "reason": "..."}` | Block on `UserPromptSubmit`, `PostToolUse`, `Stop`, `SubagentStop` |
-| `{"decision": {"behavior": "allow" \| "deny"}}` | Answer a `PermissionRequest` |
+| `{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"deny"}}}` | Answer a `PermissionRequest` |
 | `additionalContext` | Extra context on `PreToolUse` in both leads |
 
 | Generalized term | Claude Code | Codex | OpenCode |
@@ -137,12 +137,12 @@ Claude Code also has judgement hooks (`prompt`, `agent`), which Codex skips; Ope
 
 1. **Block with exit 2 or a deny decision, never with exit 1 or ask.**
    - Why: Claude Code treats exit 1 as a non-blocking error and proceeds. Codex marks `permissionDecision: "ask"`, `decision: "approve"`, `continue: false` and `stopReason` on `PreToolUse` as failed "and continues the tool call".
-   - How: Exit 2 with a stderr reason, or `permissionDecision: "deny"` with `permissionDecisionReason`. For a human decision, use the harness's ask rules. Return `allow` only to rewrite input.
+   - How: For `PreToolUse`, exit 2 with a stderr reason, or `hookSpecificOutput.permissionDecision: "deny"` with `permissionDecisionReason`. For `PermissionRequest`, return `hookSpecificOutput.decision.behavior: "deny"` on exit 0; Claude Code ignores exit 2 for that event. For a human decision, use the harness's ask rules. Return `allow` only to rewrite input.
    - Evidence: [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks#exit-code-output), [Codex hooks](https://learn.chatgpt.com/docs/hooks).
 
 2. **Pick one signalling style per hook and keep stdout clean.**
-   - Why: When stdout parses as JSON, Claude Code "ignores the exit code and the JSON alone decides". Stray output (for example from a shell profile) means stdout "no longer starts with `{`". A field at the wrong level is silently ignored.
-   - How: Exit codes alone, or exit 0 plus JSON. Diagnostics go to stderr. Guard profile output with `if [[ $- == *i* ]]`.
+   - Why: On events where exit 2 blocks, JSON cannot override the block. For other exit codes in the standard decision model, valid JSON decides; malformed output normally produces a non-blocking error. `PermissionRequest` requires its decision object. Extra stdout or wrong field nesting can void a decision (security recheck 2026-10-05).
+   - How: Use exit codes alone for a simple `PreToolUse` gate, or exit 0 plus JSON for structured control. `PermissionRequest` needs its nested JSON decision. Diagnostics go to stderr. Guard profile output with `if [[ $- == *i* ]]`.
    - Evidence: [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks), [CC hooks guide](https://code.claude.com/docs/en/hooks-guide).
 
 3. **Write every block reason as an instruction the model can act on.**
@@ -177,7 +177,7 @@ Claude Code also has judgement hooks (`prompt`, `agent`), which Codex skips; Ope
 
 9. **Harden hook scripts against hostile input and fail closed inside the script.**
    - Why: Tool input comes from the model, which injected content can steer. The harness fails open on crashes (exit 1, 127).
-   - How: Parse stdin with `jq`, Python or Node; quote every variable; never `eval` tool input; normalize paths with `realpath` against the project root; use absolute interpreter paths (`/usr/bin/python3`); in Claude Code prefer exec form (`args`); catch parse errors and exit 2 (inference).
+   - How: Parse stdin with `jq`, Python or Node; quote every variable; never `eval` tool input; normalize paths with `realpath` against the project root; use absolute interpreter paths (`/usr/bin/python3`); in Claude Code prefer exec form (`args`); catch parse errors with an event-specific deny (exit 2 for `PreToolUse`, nested JSON for `PermissionRequest`); retain independent permissions/isolation for handler failures (inference).
    - Evidence: [Vendor] [CC hooks reference, security considerations](https://code.claude.com/docs/en/hooks#security-considerations), [Codex hooks](https://learn.chatgpt.com/docs/hooks).
 
 10. **Match the capability, not a single tool.**
@@ -207,9 +207,18 @@ Claude Code also has judgement hooks (`prompt`, `agent`), which Codex skips; Ope
 | A mod or project setting overrides a hook | Claude Code mods, project `disableAllHooks` | Managed hooks, managed-only switch |
 | Prompt injection works around hooks | "Hooks are not a security boundary" ([Trail of Bits](https://github.com/trailofbits/claude-code-config)) | Sandbox and deny rules |
 | Shell injection via tool input; secrets in output | [CC security considerations](https://code.claude.com/docs/en/hooks#security-considerations); Codex spill files | [Practices 7 and 9](#practices) |
-| Silent fail-open | Timeouts, exit 1 or 127, Codex unsupported outputs, untrusted Codex hooks skipped | Exit 2 on internal errors; canary test |
+| Silent fail-open | Timeouts, exit 1 or 127, Codex unsupported outputs, untrusted Codex hooks skipped | Event-specific denial on internal errors; fault/canary tests; independent permissions/isolation |
 
 No advisory specific to the Codex hooks system was found as of 2026-10-04.
+
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C6/C13: alternative executors and missing, malformed or timed-out
+handlers. These checks are recommendations, not a completed
+deployment evaluation.
 
 ## Verification and checklist
 
@@ -220,11 +229,11 @@ No advisory specific to the Codex hooks system was found as of 2026-10-04.
 5. **Bypass check.** Try the blocked action through another tool and confirm that the sandbox or a deny rule stops it.
 
 - [ ] Each hook enforces a rule that must hold every time.
-- [ ] Every gate blocks with exit 2 or `deny`; none rely on exit 1 or `ask`.
+- [ ] Each gate uses its event's valid denial; `PermissionRequest` uses nested JSON. No `PreToolUse` gate relies on exit 1 or Codex `ask`.
 - [ ] Block reasons name the rule and the alternative.
 - [ ] Every `Stop` and `SubagentStop` gate checks `stop_hook_active` and prints JSON.
 - [ ] Synchronous hooks have a short explicit `timeout` and a narrow matcher; async hooks only observe.
-- [ ] Scripts use a JSON parser, quote variables, use absolute paths, exit 2 on internal errors.
+- [ ] Scripts use a JSON parser, quote variables, use absolute paths, return an event-specific deny on internal errors.
 - [ ] Shared hooks handle Codex `apply_patch` as well as `tool_input.file_path`.
 - [ ] Security limits are also enforced by deny rules or the sandbox.
 - [ ] Hook config changes need owner review; headless runs over foreign repositories disable project hooks.
@@ -241,7 +250,7 @@ No advisory specific to the Codex hooks system was found as of 2026-10-04.
 1. Read stdin; take `hook_event_name` and `tool_name`.
 2. Target file: `.tool_input.file_path // .tool_input.path`; if empty and `tool_name == "apply_patch"`, the target paths are inside the patch text in `.tool_input.command`, whose format is not specified.
 3. Bash command: `.tool_input.command` in both leads.
-4. Exit 0 silently, or print the reason to stderr and exit 2. On `Stop`, print JSON.
+4. For `PreToolUse`, exit 0 silently or print the reason to stderr and exit 2. For `PermissionRequest`, use the nested JSON decision above on exit 0. On `Stop`, print JSON.
 5. Resolve paths with `$(git rev-parse --show-toplevel)` or the input `cwd`, not `${CLAUDE_PROJECT_DIR}`.
 
 Traps:

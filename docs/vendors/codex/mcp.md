@@ -139,6 +139,39 @@ CLI equivalent for the first server: `codex mcp add context7 -- npx -y @upstash/
 - **Gap: merge semantics.** Whether a `mcp_servers.<id>` defined in both user and project config is replaced as a whole table or merged per key is not documented.
 - **Gap: CLI flags.** The exact flags of `codex mcp get` and `codex mcp logout` were not captured; the subcommands exist per `codex mcp --help`.
 
+## Protocol security baseline
+
+Security supplement checked 2026-10-05. These are MCP specification
+requirements, not evidence that this harness implements every revision.
+The [current revision is 2026-07-28](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning);
+record the deployment's negotiated revision before applying its rules.
+
+- **Authorization:** validate token audience and resource binding; use
+  PKCE; check a returned authorization-response issuer before code
+  exchange. Reject missing `iss` when issuer support was advertised;
+  compare any returned `iss` even when it was not advertised. Keep
+  upstream tokens separate from MCP tokens; no token passthrough
+  ([authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization),
+  [security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)).
+- **HTTP:** validate present `Origin`, returning 403 for an invalid
+  value. Local-only binding and authentication are additional
+  recommendations, not substitutes for Origin validation
+  ([transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http)).
+- **Server and client duties:** servers validate inputs, enforce access
+  control and rate limits, and sanitize outputs. Clients should confirm
+  sensitive operations, validate results, apply timeouts and log calls;
+  annotations from untrusted servers are untrusted
+  ([tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
+- **Discovery and isolation:** check redirects and resolved addresses
+  against SSRF, bind proxy consent to each client, and reauthorize
+  application state handles. The current revision has no protocol
+  session; do not copy legacy session recipes into it
+  ([security guidance](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices),
+  [tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
+
+See the [cross-concept security guide](../../guide/security.md) for
+attack evidence and proposed verification with synthetic fixtures.
+
 ## Sources
 
 - https://developers.openai.com/codex/mcp

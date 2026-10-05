@@ -189,6 +189,15 @@ Every advisory below exploited configuration that ran before or outside the perm
 
 Several fixes were delivered by forced updates (Claude Code deprecated versions before 1.0.24, per the [CVE-2025-55284 advisory](https://advisories.gitlab.com/pkg/npm/@anthropic-ai/claude-code/CVE-2025-55284/)). Keep harnesses current unless a container pins a version on purpose (inference).
 
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C4: startup discovery and explicitly supplied executables. These
+checks are recommendations, not a completed
+deployment evaluation.
+
 ## Verification and checklist
 
 1. **Layers loaded.** Claude Code `/status` (setting sources); Codex `/debug-config` and `/status`; OpenCode `opencode debug config`. The policy layer appears where expected.

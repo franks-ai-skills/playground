@@ -207,7 +207,7 @@ The core threat is that an agent with **private data access + untrusted content 
 
 ### Inferences
 - In a typical coding session all three trifecta legs are present by default: repo + env secrets (A), issues/web/dependency READMEs (B), network/git push (C). The practical lever is cutting leg C (egress allowlist, no push without ask) or leg A (no secrets in the agent's reach), not detecting injection.
-- Every CVE in this list exploited something running **before or outside** the permission system (startup hooks, MCP launch, base URL, config redirect, model-chosen cwd, auto-approved "safe" commands). Verification should focus on those pre-trust and out-of-sandbox paths, not only on rule lists.
+The cited cases span pre-trust execution, execution outside the command sandbox and unsafe approval decisions. Verify startup, approval and executor boundaries separately; checking rule lists alone misses these different failure modes (inference from the advisories above).
 - Keep harness versions current and auto-updating, except where pinned in a container on purpose. Several fixes were delivered by forced updates (e.g. CC deprecating versions before 1.0.24 per the CVE-2025-55284 advisory text).
 
 ### Gaps

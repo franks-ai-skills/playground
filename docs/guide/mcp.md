@@ -130,22 +130,22 @@ Do not use it when:
 7. **When building a server, design few workflow-level tools.**
    - Why: consolidated tools need fewer calls and less context.
    - How: `schedule_event` instead of `list_users` + `list_events` + `create_event`; prefix tools per service; keep the server name stable because it is part of `mcp__<server>__<tool>`. No vendor gives a number beyond "few".
-   - Evidence: [Vendor] ([Anthropic, Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents); [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)).
+   - Evidence: [Vendor] ([Anthropic, Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents); [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
 8. **Write tool descriptions for a new team member and return concise, actionable results.**
    - Why: with deferred loading the description is also the search key; tool use examples raised accuracy on complex parameters from 72% to 90% ([Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)).
    - How: unambiguous parameter names, examples for nested parameters, a `concise` default response format, pagination with instructions for narrowing, and execution failures as `isError: true` results that name the fix.
-   - Evidence: [Vendor] ([Anthropic, Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents); [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)).
+   - Evidence: [Vendor] ([Anthropic, Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents); [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)).
 9. **Authenticate with minimal scopes and never pass tokens through.**
    - Why: a broad or forwarded token turns a confused server into access to everything the user can reach.
    - How: servers validate token audience; start with a minimal scope and step up; no static API keys in `.mcp.json` or `config.toml`.
-   - Evidence: [Vendor] ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)).
+   - Evidence: [Vendor] ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)).
 10. **Allowlist servers by identity and pin versions.**
-   - Why: a name is not a security control, and unpinned `npx -y` runs the latest release in every session. `postmark-mcp` became malicious only from version 1.0.16, so an unpinned install picked up the change.
+   - Why: a name is not a security control, and unpinned `npx -y` runs the latest release in every session. `postmark-mcp` added a backdoor in version 1.0.16; an unpinned installation can pick up such an update.
    - How: Claude Code `allowedMcpServers` by `serverUrl` or `serverCommand`, paired with `disableSideloadFlags` (which alone does not restrict `.mcp.json`, `claude mcp add` or SDK servers); Codex `requirements.toml` `identity`; pin `@x.y.z`.
    - Evidence: [Vendor] ([Claude Code plugins for orgs](https://code.claude.com/docs/en/plugins/org); [Codex managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)); [Advisory] ([OWASP MCP04](https://owasp.org/www-project-mcp-top-10/2025/MCP04-2025%E2%80%93Software-Supply-Chain-Attacks%26Dependency-Tampering)).
 11. **Never give one session private data, untrusted content and an exfiltration channel.**
    - Why: injection through tool results works even when the server is clean (GitHub MCP, May 2025, below).
-   - How: read untrusted content (issues, web, email) in a [subagent](subagents.md) or session without write or outbound tools; require approval for any tool that sends data out.
+   - How: read untrusted content (issues, web, email) in a [subagent](subagents.md) or session without write or outbound tools; require approval for any tool that sends data out. Read-only queries are outbound too: keep private data out of the reader and enforce allowed query arguments ([OpenAI deep research security](https://developers.openai.com/api/docs/guides/deep-research), [Vendor]; enforcement recommendation [Inference]).
    - Evidence: [Practitioner] ([Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)); [Advisory] ([Invariant Labs](https://invariantlabs.ai/blog/mcp-github-vulnerability)).
 12. **Review a third-party server before connecting it, and again on every update.**
    - Why: descriptions can carry hidden instructions and can change after approval; neither lead documents detection of such changes.
@@ -154,7 +154,7 @@ Do not use it when:
 
 ## Security
 
-Threat model per server: is the code trustworthy (supply chain), are the descriptions trustworthy (poisoning, rug pull), are the results trustworthy (injection), are the credentials scoped. Allowlisting covers the first and part of the second. Only least privilege and splitting tool sets per session mitigate injection through results.
+Threat model per server: is the code trustworthy (supply chain), are the descriptions trustworthy (poisoning, rug pull), are the results trustworthy (injection), are the credentials scoped. Allowlisting covers the first and part of the second. Least privilege, separated data access and enforced outbound argument/destination checks reduce injection impact (inference; [security guide](security.md#data-access-and-outbound-channels)). Read-only search still sends its arguments outside the session ([OpenAI deep research](https://developers.openai.com/api/docs/guides/deep-research)).
 
 | Threat | Mitigation |
 | --- | --- |
@@ -162,9 +162,9 @@ Threat model per server: is the code trustworthy (supply chain), are the descrip
 | Rug pull: descriptions change after approval | Pin versions; diff `tools/list` on update |
 | Shadowing: one server's descriptions change how another server is used | Fewer servers per session |
 | Injection through results: a clean server returns attacker content | Trifecta split; approval on outbound tools |
-| OAuth confused deputy, SSRF via metadata URLs, `javascript:` authorization URLs | Per-client consent, exact `redirect_uri`, single-use `state`; block private ranges; validate URL schemes ([MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)) |
+| OAuth confused deputy, SSRF via metadata URLs, `javascript:` authorization URLs | Per-client consent, exact `redirect_uri`, single-use `state`; block private ranges; validate URL schemes ([MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)) |
 | Malicious startup command in a one-click install | Show the full command; explicit consent |
-| Local HTTP server reached from a browser page (DNS rebinding) | Use stdio, or require an auth token or a unix socket |
+| Local HTTP server reached from a browser page (DNS rebinding) | Prefer stdio; for HTTP, validate present Origin and use authentication plus restricted binding or restricted IPC |
 
 Measured susceptibility: MCPTox tested 45 live servers and 1,348 malicious cases; average attack success was 36.5%, and the highest refusal rate was under 3%. The models tested are from 2025; no 2026 data was found ([MCPTox](https://arxiv.org/html/2508.14925v1), [Empirical]).
 
@@ -173,10 +173,19 @@ Measured susceptibility: MCPTox tested 45 live servers and 1,348 malicious cases
 | Fixed 2025-06-17 | CVE-2025-6514, `mcp-remote` 0.0.5–0.1.15: OS command injection via a crafted `authorization_endpoint`; CVSS 9.6 ([GitLab](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/)) |
 | 2025 | CVE-2025-49596 (MCP Inspector < 0.14.1, RCE) and CVE-2025-58444 (Inspector, XSS to command execution, fixed 0.16.6) ([SentinelOne](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/); [GitLab](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)) |
 | Fixed 2025-08-20 | CVE-2025-61260, Codex CLI: a repository `.env` set `CODEX_HOME=./.codex`, and project `mcp_servers` commands ran at startup without a prompt; CVSS 9.8; fixed in v0.23.0 ([Check Point](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/)) |
-| 2025 | `postmark-mcp` on npm, the first malicious MCP server found in use: since version 1.0.16 it BCC'd every email to the attacker; reported by Koi Security ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)) |
+| 2025 | Unofficial `postmark-mcp` on npm added an external BCC in 1.0.16 after building trust over 15 versions; Postmark's API was unaffected ([Postmark incident notice](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)) |
 | Fixes 2025-08-26 to 2025-12-28 | Claude Code project files: CVE-2025-59536 (hooks RCE), MCP consent bypass via `enableAllProjectMcpServers` in project settings, API key exfiltration via `ANTHROPIC_BASE_URL` ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)) |
 
 Plan around current behaviour: Claude Code loads `.mcp.json` servers without asking in `-p`, SDK and cloud runs; Codex `trust_level = "untrusted"` turns project-local config off ([Codex security](https://learn.chatgpt.com/docs/agent-approvals-security)). Do not commit `enableAllProjectMcpServers`. For headless runs in untrusted checkouts, see [automation](automation.md).
+
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C7–C11: outbound arguments, metadata changes, OAuth, transport and
+client isolation. These checks are recommendations, not a completed
+deployment evaluation.
 
 ## Verification and checklist
 
@@ -264,6 +273,6 @@ Vendor pages: [Claude Code: MCP](../vendors/claude-code/mcp.md), [Codex: MCP](..
 - Claude Code: [best practices](https://code.claude.com/docs/en/best-practices), [Extend Claude Code](https://code.claude.com/docs/en/features-overview), [MCP](https://code.claude.com/docs/en/mcp), [plugins for orgs](https://code.claude.com/docs/en/plugins/org)
 - Codex: [MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli), [agent approvals and security](https://learn.chatgpt.com/docs/agent-approvals-security), [managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration), [PR #29486](https://github.com/openai/codex/pull/29486)
 - Anthropic: [Writing effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents), [Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use), [Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp); [Cloudflare Code Mode](https://blog.cloudflare.com/code-mode/)
-- MCP spec: [Tools](https://modelcontextprotocol.io/specification/draft/server/tools), [Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
+- MCP spec: [Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools), [Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)
 - Practitioner and empirical: [Zechner](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/), [Willison, skills](https://simonwillison.net/2025/Oct/16/claude-skills/), [Willison, lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), [Checkly](https://www.checklyhq.com/blog/mcp-vs-cli-token-efficiency/), [MCPTox](https://arxiv.org/html/2508.14925v1)
-- Advisories: [Invariant, tool poisoning](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks), [Invariant, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), [OWASP MCP Top 10](https://owasp.org/www-project-mcp-top-10/), [CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/), [CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/), [CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/), [CVE-2025-61260 (NVD)](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [postmark-mcp (CSO Online)](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
+- Advisories: [Invariant, tool poisoning](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks), [Invariant, GitHub MCP](https://invariantlabs.ai/blog/mcp-github-vulnerability), [OWASP MCP Top 10](https://owasp.org/www-project-mcp-top-10/), [CVE-2025-6514](https://advisories.gitlab.com/npm/mcp-remote/CVE-2025-6514/), [CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/), [CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/), [CVE-2025-61260 (NVD)](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [postmark-mcp (Postmark notice)](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)

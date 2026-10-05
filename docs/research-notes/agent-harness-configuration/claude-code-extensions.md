@@ -471,7 +471,7 @@ Control flows through exit codes (2 = block on blockable events) and JSON stdout
   - The older top-level `decision` / `reason` (`approve` / `block`) are deprecated for PreToolUse.
   - Deny and ask permission rules are still evaluated regardless.
   - `defer` works only in `-p`; the run exits with `stop_reason: "tool_deferred"`.
-- PermissionRequest: `decision.behavior` allow/deny, plus `updatedInput`, `updatedPermissions`, `message`, `interrupt`.
+- PermissionRequest: `hookSpecificOutput.decision.behavior` allow/deny, plus `updatedInput`, `updatedPermissions`, `message`, `interrupt`.
 - PostToolUse: `updatedToolOutput`, `classifierContext`.
 - SessionStart: `additionalContext`, `initialUserMessage`, `sessionTitle`, `watchPaths`, `reloadSkills`.
 - WorktreeCreate: prints the path (HTTP hooks return `hookSpecificOutput.worktreePath`).

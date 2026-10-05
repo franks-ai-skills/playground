@@ -143,7 +143,7 @@ For auth, use OAuth with minimal scopes (or a header helper for internal SSO), a
   - Clients that aggregate servers SHOULD disambiguate, for example with a server prefix. `serverInfo.name` "SHOULD NOT be relied upon for disambiguation".
   - Servers SHOULD return tools in a deterministic order, which helps caching and the model's prompt cache.
 
-  — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
+  — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 - [Vendor] Both leads already prefix tools as `mcp__<server>__<tool>`. The server name is therefore part of the public interface used by permission rules and hook matchers. — `docs/concepts/mcp.md` (repo)
 
 **Descriptions and server instructions**
@@ -165,19 +165,19 @@ For auth, use OAuth with minimal scopes (or a header helper for internal SSO), a
   - For backward compatibility, a tool returning structured content SHOULD also return serialized JSON in a text block.
   - `resource_link` can return a pointer instead of the content itself.
 
-  — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
-- [Vendor] MCP spec, stateful tools: the draft spec has no protocol session. Return an explicit, opaque, high-entropy handle such as `basket_id`. Re-authorize the caller on every call. State the handle's lifetime in the description. On an expired handle, return a tool error that says so. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
+  — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+- [Vendor] MCP spec, stateful tools: the 2026-07-28 spec has no protocol session. Return an explicit, opaque, high-entropy handle such as `basket_id`. Re-authorize the caller on every call. State the handle's lifetime in the description. On an expired handle, return a tool error that says so. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 
 **Errors**
 - [Vendor] MCP spec, two error channels:
   - Protocol errors (JSON-RPC) for unknown tools or malformed requests.
   - Tool execution errors as results with `isError: true` containing "actionable feedback that language models can use to self-correct". Example: "Invalid departure date: must be in the future. Current date is 08/08/2025."
 
-  Clients SHOULD pass execution errors to the model. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
+  Clients SHOULD pass execution errors to the model. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 - [Vendor, Sep 2025] Errors should be "clearly actionable improvements, rather than opaque error codes". — [Anthropic tools](https://www.anthropic.com/engineering/writing-tools-for-agents)
 
 **Approval hints from the server**
-- [Vendor] MCP spec: clients MUST treat tool annotations as untrusted unless the server is trusted. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
+- [Vendor] MCP spec: clients MUST treat tool annotations as untrusted unless the server is trusted. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 - [Vendor] Codex always asks approval for a tool with a destructive annotation, unless the tool also has a read annotation, which takes priority. Claude Code honours `_meta["anthropic/requiresUserInteraction"]`. A cross-harness server should emit both. — [Codex security](https://learn.chatgpt.com/docs/agent-approvals-security); `docs/concepts/mcp.md` (repo)
 
 **Auth**
@@ -200,10 +200,10 @@ For auth, use OAuth with minimal scopes (or a header helper for internal SSO), a
   - Use progressive least-privilege scopes, such as a minimal `mcp:tools-basic`, and step up via `WWW-Authenticate scope=`.
   - Common scope mistakes: wildcard or omnibus scopes, and publishing every scope in `scopes_supported`.
 
-  — [MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
+  — [MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)
 
 **Transports**
-- [Vendor] MCP security best practices: local servers SHOULD use stdio to limit access to the client. If they use HTTP, require an auth token or use unix sockets or other restricted IPC, to defend against DNS rebinding from browser pages. — [MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
+- [Vendor] MCP security best practices: local servers SHOULD use stdio to limit access to the client. If they use HTTP, require an auth token or use unix sockets or other restricted IPC, to defend against DNS rebinding from browser pages. — [MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)
 - [Vendor] Codex supports only stdio and streamable HTTP. SSE is deprecated in Claude Code. WebSocket and SDK transports exist only in Claude Code. — `docs/concepts/mcp.md` (repo, from vendor docs)
 
 **Process: evals**
@@ -289,8 +289,8 @@ The controls that work are structural:
   - `javascript:` authorization URLs leading to XSS or RCE.
   - Scope minimization.
 
-  Clients offering one-click local installs MUST show the full command without truncation and get explicit consent. They SHOULD sandbox servers with minimal privileges. — [MCP Security Best Practices](https://modelcontextprotocol.io/specification/draft/basic/security_best_practices)
-- [Vendor] MCP spec, Tools: servers MUST validate inputs, enforce access control, rate limit, and sanitize outputs. Clients SHOULD confirm sensitive operations, show tool inputs before calling, validate results before passing them to the LLM, apply timeouts, and log calls. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/draft/server/tools)
+  Clients offering one-click local installs MUST show the full command without truncation and get explicit consent. They SHOULD sandbox servers with minimal privileges. — [MCP Security Best Practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)
+- [Vendor] MCP spec, Tools: servers MUST validate inputs, enforce access control, rate limit, and sanitize outputs. Clients SHOULD confirm sensitive operations, show tool inputs before calling, validate results before passing them to the LLM, apply timeouts, and log calls. — [MCP spec, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 - [Practitioner/standards body, 2025 beta] The OWASP MCP Top 10:
   - MCP01 token mismanagement
   - MCP02 scope creep
@@ -312,7 +312,7 @@ The controls that work are structural:
   - CVE-2025-58444 (fixed 0.16.6): XSS through a redirect URL from a malicious server, leading to command execution.
 
   — [SentinelOne CVE-2025-49596](https://www.sentinelone.com/vulnerability-database/cve-2025-49596/); [GitLab advisory CVE-2025-58444](https://advisories.gitlab.com/npm/@modelcontextprotocol/inspector/CVE-2025-58444/)
-- [Advisory/incident, 2025] `postmark-mcp` on npm, reported by Koi Security (Idan Dardikman), was the first malicious MCP server found in use. Since version 1.0.16 it BCC'd every email to the attacker. — [CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
+- [Advisory/incident, 2025] Unofficial `postmark-mcp` on npm added an external BCC in 1.0.16 after building trust over 15 versions. Postmark's legitimate API was unaffected. — [Postmark incident notice](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)
 - [Advisory] Claude Code, reported by Check Point:
   - CVE-2025-59536: RCE through hooks in repository `.claude/settings.json`.
   - MCP consent bypass: `enableAllProjectMcpServers`/`enabledMcpjsonServers` in project settings auto-approved `.mcp.json` servers.
@@ -354,7 +354,7 @@ The controls that work are structural:
 
   Allowlisting covers (1) and partly (2). Only least privilege and splitting tool sets per session or subagent mitigate (3).
 - **Anti-patterns:**
-  - `npx -y <pkg>` or `uvx <pkg>` without a version. Every session then runs whatever the latest release is; `postmark-mcp` became malicious only from version 1.0.16, so an unpinned install picked up the change. Pin `@x.y.z`, or use an internal mirror.
+  - `npx -y <pkg>` or `uvx <pkg>` without a version. Every session then runs whatever the latest release is; `postmark-mcp` added a backdoor in version 1.0.16; an unpinned installation can pick up such an update. Pin `@x.y.z`, or use an internal mirror.
   - Committing `enableAllProjectMcpServers`.
   - Using `-p` or CI in untrusted checkouts with repository MCP config.
   - Allowlisting by server name only, since a name is not a security control.
@@ -511,3 +511,11 @@ A plugin is the distribution unit for skills, hooks and MCP definitions. Package
 - I found no Codex equivalent of plugin `dependencies`, `renames`, release-channel guidance, or a `validate` command.
 - I found no published review checklist from OpenAI for third-party Codex plugins beyond hook trust review.
 - I found no empirical data on plugin supply-chain incidents (as opposed to MCP package incidents) as of October 2026.
+
+## Security follow-up, 2026-10-05
+
+The [cross-concept research](../agent-harness-security.md) adds read-only
+query disclosure, current protocol authorization/transport requirements,
+SDK isolation advisories and proposed benign tests. Citations above now
+pin revision 2026-07-28; older implementations may negotiate legacy
+revisions. The Postmark incident now uses its first-party notice.

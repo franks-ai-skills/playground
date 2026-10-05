@@ -294,6 +294,12 @@ ignores exit 2 and requires its structured decision. These rules must
 not be collapsed into “exit 2 makes every hook fail closed”
 ([hooks, timeouts and decision control][cc-hooks]).
 
+**[Vendor; review correction]** On events where exit 2 blocks, valid JSON
+cannot override the block. For other exit codes in the standard decision
+model, valid JSON determines the outcome; malformed output normally
+produces a non-blocking error. `PermissionRequest` has its separate
+decision contract ([hooks output precedence][cc-hooks]).
+
 **[Inference] Defense/check:** parse JSON, pass arguments without `eval`,
 resolve paths and reject escape outside an allowed root. Test malformed
 input/output, missing handlers, timeout, alternate tools and an inert

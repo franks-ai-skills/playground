@@ -37,6 +37,28 @@ portability traps.
   server definitions so they can be installed in many places; it adds
   no capability of its own.
 
+## Security across the concepts
+
+Security guidance was already researched per mechanism. The
+[2026-10-05 audit and deeper research](research-notes/agent-harness-security.md)
+connects those findings into a shared threat model. The practical
+[security guide](guide/security.md) covers controls, sixteen proposed
+benign canary checks, detection and recovery. Security applies across
+the ten concepts; it is not another extension mechanism.
+
+| Boundary | Attack to consider | What to verify |
+| --- | --- | --- |
+| External content → context | Prompt injection, false approval claims, poisoned memory | Preserve provenance; inspect persistent writes; a fresh session does not clear stored poison ([research](research-notes/agent-harness-security.md#5-memory-poisoning-survives-the-conversation)) |
+| Repository/extension → execution | Startup commands, hidden helpers, changed packages or metadata | Review before launch and after updates; isolate every executor, including hooks and servers ([research](research-notes/agent-harness-security.md#13-startup-and-execution-controls-have-different-scope)) |
+| Private data → external service | Query arguments, tool calls, URLs and publication leak data | Enforce data access, call arguments and destinations; read-only tools still send data ([OpenAI](https://developers.openai.com/api/docs/guides/deep-research)) |
+| Tool request → authority | OAuth confusion, cross-client state, event-specific hook failure | Check caller/resource binding, client isolation and live failure semantics ([research](research-notes/agent-harness-security.md#10-oauth-authorizes-the-wrong-client-or-resource)) |
+| Untrusted work → privileged consumer | CI artifacts/caches, generated code, logs and resource exhaustion | Validate provenance and approved SHA; consume output as untrusted data; enforce external limits ([research](research-notes/agent-harness-security.md#15-privileged-ci-consumes-hostile-code-and-artifacts)) |
+
+The verification recommendations are **[Inference]** from the cited
+evidence. Prompt reminders and schema validation support security;
+authorization and isolation must enforce the actual boundary. Proposed
+canaries have not yet been executed against our deployments.
+
 ## Instructions
 
 **Used for:** standing guidance that every session starts with: build
@@ -212,8 +234,11 @@ before a tool call or at the end of a turn, every time, whatever the
 model decides.
 
 **How:** event → matcher → handler. The handler (a command or an MCP
-tool call) receives the event as JSON and can allow, block (exit code
-2), rewrite the input or add context. Eleven events share their names
+tool call) receives the event as JSON and can allow, block, rewrite the
+input or add context. Denial depends on the event: `PreToolUse` accepts
+exit 2; `PermissionRequest` uses nested JSON, and Claude Code ignores
+exit 2 there ([hooks reference](https://code.claude.com/docs/en/hooks),
+[Codex hooks](https://learn.chatgpt.com/docs/hooks)). Eleven events share their names
 in both leads. Codex treats some decisions differently: a `PreToolUse`
 answer of `ask` fails open.
 

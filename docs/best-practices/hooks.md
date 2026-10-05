@@ -85,7 +85,7 @@ All portable approaches use the shared events and the `command` handler. Registe
 
 **When it fits.** Auto-approving one specific, low-risk prompt (the CC guide's example is `ExitPlanMode`).
 
-**How.** Return `{"decision": {"behavior": "allow" | "deny", "message": "..."}}`. Codex: "any `deny` wins. Otherwise, an `allow` lets the request proceed without surfacing the approval prompt"; `updatedInput`, `updatedPermissions` and `interrupt` "fail closed today" ([Codex hooks](https://learn.chatgpt.com/docs/hooks)).
+**How.** Return event-specific JSON, for example `{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"deny","message":"Outside approved scope"}}}`. Set `behavior` to `allow` only for an authorized request. Codex: "any `deny` wins. Otherwise, an `allow` lets the request proceed without surfacing the approval prompt"; `updatedInput`, `updatedPermissions` and `interrupt` "fail closed today" ([Codex hooks](https://learn.chatgpt.com/docs/hooks)).
 
 **Trade-offs.** "Matching on `.*` or leaving the matcher empty would auto-approve every tool permission prompt, including file writes and shell commands" ([CC hooks guide](https://code.claude.com/docs/en/hooks-guide)).
 
@@ -132,13 +132,13 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 ### 2. Block with exit 2 or a deny decision, never with exit 1 or ask
 
 - **Why:** CC: "Without valid JSON on stdout, Claude Code treats exit code 1 as a non-blocking error and proceeds with the action... If your hook is meant to enforce a policy, use `exit 2`." Codex behavior for other exit codes is not documented. In Codex, `PreToolUse` `permissionDecision: "ask"`, legacy `decision: "approve"`, `continue: false`, `stopReason` and `suppressOutput` "are parsed but not supported yet. Codex marks the hook run as failed, reports the error, and continues the tool call."
-- **How:** Use exit 2 with a stderr reason, or `permissionDecision: "deny"` with `permissionDecisionReason`. To get a human decision, let the harness's own ask rules prompt, or deny with a reason telling the model to ask the user. Return `allow` only to rewrite input (`updatedInput`), not to approve: in Codex `allow` is documented only for rewriting.
+- **How:** For `PreToolUse`, use exit 2 with a stderr reason, or `hookSpecificOutput.permissionDecision: "deny"` with `permissionDecisionReason`. For `PermissionRequest`, use `hookSpecificOutput.decision.behavior: "deny"` on exit 0; Claude Code ignores exit 2 for that event. To get a human decision, let the harness's own ask rules prompt, or deny with a reason telling the model to ask the user. Return `allow` only to rewrite input (`updatedInput`), not to approve: in Codex `allow` is documented only for rewriting.
 - **Evidence:** [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks#exit-code-output); [Vendor] [Codex hooks](https://learn.chatgpt.com/docs/hooks).
 
 ### 3. Pick one signalling style per hook and keep stdout clean
 
-- **Why:** "Choose one approach per hook: either use exit codes alone for signaling, or exit 0 and print JSON for structured control." When stdout parses as a valid object, CC "ignores the exit code and the JSON alone decides the outcome"; exit 2 with schema-invalid JSON still blocks (since v2.1.214). Extra stdout before the JSON (for example an unconditional `echo` in a shell profile sourced through `BASH_ENV` or Git Bash) means stdout "no longer starts with `{`" and is treated as plain text. A field at the wrong level, such as `permissionDecision` outside `hookSpecificOutput`, is silently ignored.
-- **How:** Simple gate: exit codes only. Structured control: exit 0 plus JSON. Write diagnostics to stderr, which "keeps stdout clean for JSON output and sends the message to the debug log". Guard profile output with `if [[ $- == *i* ]]; then echo ...; fi`. Check the CC debug log for "Hook JSON output had unrecognized keys".
+- **Why:** On events where exit 2 blocks, valid JSON cannot override that block. For other exit codes in the standard decision model, valid JSON decides the outcome; malformed output normally produces a non-blocking error. `PermissionRequest` is an event-specific exception and requires its decision object. Keep stdout free of unrelated text and use the documented field nesting (security recheck 2026-10-05).
+- **How:** Simple `PreToolUse` gate: exit codes only. `PermissionRequest` needs event-specific JSON. Structured control: exit 0 plus JSON. Write diagnostics to stderr, which "keeps stdout clean for JSON output and sends the message to the debug log". Guard profile output with `if [[ $- == *i* ]]; then echo ...; fi`. Check the CC debug log for "Hook JSON output had unrecognized keys".
 - **Evidence:** [Vendor] [CC hooks reference](https://code.claude.com/docs/en/hooks); [Vendor] [CC hooks guide](https://code.claude.com/docs/en/hooks-guide).
 
 ### 4. Write every block reason as an instruction the model can act on
@@ -190,7 +190,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
   - Normalize paths with `realpath` and check them against the project root, not only for `..` (inference).
   - Use absolute interpreter paths, as the Codex examples do (`/usr/bin/python3`), so a repository cannot shadow `python3` on `PATH`.
   - CC: prefer exec form (`args` present), which spawns the executable with no shell; "Special characters such as apostrophes, `$`, and backticks pass through verbatim". "Prefer exec form for any hook that references a path placeholder." Plugin `${user_config.*}` values are substituted only in exec form (since v2.1.207).
-  - In gate hooks, catch parse errors and exit 2 (fail closed inside the script) (inference).
+  - Catch parse errors with the event's valid denial: exit 2 for `PreToolUse`, structured JSON deny for `PermissionRequest`. Keep an independent permission or isolation boundary for a missing, crashing or timed-out handler (inference).
 - **Evidence:** [Vendor] [CC hooks reference, security considerations](https://code.claude.com/docs/en/hooks#security-considerations); [Vendor] [CC hooks reference, exec form](https://code.claude.com/docs/en/hooks#exec-form-and-shell-form); [Vendor] [Codex hooks](https://learn.chatgpt.com/docs/hooks).
 
 ### 11. Match the capability, not a single tool
@@ -218,7 +218,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
   1. `input=$(cat)`; read `hook_event_name` and `tool_name`.
   2. Target file: `jq -r '.tool_input.file_path // .tool_input.path // empty'`; if empty and `tool_name == "apply_patch"`, the target paths are inside the patch text in `.tool_input.command`, whose format the hooks page does not specify.
   3. Bash: `.tool_input.command` (same field in both leads).
-  4. Decide; exit 0 silently, or print the reason to stderr and exit 2.
+  4. For `PreToolUse`, exit 0 silently or print the reason to stderr and exit 2. For `PermissionRequest`, return the nested JSON decision above on exit 0.
   5. On `Stop`, always print JSON on exit 0.
   6. Resolve repository paths from the input `cwd` or `git rev-parse --show-toplevel`, not `${CLAUDE_PROJECT_DIR}`.
 
@@ -268,7 +268,7 @@ OpenCode has no shell-command hooks. A plugin function throws in `tool.execute.b
 | Prompt injection works around hooks | "Hooks are not a security boundary -- a prompt injection can work around them. They are structured prompt injection at opportune times" ([trailofbits/claude-code-config](https://github.com/trailofbits/claude-code-config)) | Sandbox and deny rules for hard limits |
 | Shell injection through tool input | [CC hooks reference, security considerations](https://code.claude.com/docs/en/hooks#security-considerations) | [Practice 10](#10-harden-hook-scripts-against-hostile-input) |
 | Secrets leaked through hook output | Codex spill files ([Codex hooks](https://learn.chatgpt.com/docs/hooks)) | [Practice 8](#8-keep-hook-context-short-and-free-of-secrets) |
-| Silent fail-open | Timeouts, crashes (exit 1, 127), Codex unsupported outputs, untrusted Codex hooks skipped | Exit 2 on internal errors; canary test after deploy |
+| Silent fail-open | Timeouts, crashes (exit 1, 127), Codex unsupported outputs, untrusted Codex hooks skipped | Event-specific denial on internal errors; fault and canary tests; independent permissions/isolation |
 
 No advisory specific to the Codex hooks system (as distinct from its MCP config or Git hooks) was found as of 2026-10-04.
 
@@ -285,12 +285,12 @@ No advisory specific to the Codex hooks system (as distinct from its MCP config 
 ## Checklist
 
 - [ ] Each hook enforces a rule that must hold every time; judgement-based rules live in instructions.
-- [ ] Every gate blocks with exit 2 or `permissionDecision: "deny"`; none rely on exit 1 or `ask`.
+- [ ] Each gate uses its event's valid denial; `PermissionRequest` uses nested JSON. No `PreToolUse` gate relies on exit 1 or Codex `ask`.
 - [ ] Block reasons name the rule and the allowed alternative.
 - [ ] Every `Stop` and `SubagentStop` gate checks `stop_hook_active` and prints JSON.
 - [ ] Every synchronous hook has an explicit short `timeout` and a narrow matcher.
 - [ ] Async hooks only observe.
-- [ ] Scripts parse JSON with a parser, quote variables, use absolute paths and exit 2 on internal errors.
+- [ ] Scripts parse JSON with a parser, quote variables, use absolute paths and return event-specific denial on internal errors.
 - [ ] Shared hooks handle both `tool_input.file_path` and Codex `apply_patch`.
 - [ ] Security-relevant limits are also enforced by deny rules or the sandbox.
 - [ ] Hook config changes need owner review; headless runs over third-party repositories disable project hooks.

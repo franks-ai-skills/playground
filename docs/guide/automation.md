@@ -209,6 +209,15 @@ Prompt injection through issue, PR and comment text is the main automation threa
 
 Gaps: no vendor statement on comparable injection CVEs for `codex-action`; no security guidance for the OpenCode action.
 
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C15/C16: artifact provenance, changed heads, shared state and
+external limits. These checks are recommendations, not a completed
+deployment evaluation.
+
 ## Verification and checklist
 
 **Run-level checks.** Claude Code: exit code, `permission_denials`, `total_cost_usd` (a client-side estimate), `plugin_errors`/`mcp_server_errors` in `system/init`. Codex: the `--json` stream, the `-o` file and the schema-validated output. Scheduled and CI runs: read the transcript and check the output exists and passes its checks.

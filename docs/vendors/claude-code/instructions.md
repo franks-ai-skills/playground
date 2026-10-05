@@ -139,6 +139,20 @@ paths:
 - Gap (research notes): the docs do not publish the "combined limit" across instruction files that triggers the startup warning.
 - Gap (research notes): the exact on-disk name derivation for `<project>` (path sanitization) was not verified beyond "derived from the git repository".
 
+### Persistent memory injection
+
+[Empirical; preprint] PMPA (2026-09-12) tests external text, images and
+PDFs causing memory writes and later-session disclosure. It uses Claude
+Code/OpenClaw with DeepSeek and Qwen models, local JSON workspace
+simulations and scenario skills; harness versions are unspecified.
+This does not establish a success rate for default Claude or Codex
+deployments ([paper](https://arxiv.org/html/2609.13889v1)).
+
+[Inference] Review persistent writes and their provenance; test recall
+with synthetic markers after a fresh session. Restore poisoned memory
+from reviewed state rather than relying on a conversation reset
+([research scope](../../research-notes/agent-harness-security.md#5-memory-poisoning-survives-the-conversation)).
+
 ## Sources
 
 - https://code.claude.com/docs/en/memory

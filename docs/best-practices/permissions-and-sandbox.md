@@ -245,7 +245,7 @@ Permissions decide whether a tool call runs. The sandbox limits what a running c
 | Package installs routed around an internal registry | [CC permission modes](https://code.claude.com/docs/en/permission-modes) | CC auto mode blocks this by default when an internal registry is declared |
 | Repository config running before trust | See [Configuration security](configuration.md#security) | Trust gate, restricted loading |
 
-Every CVE in the research exploited something running before or outside the permission system: startup hooks, MCP launch, base URL, config redirect, model-chosen cwd, auto-approved "safe" commands (inference). Verify those paths, not only the rule lists.
+The cited cases span pre-trust execution, execution outside the command sandbox and unsafe approval decisions. Verify startup, approval and executor boundaries separately; checking rule lists alone misses these different failure modes (inference from the advisories above).
 
 ## Verification
 

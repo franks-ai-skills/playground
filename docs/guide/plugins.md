@@ -155,9 +155,18 @@ Advisories that apply to plugin-enabling configuration [Advisory]:
 
 - Claude Code (fixes 2025-08-26, 2025-09-22, 2025-12-28): CVE-2025-59536, RCE through hooks in repository `.claude/settings.json`; an MCP consent bypass via `enableAllProjectMcpServers` in project settings; API key exfiltration via a project-set `ANTHROPIC_BASE_URL` ([Check Point](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/)).
 - Codex CLI CVE-2025-61260 (fixed 2025-08-20, v0.23.0, CVSS 9.8): a repository `.env` set `CODEX_HOME=./.codex`, and project `mcp_servers` commands ran at startup without a prompt ([NVD](https://nvd.nist.gov/vuln/detail/cve-2025-61260)).
-- `postmark-mcp` on npm shows the update risk for packages a plugin references: since version 1.0.16 it BCC'd every email to the attacker ([CSO Online](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)); see [MCP](mcp.md).
+- `postmark-mcp` on npm shows the update risk for packages a plugin references: its 1.0.16 update secretly BCC'd emails to an external server ([Postmark incident notice](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)); see [MCP](mcp.md).
 
 No plugin supply-chain incident, as opposed to MCP package incidents, was found as of October 2026.
+
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C4/C8: independently running code and updates to code or metadata.
+These checks are recommendations, not a completed
+deployment evaluation.
 
 ## Verification and checklist
 
@@ -243,4 +252,4 @@ Vendor pages: [Claude Code: plugins](../vendors/claude-code/plugins.md), [Codex:
 
 - Claude Code: [Extend Claude Code](https://code.claude.com/docs/en/features-overview), [plugins overview](https://code.claude.com/docs/en/plugins/overview), [plugin dependencies](https://code.claude.com/docs/en/plugin-dependencies), [host a marketplace](https://code.claude.com/docs/en/plugins/host-marketplace), [create a marketplace](https://code.claude.com/docs/en/plugin-marketplaces), [plugins for orgs](https://code.claude.com/docs/en/plugins/org), [plugin security](https://code.claude.com/docs/en/plugins/security), [headless](https://code.claude.com/docs/en/headless)
 - Codex: [Build plugins](https://developers.openai.com/codex/plugins/build.md), [managed configuration](https://developers.openai.com/codex/enterprise/managed-configuration)
-- Advisories: [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [NVD CVE-2025-61260](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [CSO Online, postmark-mcp](https://www.csoonline.com/article/4064009/trust-in-mcp-takes-first-in-the-wild-hit-via-squatted-postmark-connector.html)
+- Advisories: [Check Point, Claude Code](https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/), [Check Point, Codex CLI](https://research.checkpoint.com/2025/openai-codex-cli-command-injection-vulnerability/), [NVD CVE-2025-61260](https://nvd.nist.gov/vuln/detail/cve-2025-61260), [Postmark, unofficial postmark-mcp](https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package)

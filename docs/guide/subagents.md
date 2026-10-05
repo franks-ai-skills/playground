@@ -200,6 +200,15 @@ Return a list of findings, each with file:line, severity and a suggested fix. Ma
 
 **Approvals in headless fan-out.** In Codex non-interactive runs, an action that needs new approval fails back to the parent. Pre-approve only the narrow tools needed (`--allowedTools` with `--permission-mode dontAsk` in Claude Code).
 
+### Cross-concept checks
+
+Use the [security guide](security.md) to connect this mechanism to the
+other execution, data and persistence boundaries. Its proposed
+[benign canary checks](security.md#verification-with-benign-canaries)
+include C7/C12: private data separation and false approval claims. These
+checks are recommendations, not a completed
+deployment evaluation.
+
 ## Verification and checklist
 
 - **Observe:** `SubagentStart` and `SubagentStop` hooks in both leads. Log agent type, start and stop time, result size and token use where available; keep transcripts. Codex documents no per-subagent token accounting.

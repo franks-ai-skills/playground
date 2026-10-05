@@ -5,6 +5,13 @@ Vendor-neutral versions of the agent harness concepts, built from the
 and OpenCode, describes the concept without vendor names, explains how
 to author it once for several harnesses, and lists what was left out.
 
+Security is a concern across these concepts. See the
+[overview's boundary map](../overview.md#security-across-the-concepts),
+the [practical security guide](../guide/security.md) and the
+[dated research audit](../research-notes/agent-harness-security.md).
+The guide connects attacks to controls and proposed canary checks;
+it does not add another generalized mechanism.
+
 ## Generalization rule
 
 - Claude Code and Codex are equal leads. A concept or feature is kept

@@ -143,8 +143,9 @@ Effect of exit 2 by event:
 | PermissionRequest | Ignored |
 | PostToolUse | Only shows stderr to Claude |
 
+- On events where exit 2 blocks, JSON cannot override that block; valid fields are still read. For other exit codes in the standard decision model, valid JSON determines the decision. `PermissionRequest` uses its separate decision object ([hooks reference](https://code.claude.com/docs/en/hooks), rechecked 2026-10-05).
 - WorktreeCreate and WorktreeRemove fail on any non-zero exit code.
-- A timed-out command hook on PreToolUse does not block. An SDK callback hook that times out does block.
+- A timed-out `PreToolUse` command, HTTP or MCP hook continues normal permission flow; an SDK callback timeout blocks. `PermissionRequest` ignores exit 2 and needs structured JSON denial. Security semantics rechecked 2026-10-05 ([hooks reference](https://code.claude.com/docs/en/hooks)).
 
 ### JSON output and decision control
 
@@ -160,7 +161,7 @@ From the [hooks reference](https://code.claude.com/docs/en/hooks):
 | `additionalContext` | Several | Arrives as a system reminder. Each string capped at 10,000 chars; overflow is saved to a file and a 2,000-char preview is passed |
 | `decision: "block"` + `reason` | UserPromptSubmit, UserPromptExpansion, PostToolUse, PostToolUseFailure, PostToolBatch, Stop, SubagentStop, ConfigChange, PreCompact | Block |
 | `hookSpecificOutput.permissionDecision` | PreToolUse | `allow` / `deny` / `ask` / `defer`; precedence deny > defer > ask > allow. Also `permissionDecisionReason`, `updatedInput`, `additionalContext` |
-| `decision.behavior` | PermissionRequest | `allow` / `deny`, plus `updatedInput`, `updatedPermissions`, `message`, `interrupt` |
+| `hookSpecificOutput.decision.behavior` | PermissionRequest | `allow` / `deny`, plus `updatedInput`, `updatedPermissions`, `message`, `interrupt` |
 | `updatedToolOutput`, `classifierContext` | PostToolUse | Replace tool output; context for the classifier |
 | `additionalContext`, `initialUserMessage`, `sessionTitle`, `watchPaths`, `reloadSkills` | SessionStart | Session setup |
 | Path on stdout / `hookSpecificOutput.worktreePath` (HTTP) | WorktreeCreate | Worktree location |
