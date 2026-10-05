@@ -58,17 +58,23 @@ Assessed on 2026-10-05.
 
 | Category | Domains |
 | --- | --- |
-| Vendor documentation and repositories | `code.claude.com`, `platform.claude.com`, `claude.com`, `anthropic.com`, `learn.chatgpt.com`, `developers.openai.com`, `cdn.openai.com`, `chatgpt.com`, `opencode.ai`; GitHub `anthropics/*`, `openai/*`, `anomalyco/opencode` |
+| Vendor documentation and repositories | `code.claude.com`, `platform.claude.com`, `claude.com`, `anthropic.com`, `learn.chatgpt.com`, `developers.openai.com`, `cdn.openai.com`, `chatgpt.com`, `opencode.ai`, `docs.github.com`, `postmarkapp.com`; GitHub `anthropics/*`, `openai/*`, `anomalyco/opencode` |
 | Standards and specifications | `agentskills.io`, `modelcontextprotocol.io`, `agents.md`, `json.schemastore.org`, `owasp.org`, `owasp.github.io`, `genai.owasp.org` |
 | Vulnerability databases and advisories | `nvd.nist.gov`, `advisories.gitlab.com`, GitHub security advisories (`github.com/<owner>/<repo>/security/advisories`) |
 | Research | `arxiv.org`, `iclr.cc`, `research.google`, `ai.meta.com`, `metr.org`, `dora.dev` |
-| Security research, first-hand | `research.checkpoint.com`, `wiz.io`, `invariantlabs.ai`, `snyk.io`, `sentinelone.com`, `stepsecurity.io`, `embracethered.com`; GitHub `trailofbits/*` |
+| Security research, first-hand | `research.checkpoint.com`, `wiz.io`, `invariantlabs.ai`, `snyk.io`, `sentinelone.com`, `stepsecurity.io`, `embracethered.com`, `securitylab.github.com`; GitHub `trailofbits/*` |
 | Company engineering blogs, first-hand | `developer.nvidia.com`, `aws.amazon.com`, `blog.cloudflare.com`, `github.blog`, `docs.docker.com`, `vercel.com`, `cognition.com`, `checklyhq.com` |
 | Practitioners, first-hand | `simonwillison.net`, `humanlayer.dev`, `mariozechner.at`, `scottspence.com`, `martinfowler.com`; GitHub `obra/superpowers` |
 | Trade press (rule 7) | `csoonline.com`, `securityweek.com` |
 
 A trusted domain does not make every page on it a valid source: rule 1
 still applies to each claim.
+
+The security pass on 2026-10-05 added GitHub's product documentation and
+Security Lab as primary documentation and first-hand research, and
+Postmark's own notice about an impersonating package as a first-party
+incident source. The assessment concerns those source roles, not every
+page published on those domains.
 
 ## Rejected domains
 

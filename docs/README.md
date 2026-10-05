@@ -8,6 +8,10 @@ Code, OpenAI Codex and OpenCode as of 2026-10-04.
 Start with the [overview](overview.md): every concept on one page,
 with what it is used for, how and when to use it, and when not to.
 
+The [security research](research-notes/agent-harness-security.md), dated
+2026-10-05, audits the existing security coverage and extends it with
+attacks across concepts, defensive controls and proposed canary checks.
+
 ## Layout
 
 | Directory | Content |
