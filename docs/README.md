@@ -17,6 +17,7 @@ with what it is used for, how and when to use it, and when not to.
 | [`best-practices/`](best-practices/) | How to apply each generalized concept: approaches, implementation in Claude Code and Codex, security, verification and a review checklist, with an evidence label on every practice. |
 | [`concepts/`](concepts/) | Vendor-neutral version of each concept: a comparison across harnesses, a generalized model, portability guidance and what was dropped. |
 | [`vendors/`](vendors/) | One reference section per harness. Every section has the same set of pages, so a concept can be compared by opening the same file name in each. |
+| [`sources.md`](sources.md) | Source policy: rules for citing sources, and the trusted and rejected domains. |
 | [`research-notes/`](research-notes/) | The raw research notes behind the pages, with a source for each claim. |
 
 ## Vendor references
