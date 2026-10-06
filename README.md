@@ -17,4 +17,4 @@ A scratch repository for trying things out in the
 
 ## License
 
-No license is granted. All rights reserved.
+[GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0-only).
