@@ -1,6 +1,6 @@
 # harness-forge design
 
-Status: approved in brainstorming on 2026-10-06; revised after two
+Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; spec awaiting review.
 
 ## Goal
@@ -22,8 +22,10 @@ Success criteria:
   always produce the same recommendation. Live research does not
   repeat exactly; only the answers the user confirms from it feed the
   selection.
-- Every recommendation, finding and verdict cites a rule id and the
-  knowledge-base page behind it.
+- Every recommendation, verification finding and verdict about a
+  mechanism cites a rule id and the Harness KB page behind it.
+- Every idea research finding cites its source with a verbatim quote.
+  An accepted requirement also gets an Idea KB rule id.
 - Verification is deterministic wherever a script can decide; a model
   judges only what no script can.
 - The tooling runs in Claude Code and Codex as equals. OpenCode is
@@ -294,6 +296,18 @@ because the user is waiting inside the intake:
 - Each finding stores its source URL, fetch date and a verbatim quote
   that supports the claim.
 
+**Source support check.** Two checks run on every finding before the
+user sees it:
+
+1. A script confirms that the quote appears in the fetched text.
+2. A fresh-context check, separate from the researcher, judges whether
+   the quote and its surrounding text support the claim. A real quote
+   can still back a wrong conclusion: "supported only on Linux" does
+   not support "supported on every platform".
+
+A finding that fails either check is dropped, as `docs/sources.md`
+requires.
+
 **Acceptance.** The deep pass ends with proposed requirements, not a
 build. The user accepts, edits or rejects each one. Only accepted
 requirements and their idea rules form the Idea KB revision the
@@ -335,9 +349,19 @@ pinned Harness KB is outdated, the report lists it as drift for
 `agent-harness-kb`, with its source. It never changes the pinned
 rules. When the drift touches a security rule or would break
 compatibility, the affected parts stop at `blocked` until the user
-decides for this idea: follow the sourced drift finding, or keep the
-Harness KB rule. The forge does not unblock on the research's own
-say-so, because fetched content could invent drift to steer a build.
+chooses one of two paths:
+
+- **Adopt the correction.** This needs a Harness KB release that
+  contains the corrected rule, reviewed in `agent-harness-kb`. The
+  part stays `blocked` until the plugin pins that release; verification
+  then runs against it like any other version. A user who cannot
+  publish to `agent-harness-kb` waits for that release.
+- **Keep the pinned rule.** The part continues, and every applicable
+  check and stated goal must still pass against the pinned version.
+
+The user's choice authorizes the path. It never waives a failed check,
+and the forge does not unblock on the research's own say-so, because
+fetched content could invent drift to steer a build.
 
 **Harness support.** Both harnesses support web search. Codex defaults
 to cached search; live search needs `web_search = "live"` or
@@ -395,7 +419,9 @@ A part is `verified` only when all of these hold:
   `applicability: judged`; the reviewer may answer "not applicable"
   only for those, with a reason. For an `error` rule, that answer
   leaves the rule unresolved, and an unresolved rule keeps the part
-  from `verified` until the user confirms the reason;
+  from `verified` until the user confirms the reason. That
+  confirmation settles only whether the rule applies; a rule that
+  applies and fails stays failed;
 - no `error` rule failed;
 - the bound inputs are unchanged: the sha256 of every checked file,
   the Harness KB version, the Idea KB revision, the decision record's
@@ -454,7 +480,9 @@ to harness-forge itself:
 - **Research:** the subagent's output is validated against its schema,
   and every cited domain is checked against `docs/sources.md`. Fixture
   cases with stubbed fetches cover: a trusted source whose text does
-  not contain the quoted claim; research reused after the goal
+  not contain the quote; a real quote that does not support its
+  claim ("supported only on Linux" cited for "supported on every
+  platform"); research reused after the goal
   changed; injected instructions in a fetched page; a requirement the
   user did not accept reaching a builder; an idea rule that names a
   checker outside the catalog or a script path. Each must be rejected.
