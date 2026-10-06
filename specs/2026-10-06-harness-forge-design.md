@@ -1,7 +1,7 @@
 # harness-forge design
 
-Status: approved in brainstorming on 2026-10-06; revised after a
-review and to add idea research on 2026-10-06; spec awaiting review.
+Status: approved in brainstorming on 2026-10-06; revised after two
+reviews and to add idea research on 2026-10-06; spec awaiting review.
 
 ## Goal
 
@@ -18,7 +18,10 @@ installs it, without the author's personal plugins or settings.
 
 Success criteria:
 
-- The same intake answers always produce the same recommendation.
+- The same normalized intake answers with the same Harness KB version
+  always produce the same recommendation. Live research does not
+  repeat exactly; only the answers the user confirms from it feed the
+  selection.
 - Every recommendation, finding and verdict cites a rule id and the
   knowledge-base page behind it.
 - Verification is deterministic wherever a script can decide; a model
@@ -68,6 +71,9 @@ idea → harness-intake
                                                        .harness/research/<slug>.rules.yaml
                               │
                               ▼
+       proposed requirements ─► user accepts ──► Idea KB revision recorded
+                              │   (or: chosen mechanism cannot meet the goal → back to intake)
+                              ▼
        build-<concept>, once per part
                               │
                               ▼
@@ -84,11 +90,16 @@ result is a plugin with its own repository, `.harness/` goes there.
 
 Two kinds of knowledge feed the flow:
 
-| | Mechanism knowledge | Idea knowledge |
+| | Harness KB | Idea KB |
 | --- | --- | --- |
 | Answers | How to build a good skill, hook or subagent | What the idea's domain requires: prior art, approaches, pitfalls |
-| Source | `agent-harness-kb`, a pinned snapshot | `harness-research`, live sources, per idea |
-| Becomes | Rules every build is verified against | Input to the split and recommendation, and idea rules for verification |
+| Source | `agent-harness-kb`, a pinned snapshot in the plugin | `harness-research`, live sources, per idea, in `.harness/research/` |
+| Owns | Mechanism selection, harness behavior, portability, security rules, and the trusted checkers | Domain evidence, accepted requirements, existing-solution candidates |
+| Changes through | Reviewed, versioned releases of `agent-harness-kb` | Research plus revisions the user approved for that idea |
+
+Both feed the forge, and neither updates the other. They share the
+rule schema, not authority: only the Harness KB provides executable
+checkers.
 
 ## Rules
 
@@ -120,7 +131,8 @@ page, plus the security guide, not only the checklists.
   kind: must
   severity: error
   check: script
-  script: checks/skills/description_length.py
+  checker: skills.description-length   # id in checks/catalog.yaml
+  params: {max_chars: 1024}
   statement: The description is present and within the harness limit
   applies_to: {harnesses: [claude-code, codex, opencode]}
   evidence: Vendor
@@ -130,6 +142,9 @@ page, plus the security guide, not only the checklists.
 
 - Rule ids are stable. Reports, decision records and recommendations
   cite them.
+- `checks/catalog.yaml` in `agent-harness-kb` lists every executable
+  checker by id, with a schema for its parameters. Rules refer to a
+  checker by id; idea rules may only use catalog checkers.
 - `check: script` only for what a script decides without
   interpretation: presence, length, syntax, names, paths, schemas.
   Anything that needs reading prose for meaning is `judged`.
@@ -154,17 +169,18 @@ page, plus the security guide, not only the checklists.
    will know it works. These become the success criteria.
 2. **The user's picture.** How the user imagines it working, recorded
    verbatim.
-3. **Survey research.** `harness-research` runs its survey pass on
-   the goal and picture (see "harness-research"). The user confirms
-   which findings to use before the split.
-4. **Split into parts.** Each part has one job and a letter id: A, B,
+3. **Whole-idea questions, asked once.** Target harnesses; reach (this
+   repo, all of the user's repos, public). The survey uses both to
+   look only for compatible existing solutions.
+4. **Survey research.** `harness-research` runs its survey pass on
+   the goal, picture, targets and reach (see "harness-research"). The
+   user confirms which findings to use before the split.
+5. **Split into parts.** Each part has one job and a letter id: A, B,
    C. The user confirms or corrects the split by letter:
    - "Combine A and C": the result keeps A; C is retired and never
      reused in this idea.
    - "Split B": the results are B1 and B2.
    - A new part takes the next unused letter.
-5. **Whole-idea questions, asked once.** Target harnesses; reach (this
-   repo, all of the user's repos, public).
 6. **Per-part questions, asked only when the part's description does
    not already answer them.**
    - Must it hold every time, or may the agent occasionally skip it?
@@ -179,7 +195,10 @@ page, plus the security guide, not only the checklists.
    - a control outside the harness, such as a CI check or repository
      settings. The knowledge base assigns the authoritative merge gate
      to CI because committed agent configuration can be changed by a
-     pull request (`docs/overview.md`, `docs/guide/hooks.md`);
+     pull request (`docs/overview.md`, `docs/guide/hooks.md`). A CI job
+     is a gate only once the repository requires it to pass, for
+     example through GitHub branch protection, so the recommendation
+     lists that setting as a prerequisite;
    - reuse what exists: the survey found an existing skill, plugin or
      tool that meets the part's goal; the recommendation names it with
      its source, license and maintenance state;
@@ -211,7 +230,7 @@ goals: [...]
 targets: [claude-code, codex]
 reach: public
 kb_version: v1.2.0
-status: decided           # decided → built → verified
+status: decided           # decided → built → verified; blocked on unresolved drift
 parts:
   - id: A
     slug: review-diff
@@ -248,7 +267,8 @@ A skill that researches the user's idea, not the harness. It runs in a
 subagent and can also be started on its own; a later intake then
 reuses the existing research file.
 
-**Survey pass**, after the goal and the user's picture, kept short
+**Survey pass**, after the goal, the user's picture, targets and
+reach, kept short
 because the user is waiting inside the intake:
 
 - what people already do for this goal, and which approaches exist;
@@ -267,10 +287,20 @@ because the user is waiting inside the intake:
 - `.harness/research/<slug>.md`: findings grouped by pass and part,
   each claim with a fetched source.
 - `.harness/research/<slug>.rules.yaml`: idea rules in the same schema
-  as the knowledge-base rules, with ids prefixed `idea.<slug>.`.
-  `harness-verify` checks them like any other rule.
-- The decision record stores the path and date of the research it
-  used.
+  as the Harness KB rules, with ids prefixed `idea.<slug>.`. An idea
+  rule is either `judged` or names a checker from the Harness KB's
+  checker catalog by id, with parameters validated against that
+  checker's schema. It can never name a script path.
+- Each finding stores its source URL, fetch date and a verbatim quote
+  that supports the claim.
+
+**Acceptance.** The deep pass ends with proposed requirements, not a
+build. The user accepts, edits or rejects each one. Only accepted
+requirements and their idea rules form the Idea KB revision the
+builders and `harness-verify` use; the decision record stores that
+revision's sha256. When the deep pass shows that a chosen mechanism
+cannot meet a part's goal, the forge returns to the intake with a
+concrete alternative instead of building.
 
 **Source rules.** The rules in the knowledge base's `docs/sources.md`
 apply: every source is fetched and says what is cited, claims that
@@ -280,8 +310,18 @@ snapshot.
 
 **Safety.** Fetched pages are untrusted content.
 
-- The research subagent has web access and read-only tools, and no
-  tool that writes outside `.harness/research/`.
+- The research subagent receives only an approved research brief: the
+  goal, the user's picture, the parts and their accepted answers. It
+  gets no access to the repository's other files, because search
+  arguments and fetched URLs can carry data out (OpenAI's deep-research
+  security guidance, cited in `docs/guide/security.md`).
+- It has web access and no tool that writes outside
+  `.harness/research/`.
+- Restrictions are set up per harness and tested in each. Codex
+  subagents inherit the parent's sandbox and live runtime overrides
+  even when the agent file says otherwise
+  (`docs/vendors/codex/subagents.md`), so an agent file alone does not
+  enforce them.
 - It returns structured findings, each with a source. Fetched text
   reaches builders only through findings the user confirmed, never as
   instructions.
@@ -291,8 +331,13 @@ snapshot.
   confirmed answers.
 
 **Knowledge-base drift.** When research finds that a fact in the
-pinned knowledge base is outdated, the report lists it as drift for
-`agent-harness-kb`. It never changes the pinned rules.
+pinned Harness KB is outdated, the report lists it as drift for
+`agent-harness-kb`, with its source. It never changes the pinned
+rules. When the drift touches a security rule or would break
+compatibility, the affected parts stop at `blocked` until the user
+decides for this idea: follow the sourced drift finding, or keep the
+Harness KB rule. The forge does not unblock on the research's own
+say-so, because fetched content could invent drift to steer a build.
 
 **Harness support.** Both harnesses support web search. Codex defaults
 to cached search; live search needs `web_search = "live"` or
@@ -344,10 +389,19 @@ user-invoked skills, so `build-skill` builds them too. Each one:
 A part is `verified` only when all of these hold:
 
 - every applicable rule produced a result; none is missing or errored;
-- every "not applicable" verdict has a reason shown in the report;
+- applicability was decided before review: scripts evaluate
+  `applies_to` for every rule, and the reviewer receives only rules
+  that apply. A rule whose applicability needs judgment carries
+  `applicability: judged`; the reviewer may answer "not applicable"
+  only for those, with a reason. For an `error` rule, that answer
+  leaves the rule unresolved, and an unresolved rule keeps the part
+  from `verified` until the user confirms the reason;
 - no `error` rule failed;
-- every recorded file hash still matches. A changed file returns its
-  part to `built`.
+- the bound inputs are unchanged: the sha256 of every checked file,
+  the Harness KB version, the Idea KB revision, the decision record's
+  answers and the checker versions. A change to any of them returns
+  the affected parts to `built`, even when the generated files did not
+  change.
 
 `verified` means the part passed the static checks and the listed
 runtime tests at the recorded versions. It does not mean the part is
@@ -374,12 +428,18 @@ again on the fixed parts, on every part linked to them through
 The files under review may be hostile, so the security guide applies
 to harness-forge itself:
 
-- Rules and check scripts come only from the pinned knowledge-base
-  snapshot inside the plugin, never from the repository being
-  checked.
+- Mechanism rules and every executable checker come only from the
+  pinned Harness KB snapshot inside the plugin. Accepted idea rules
+  come from the Idea KB and can only be judged or call a catalog
+  checker with validated parameters. Nothing from the repository being
+  checked is executed as a check.
+- Runtime tests run the candidate's own code, so they run in a
+  separate, disposable environment with synthetic credentials and an
+  explicit network allowlist.
 - Check scripts run with time and output limits and do not execute
   the files they check.
-- The reviewer subagent gets read-only tools and no network access.
+- The reviewer subagent gets read-only tools and no network access,
+  set up and tested per harness as for research.
 - Reviewer output is validated against a schema: every applicable rule
   id must appear exactly once, and unknown ids are rejected.
 - A fresh context removes the builder's conversation, not prompt
@@ -392,7 +452,12 @@ to harness-forge itself:
 - **Rules:** every script check has good and bad fixtures in
   `agent-harness-kb` that show it fires on the bad case only.
 - **Research:** the subagent's output is validated against its schema,
-  and every cited domain is checked against `docs/sources.md`.
+  and every cited domain is checked against `docs/sources.md`. Fixture
+  cases with stubbed fetches cover: a trusted source whose text does
+  not contain the quoted claim; research reused after the goal
+  changed; injected instructions in a fetched page; a requirement the
+  user did not accept reaching a builder; an idea rule that names a
+  checker outside the catalog or a script path. Each must be rejected.
 - **Intake:** fixed answer sets run through `rules/selection.yaml`
   must produce the expected recommendation, without a model.
 - **End to end:** reference ideas run in Claude Code and Codex in
@@ -410,7 +475,8 @@ Each gets its own spec, plan and implementation, in this order.
 1. **Thin slice: skills, end to end.** Proves the contracts before
    they spread across every concept:
    - create `agent-harness-kb`, move `docs/` out of `playground`, and
-     write the rule schema and the severity policy;
+     write the rule schema, the severity policy and the checker
+     catalog;
    - the rules for the skills concept, with fixtures;
    - `rules/selection.yaml` for all concepts, but only at the level of
      the overview's "use it when / do not use it when" columns, so the
