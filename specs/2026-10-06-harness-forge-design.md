@@ -1,6 +1,7 @@
 # harness-forge design
 
-Status: approved in brainstorming on 2026-10-06; spec awaiting review.
+Status: approved in brainstorming on 2026-10-06; revised after a
+review on 2026-10-06; spec awaiting review.
 
 ## Goal
 
@@ -34,10 +35,15 @@ Success criteria:
 | Knowledge-base home | Its own repo; the plugin bundles a pinned snapshot | Same repo as the tooling: couples research and tooling releases. Fetching pages at run time: non-deterministic, needs network, and brings outside content into context, which the security guide warns against |
 | Verification | Scripts first, then a fresh-context reviewer subagent on a fixed rule list | Model-only review: not deterministic |
 | Granularity | Deciding questions per part of an idea | One round for the whole idea: fails when parts need different mechanisms |
+| Build order | A thin slice for the skills concept, end to end in both harnesses, before extracting the other concepts | Extracting every rule first: the schema and contracts would only be tested after hundreds of rules depend on them |
+| Overrides | Choosing another mechanism only warns; a chosen mechanism that cannot meet a stated goal stays an error | Downgrading every fit failure to a warning: "verified" would hide unmet goals |
+| Re-verification | Fixed parts plus every part linked to them | Fixed parts only: a change can break the part that calls it |
+| License | AGPL-3.0 for every repository in the organization, with an additional permission that excludes files harness-forge generates in a user's repository | Plain AGPL-3.0: leaves open whether generated configuration in a user's repository is covered |
 
 ## Repositories
 
-All in the `franks-ai-skills` organization, all public.
+All in the `franks-ai-skills` organization, all public, all licensed
+AGPL-3.0. `harness-forge` adds the output exception from "Decisions".
 
 | Repo | Contents |
 | --- | --- |
@@ -72,25 +78,48 @@ Extraction sweeps the "When not", Practices, Security, Portability,
 page, plus the security guide, not only the checklists.
 
 ```yaml
-- id: skills.description.what-not-when
+- id: skills.description.no-workflow-steps
   concept: skills
   kind: must-not          # must | must-not | should | should-not
-  severity: error         # error fails verification; warning reports only
-  check: script           # script | judged
-  script: checks/skills/description.py
-  statement: Description summarizes the workflow instead of when to use it
+  severity: warning       # error fails verification; warning reports only
+  check: judged           # script | judged
+  statement: The description lists the skill's workflow steps
+  applies_to:
+    harnesses: [claude-code, codex, opencode]
+    versions: {claude-code: ">=2.1.289", codex: ">=0.159.2"}
+    when: []              # conditions, e.g. "targets include two harnesses"
   evidence: Practitioner  # the label used on the best-practices page
   sources:
     - docs/guide/skills.md#practices
     - https://raw.githubusercontent.com/obra/superpowers/main/skills/writing-skills/SKILL.md
   contested: false
+
+- id: skills.description.length
+  concept: skills
+  kind: must
+  severity: error
+  check: script
+  script: checks/skills/description_length.py
+  statement: The description is present and within the harness limit
+  applies_to: {harnesses: [claude-code, codex, opencode]}
+  evidence: Vendor
+  sources: [docs/vendors/claude-code/skills.md, docs/vendors/codex/skills.md]
+  contested: false
 ```
 
 - Rule ids are stable. Reports, decision records and recommendations
   cite them.
-- `severity` follows the evidence. Vendor documentation and security
-  findings may be `error`. A rule based on practitioner opinion alone
-  is at most `warning` unless the author raises it.
+- `check: script` only for what a script decides without
+  interpretation: presence, length, syntax, names, paths, schemas.
+  Anything that needs reading prose for meaning is `judged`.
+- `applies_to` limits a rule to harnesses, version ranges and
+  conditions. A rule outside its scope is reported as not applicable
+  with that reason.
+- `evidence` and `severity` are separate. A written severity policy in
+  `agent-harness-kb` sets each rule's severity; evidence only caps it.
+  Vendor advice is not automatically `error`, and a rule based on
+  practitioner opinion alone is at most `warning` unless the author
+  raises it with a recorded reason.
 - `contested: true` marks a point the sources disagree on, such as
   emphatic ALWAYS/NEVER wording. A contested rule only warns, and the
   report shows each position with its source.
@@ -118,16 +147,29 @@ page, plus the security guide, not only the checklists.
    - Who starts it: the user, the model, or an event?
    - Does it need its own context, other tools or another model?
    - Does it reach an external system, and does a CLI exist for it?
-6. **Recommendation.** A mechanism per part with alternatives, pros
+6. **Recommendation.** An outcome per part with alternatives, pros
    and cons, each citing rule ids and pages, plus how the parts
-   connect, for example "B starts A; C enforces A's result".
+   connect, for example "B starts A; C enforces A's result". An
+   outcome is one of:
+   - a harness mechanism, such as a skill, hook or subagent;
+   - a control outside the harness, such as a CI check or repository
+     settings. The knowledge base assigns the authoritative merge gate
+     to CI because committed agent configuration can be changed by a
+     pull request (`docs/overview.md`, `docs/guide/hooks.md`);
+   - nothing fits: the part's goal cannot be met by any researched
+     mechanism, and the intake says so instead of forcing a choice.
 7. **The user decides**, and may override. An override and its reason
    are recorded.
 
 One question per message, multiple choice where possible. The intake
 stops asking about a part once all remaining answers lead to the same
-mechanism. A part that fits no mechanism, or parts that turn out to
-be the same, trigger a proposal to re-split.
+outcome. Parts that turn out to be the same, or a part that mixes two
+jobs, trigger a proposal to re-split.
+
+Builders exist only for researched outcomes. An outside control that
+the knowledge base has not researched with sources, such as GitHub
+branch protection today, is named in the recommendation but not
+built.
 
 `rules/selection.yaml` holds the questions and what each answer
 implies, so the recommendation is computed from data. The model only
@@ -163,8 +205,11 @@ parts:
   - id: C
     slug: merge-gate
     goal: Never merge without a review
-    recommended: hook
-    chosen: hook
+    outcome: outside-harness
+    recommended: automation-ci   # a CI job that runs A and must pass
+    chosen: automation-ci
+    alternatives:
+      - {concept: hook, pros: [...], cons: ["agent config can be changed by a pull request"], rules: [...]}
     connects_to: [{to: A, how: enforces}]
 ---
 The user's own description, and a summary of the trade-offs.
@@ -173,8 +218,8 @@ The user's own description, and a summary of the trade-offs.
 ## Builders
 
 One skill per mechanism: `build-skill`, `build-hook`,
-`build-subagent`, `build-instructions`, `build-permissions`,
-`build-mcp`, `build-plugin`, `build-automation`. Commands are
+`build-subagent`, `build-instructions`, `build-configuration`,
+`build-permissions`, `build-mcp`, `build-plugin`, `build-automation`. Commands are
 user-invoked skills, so `build-skill` builds them too. Each one:
 
 - reads its parts from the decision record;
@@ -188,24 +233,71 @@ user-invoked skills, so `build-skill` builds them too. Each one:
 ## harness-verify
 
 1. **Deterministic checks.** For each part, run every `check: script`
-   rule for its mechanism, plus the vendors' validators where they
+   rule that applies to it, plus the vendors' validators where they
    exist (`claude plugin validate`, hook JSON schemas, size limits).
    Then check the links between parts: a named subagent, skill or hook
    event exists and its name matches. No model is involved.
 2. **Judged checks.** A reviewer subagent starts with a fresh context
    and receives only the built files, the decision record and the
-   `judged` rules for the chosen mechanisms, not the conversation. It
-   returns one structured verdict per rule id: pass, fail or not
-   applicable, with a reason and a citation. It also checks each part
-   against its goal. Free-form verdicts are rejected.
-3. **Report.** `.harness/reports/<slug>.md`, grouped by part letter,
-   then rule id, with severity, sources, contested positions and the
-   knowledge-base version.
+   applicable `judged` rules, not the conversation. It returns one
+   structured verdict per rule id: pass, fail or not applicable, each
+   with a reason and a citation. It also checks each part against its
+   goal.
+3. **Runtime tests**, where a cheap one exists: the hook blocks a
+   sample bad command, the skill triggers on sample prompts. Reported
+   separately from the static checks in 1 and 2.
+4. **Report.** `.harness/reports/<slug>.md`, grouped by part letter,
+   then rule id, with severity, sources, contested positions, the
+   knowledge-base version, the version of each tool used, and the
+   sha256 of every file checked.
 
-A part becomes `verified` only when no `error` rule fails. When the
-user overrode a recommendation, the wrong-mechanism rules for that
-part report as warnings. On request, builders fix only the failing
-parts and verify runs again on those parts.
+### What "verified" means
+
+A part is `verified` only when all of these hold:
+
+- every applicable rule produced a result; none is missing or errored;
+- every "not applicable" verdict has a reason shown in the report;
+- no `error` rule failed;
+- every recorded file hash still matches. A changed file returns its
+  part to `built`.
+
+`verified` means the part passed the static checks and the listed
+runtime tests at the recorded versions. It does not mean the part is
+free of defects the rules do not cover.
+
+### Overrides
+
+When the user chose a mechanism other than the recommended one:
+
+- rules that only say "a different mechanism was recommended" report
+  as warnings;
+- rules that say "the chosen mechanism cannot meet a goal the user
+  stated" stay errors, until the user changes that goal in the
+  decision record.
+
+### Re-verification
+
+On request, builders fix the failing parts. Verification then runs
+again on the fixed parts, on every part linked to them through
+`connects_to`, and on the link checks.
+
+### Security of the verifier
+
+The files under review may be hostile, so the security guide applies
+to harness-forge itself:
+
+- Rules and check scripts come only from the pinned knowledge-base
+  snapshot inside the plugin, never from the repository being
+  checked.
+- Check scripts run with time and output limits and do not execute
+  the files they check.
+- The reviewer subagent gets read-only tools and no network access.
+- Reviewer output is validated against a schema: every applicable rule
+  id must appear exactly once, and unknown ids are rejected.
+- A fresh context removes the builder's conversation, not prompt
+  injection inside the reviewed files. The reviewer's instructions
+  treat file contents as data, and a judged verdict can never
+  overrule a failed script check.
 
 ## Testing harness-forge itself
 
@@ -213,26 +305,35 @@ parts and verify runs again on those parts.
   `agent-harness-kb` that show it fires on the bad case only.
 - **Intake:** fixed answer sets run through `rules/selection.yaml`
   must produce the expected recommendation, without a model.
-- **End to end:** reference ideas, starting with the code-review
-  example, run in Claude Code and Codex in `playground`. Their
+- **End to end:** reference ideas run in Claude Code and Codex in
+  `playground`. The thin slice uses an idea that ends in a skill; the
+  code-review example follows once the hook, subagent and automation
+  builders exist. Their
   decision records and reports are kept as reference results.
 - **Self-check:** harness-forge's own skills and subagent pass
   `harness-verify`.
 
 ## Sub-projects
 
-Each gets its own spec, plan and implementation, in this order:
+Each gets its own spec, plan and implementation, in this order.
 
-1. **Rules extraction** in `agent-harness-kb`: move `docs/` out of
-   `playground`, write `rules/*.yaml` and fixtures.
-2. **`harness-verify`**: check scripts and the reviewer subagent;
-   first used on the existing `agent-harness` skill.
-3. **`harness-intake`**: `rules/selection.yaml`, the questionnaire and
-   the decision record.
-4. **Builders**: skills, hooks and subagents first; then
-   instructions, permissions, MCP, plugins and automation.
-5. **Packaging and CI**: the plugin for both harnesses, the snapshot
-   sync and releases.
+1. **Thin slice: skills, end to end.** Proves the contracts before
+   they spread across every concept:
+   - create `agent-harness-kb`, move `docs/` out of `playground`, and
+     write the rule schema and the severity policy;
+   - the rules for the skills concept, with fixtures;
+   - `rules/selection.yaml` for all concepts, but only at the level of
+     the overview's "use it when / do not use it when" columns, so the
+     intake can still recommend another mechanism than a skill;
+   - `harness-intake`, `build-skill` and `harness-verify`;
+   - the plugin packaged for Claude Code and Codex and run in both,
+     in a clean environment without the author's personal plugins.
+2. **Rules for the remaining concepts**, with fixtures, using the
+   schema as corrected by the slice.
+3. **Builders**: hooks, subagents and automation first; then
+   instructions, configuration, permissions, MCP and plugins.
+4. **CI and releases**: the snapshot sync between `agent-harness-kb`
+   and `harness-forge`, and tagged releases.
 
 ## Out of scope for now
 
