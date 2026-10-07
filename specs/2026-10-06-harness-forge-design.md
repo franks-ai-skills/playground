@@ -3,7 +3,9 @@
 Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; outside controls added
 user-decided rule overrides, the goal-conflict question and the
-re-verification choice on 2026-10-07; spec awaiting review.
+re-verification choice on 2026-10-07; contracts for approval, outside
+dependencies and routing tightened on 2026-10-07; spec awaiting
+review.
 
 ## Goal
 
@@ -21,7 +23,7 @@ installs it, without the author's personal plugins or settings.
 Success criteria:
 
 - The same normalized intake answers with the same Harness KB version
-  always produce the same recommendation. Live research does not
+  and the same rule overrides always produce the same recommendation. Live research does not
   repeat exactly; only the answers the user confirms from it feed the
   selection.
 - Every recommendation, verification finding and verdict about a
@@ -209,9 +211,9 @@ page, plus the security guide, not only the checklists.
    and cons, each citing rule ids and pages, plus how the parts
    connect, for example "B starts A; C enforces A's result". An
    outcome is one of:
-   - **harness only:** a harness mechanism, such as a skill, hook or
-     subagent, or OS isolation for local actions no outside system
-     sees;
+   - **harness only:** a harness mechanism, such as a skill, hook,
+     subagent or the harness's own permission and sandbox settings,
+     for local actions no outside system sees;
    - **outside control alongside a harness mechanism:** the rule must
      survive a compromised agent and in-loop feedback saves
      iterations, or the rule protects the agent's own configuration;
@@ -245,15 +247,25 @@ them.
 - The forge recommends outside controls and never builds or
   configures them. It holds no token that could change platform
   settings.
+- **Boundary.** A file that runs the agent belongs to the harness and
+  can be built, for example a CI workflow that starts the agent
+  (automation). Anything that enforces a rule on the repository,
+  account or machine is an outside control and is only recommended:
+  required checks, rulesets and branch protection, `CODEOWNERS` and
+  the setting that requires code-owner review, scanner and policy
+  configuration, credentials and identity, network rules, containers,
+  dev containers and VMs. The harness's own sandbox and permission
+  settings stay harness mechanisms.
 - Each recommended control comes with its prerequisites as Harness KB
   rules, from the guide's seven conditions, for example "the agent's
   identity is on no bypass list" and "approvals reset on new pushes".
   A CI job, for example, is a gate only once the repository requires
   it to pass and its workflow definition is protected.
 - Every recommendation in which an agent opens pull requests includes
-  a merge rule, and every built harness setup includes code owners for
-  the agent's own configuration files, as recommended outside
-  controls.
+  a merge rule, and every built harness setup includes a recommended
+  `CODEOWNERS` entry for the agent's own configuration files together
+  with the setting that requires code-owner review; the file alone
+  enforces nothing.
 - Bypass modes, untrusted repositories, or untrusted input combined
   with secrets and egress always add an isolation recommendation.
 - When a control is unavailable on the user's plan or visibility, the
@@ -271,9 +283,10 @@ section of the README that belongs to the result: the result's own
 README when it has one, such as a plugin's, otherwise the README of
 the repository that holds `.harness/`. Each entry names the control,
 the part letter it serves, its prerequisites, and its status
-"recommended, not verified". `build-*` skills write the section;
-`harness-verify` checks with a script that every outside control in
-the decision record appears there. Verification never checks whether
+"recommended, not verified". `harness-intake` writes and updates the
+section when the user decides, so it exists even when no part is
+built; builders never write it. `harness-verify` checks with a script
+that every outside control in the decision record appears there. Verification never checks whether
 the control is actually configured on the platform.
 
 `rules/selection.yaml` holds the questions and what each answer
@@ -435,7 +448,10 @@ on the user's decision.
   edits the snapshot and applies only to the repository that holds it.
 - **Content.** The overridden rule id, the pinned version, the new
   rule or `retired: true`, the drift finding with its source and
-  quote, the user's reason, the date, and the issue or comment link.
+  quote, the user's reason, the date, and the issue or comment link,
+  or `pending` or `not published` when the user declined or has not
+  yet approved filing. Adopting the override does not depend on
+  publishing.
 - **What it may change.** Statement, parameters, severity,
   `applies_to`, or retire the rule. It may only refer to catalog
   checkers; it can never add executable code.
@@ -444,9 +460,25 @@ on the user's decision.
   check cannot be adopted. When the override loosens or retires an
   `error` rule or a security rule, the forge says so explicitly before
   the user decides.
+- **Precedence.** For the repository that holds it, an approved
+  override replaces the pinned rule with the same id in every stage:
+  intake selection, builders and verification. It changes nothing
+  else. Goal-fit checks come from the decision record, not from
+  Harness KB rules, so retiring a rule never removes the check that a
+  part meets its accepted goal.
 - **In verification** overrides are bound inputs like the Harness KB
   version. The report states "verified with N overrides" and lists
   each one, so an override is never silent.
+- **Approval in the session.** An override file and its recorded
+  decision can both be written into the repository under review, so a
+  record in the repository never proves approval on its own. Each
+  intake or verification run that uses overrides or weakening
+  decisions (an adjusted goal, "keep as is", a mechanism override)
+  shows them in one question, each with its content and sha256, and
+  asks the user to confirm them in the session. Only confirmed items
+  apply; an unconfirmed one leaves its parts `blocked`. A run without
+  a user, such as a CI run, therefore cannot verify a part that
+  depends on an override.
 - **On a Harness KB update** the forge compares each override with the
   new release. If the release contains the correction, it proposes
   removing the override; if the release keeps the old rule, it asks
@@ -514,13 +546,24 @@ A part is `verified` only when all of these hold:
 - no `error` rule failed;
 - the bound inputs are unchanged: the sha256 of every checked file,
   the Harness KB version, the rule overrides, the Idea KB revision,
-  the decision record's answers and the checker versions. A change to any of them returns
-  the affected parts to `built`, even when the generated files did not
-  change.
+  the decision record's answers and the checker versions. A change to
+  any of them returns the affected parts to `built`, even when the
+  generated files did not change.
 
 `verified` means the part passed the static checks and the listed
 runtime tests at the recorded versions. It does not mean the part is
 free of defects the rules do not cover.
+
+**Goals that depend on outside controls.** The report gives two
+separate results per part:
+
+- **Harness result**: `verified` or not, for what was built, as above.
+- **Goal result**: `met by the verified build` when the build alone
+  meets the goal; `depends on outside controls` when the goal also
+  needs an outside control, listing those controls. The forge never
+  checks platform settings, so it never reports such a goal as met.
+  "Never merge without review", for example, stays `depends on outside
+  controls` even when the review workflow is `verified`.
 
 ### Overrides
 
@@ -538,13 +581,19 @@ this kind appears there. It first shows the current state: the part's
 goal, the chosen mechanism, the failing rule ids with their sources,
 and the recommended mechanism with its pros and cons. Then:
 
-1. **Use the recommended mechanism** (listed first). The part returns
-   to its builder; it and its linked parts are re-verified.
+1. **Use the recommended mechanism** (listed first). A harness
+   mechanism returns the part to its builder; an outside control
+   returns it to the intake, which updates the decision record and
+   the README section. The part and its linked parts are re-verified.
 2. **Adjust the goal.** The forge proposes a concrete wording the
    chosen mechanism can meet, for example "must hold under prompt
    injection" → "should hold for honest work", and accepts free text.
-   The decision record keeps the old goal as history, and verification
-   results bound to the goal are invalidated.
+   The decision record keeps the old goal as history. The changed goal
+   then goes back through the steps it affects: the per-part
+   questions and selection, the research brief and deep pass when the
+   goal's domain or requirements changed, and acceptance of any
+   changed requirements, before anything is rebuilt. Verification
+   results bound to the old goal are invalidated.
 3. **Keep as is.** Nothing changes. The error stays in the report and
    the part is never `verified`.
 
@@ -572,13 +621,14 @@ The choice is recorded in the report.
 The files under review may be hostile, so the security guide applies
 to harness-forge itself:
 
-- Rule overrides change rules only through catalog checkers and
-  exist only after the user approved them; an override file without
-  a recorded decision is rejected.
+- Rule overrides change rules only through catalog checkers, and
+  apply only after the user confirmed them in the current session (see
+  "Rule overrides"); a record in the repository is not proof.
 - Mechanism rules and every executable checker come only from the
-  pinned Harness KB snapshot inside the plugin. Accepted idea rules
-  come from the Idea KB and can only be judged or call a catalog
-  checker with validated parameters. Nothing from the repository being
+  pinned Harness KB snapshot inside the plugin, replaced per rule id by
+  confirmed overrides. Accepted idea rules come from the Idea KB and
+  can only be judged or call a catalog checker with validated
+  parameters. Nothing from the repository being
   checked is executed as a check.
 - Runtime tests run the candidate's own code, so they run in a
   separate, disposable environment with synthetic credentials and an
@@ -604,6 +654,8 @@ to harness-forge itself:
   not contain the quote; a real quote that does not support its
   claim ("supported only on Linux" cited for "supported on every
   platform"); an override file without a recorded user decision; an
+  override with a forged "approved" record but no confirmation in the
+  session; an override changed after its approval; an
   override that loosens a security rule without the explicit warning
   having been shown; research reused after the goal
   changed; injected instructions in a fetched page; a requirement the
