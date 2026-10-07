@@ -4,8 +4,8 @@ Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; outside controls added
 user-decided rule overrides, the goal-conflict question and the
 re-verification choice on 2026-10-07; contracts for approval, outside
-dependencies and routing tightened on 2026-10-07; spec awaiting
-review.
+dependencies and routing tightened, and contract confirmation and
+result states added on 2026-10-07; spec awaiting review.
 
 ## Goal
 
@@ -471,14 +471,9 @@ on the user's decision.
   each one, so an override is never silent.
 - **Approval in the session.** An override file and its recorded
   decision can both be written into the repository under review, so a
-  record in the repository never proves approval on its own. Each
-  intake or verification run that uses overrides or weakening
-  decisions (an adjusted goal, "keep as is", a mechanism override)
-  shows them in one question, each with its content and sha256, and
-  asks the user to confirm them in the session. Only confirmed items
-  apply; an unconfirmed one leaves its parts `blocked`. A run without
-  a user, such as a CI run, therefore cannot verify a part that
-  depends on an override.
+  record in the repository never proves approval on its own. Overrides
+  apply only after the contract confirmation in the current session
+  (see "Contract confirmation" under harness-verify).
 - **On a Harness KB update** the forge compares each override with the
   new release. If the release contains the correction, it proposes
   removing the override; if the release keeps the old rule, it asks
@@ -533,6 +528,8 @@ user-invoked skills, so `build-skill` builds them too. Each one:
 
 A part is `verified` only when all of these hold:
 
+- the user confirmed the part's contract in this session (see
+  "Contract confirmation");
 - every applicable rule produced a result; none is missing or errored;
 - applicability was decided before review: scripts evaluate
   `applies_to` for every rule, and the reviewer receives only rules
@@ -554,16 +551,51 @@ A part is `verified` only when all of these hold:
 runtime tests at the recorded versions. It does not mean the part is
 free of defects the rules do not cover.
 
-**Goals that depend on outside controls.** The report gives two
-separate results per part:
+**Results per part.** The report gives two separate results per
+part.
 
-- **Harness result**: `verified` or not, for what was built, as above.
-- **Goal result**: `met by the verified build` when the build alone
-  meets the goal; `depends on outside controls` when the goal also
-  needs an outside control, listing those controls. The forge never
-  checks platform settings, so it never reports such a goal as met.
-  "Never merge without review", for example, stays `depends on outside
-  controls` even when the review workflow is `verified`.
+Harness result, for what was built:
+
+- `verified`: all conditions above hold;
+- `not verified`: the part was built but at least one condition fails;
+- `not applicable`: nothing is built for the part, as for an
+  outside-only part.
+
+Goal result, for the part's accepted goal, decided in this order:
+
+1. `not assessed`: the contract is unconfirmed or the part is
+   `blocked`, so nothing was assessed against a trusted goal.
+2. `not met`: the harness result is `not verified`, whether or not the
+   goal also needs outside controls; a failed build is reported as a
+   failure, never as a dependency.
+3. `depends on outside controls`: the goal needs at least one outside
+   control, listed by name, and the harness result is `verified` or
+   `not applicable`. The forge never checks platform settings, so it
+   never reports such a goal as met. "Never merge without review", for
+   example, stays here even when the review workflow is `verified`.
+4. `met by the verified build`: the harness result is `verified` and
+   the goal needs no outside control.
+
+### Contract confirmation
+
+Everything the verifier judges against lives in the repository under
+review, and so does its history. A pull request could weaken a goal,
+change the accepted requirements or the chosen mechanism, and delete
+the record of having done so; checking only for recorded weakening
+decisions would miss that. No trusted baseline exists outside the
+session: a local approval cache would be writable by the agent, which
+runs as the user.
+
+So each intake and verification run starts with one confirmation
+question showing the current contract, per part: the goal, the chosen
+outcome and mechanism, the outside controls, the sha256 of the
+accepted Idea KB revision, and every rule override with its content
+and sha256. Differences from the last confirmation recorded in the
+repository are highlighted as a hint, labelled as coming from an
+untrusted record. Only a contract the user confirms in the session is
+used. A part whose contract is not confirmed is `blocked`, and its
+goal result is `not assessed`. A run without a user, such as a CI run,
+therefore reports every goal as `not assessed`.
 
 ### Overrides
 
@@ -622,13 +654,13 @@ The files under review may be hostile, so the security guide applies
 to harness-forge itself:
 
 - Rule overrides change rules only through catalog checkers, and
-  apply only after the user confirmed them in the current session (see
-  "Rule overrides"); a record in the repository is not proof.
-- Mechanism rules and every executable checker come only from the
-  pinned Harness KB snapshot inside the plugin, replaced per rule id by
-  confirmed overrides. Accepted idea rules come from the Idea KB and
-  can only be judged or call a catalog checker with validated
-  parameters. Nothing from the repository being
+  apply only after the contract confirmation in the current session; a
+  record in the repository is not proof.
+- Rules come from the pinned Harness KB snapshot inside the plugin; a
+  confirmed override may replace a rule with the same id. Checker code
+  always comes from the pinned plugin and is never overridden.
+  Accepted idea rules come from the Idea KB and can only be judged or
+  call a catalog checker with validated parameters. Nothing from the repository being
   checked is executed as a check.
 - Runtime tests run the candidate's own code, so they run in a
   separate, disposable environment with synthetic credentials and an
@@ -655,7 +687,11 @@ to harness-forge itself:
   claim ("supported only on Linux" cited for "supported on every
   platform"); an override file without a recorded user decision; an
   override with a forged "approved" record but no confirmation in the
-  session; an override changed after its approval; an
+  session; an override changed after its approval; a goal and its
+  accepted requirements weakened with the history removed, which the
+  contract confirmation must show; a failed build, reported `not met`;
+  an outside-only part, reported `not applicable` and `depends on
+  outside controls`; an
   override that loosens a security rule without the explicit warning
   having been shown; research reused after the goal
   changed; injected instructions in a fetched page; a requirement the
