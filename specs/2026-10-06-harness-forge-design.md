@@ -2,7 +2,7 @@
 
 Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; outside controls added
-on 2026-10-07; spec awaiting review.
+and user-decided rule overrides on 2026-10-07; spec awaiting review.
 
 ## Goal
 
@@ -48,6 +48,7 @@ Success criteria:
 | Re-verification | Fixed parts plus every part linked to them | Fixed parts only: a change can break the part that calls it |
 | Idea research | A separate `harness-research` skill, run twice by the intake: a short survey before the split, and a deep pass per chosen part before building | Research only before the intake: the goal is not yet clear, so it covers too much or the wrong topic. Research only before building: the recommendation cannot use it, and existing solutions surface too late. A tool the user runs alone: the forge could not rely on its output |
 | Outside controls | Recommended with prerequisites and listed in the result's README as "recommended, not verified"; never built, configured or checked on the platform | Building them through platform APIs: the forge would need admin tokens, which the identity research advises against. Checking them with a read-only token: not wanted; the README makes each recommendation visible instead |
+| Harness KB drift | The user decides: adopt the correction at once as a documented per-repository rule override, or keep the pinned rule; an issue or comment on `agent-harness-kb` is proposed for approval | Waiting for a reviewed Harness KB release: blocks the user's work on a correction they already accepted. Research changing rules without a user decision: fetched content could steer the build |
 | License | AGPL-3.0 for every repository in the organization, with an additional permission that excludes files harness-forge generates in a user's repository | Plain AGPL-3.0: leaves open whether generated configuration in a user's repository is covered |
 
 ## Repositories
@@ -286,7 +287,7 @@ goals: [...]
 targets: [claude-code, codex]
 reach: public
 kb_version: v1.2.0
-status: decided           # decided → built → verified; blocked on unresolved drift
+status: decided           # decided → built → verified; blocked until the user decides on security or compatibility drift
 parts:
   - id: A
     slug: review-diff
@@ -403,23 +404,51 @@ snapshot.
   confirmed answers.
 
 **Knowledge-base drift.** When research finds that a fact in the
-pinned Harness KB is outdated, the report lists it as drift for
-`agent-harness-kb`, with its source. It never changes the pinned
-rules. When the drift touches a security rule or would break
-compatibility, the affected parts stop at `blocked` until the user
-chooses one of two paths:
+pinned Harness KB is outdated, the report lists it as drift, with its
+source and the source-support check result. Research never changes
+the pinned snapshot. The user decides what happens next; the forge
+never acts on drift on the research's own say-so, because fetched
+content could invent drift to steer a build.
 
-- **Adopt the correction.** This needs a Harness KB release that
-  contains the corrected rule, reviewed in `agent-harness-kb`. The
-  part stays `blocked` until the plugin pins that release; verification
-  then runs against it like any other version. A user who cannot
-  publish to `agent-harness-kb` waits for that release.
+- **Issue.** The forge searches `agent-harness-kb` for an open issue
+  on the same rule. If one exists, it proposes a comment there;
+  otherwise it proposes a new issue. The user approves the text before
+  anything is filed, because the text is derived from fetched content.
+- **Adopt the correction.** The user overrides the pinned rule for
+  this repository, effective immediately, without waiting for a
+  Harness KB release. See "Rule overrides".
 - **Keep the pinned rule.** The part continues, and every applicable
   check and stated goal must still pass against the pinned version.
 
-The user's choice authorizes the path. It never waives a failed check,
-and the forge does not unblock on the research's own say-so, because
-fetched content could invent drift to steer a build.
+When the drift touches a security rule or would break compatibility,
+the affected parts stop at `blocked` until the user has chosen. Other
+drift does not block; the pinned rule applies until the user chooses.
+
+### Rule overrides
+
+A rule override replaces a pinned Harness KB rule for one repository,
+on the user's decision.
+
+- **Where.** `.harness/overrides/<rule-id>.yaml`, committed. It never
+  edits the snapshot and applies only to the repository that holds it.
+- **Content.** The overridden rule id, the pinned version, the new
+  rule or `retired: true`, the drift finding with its source and
+  quote, the user's reason, the date, and the issue or comment link.
+- **What it may change.** Statement, parameters, severity,
+  `applies_to`, or retire the rule. It may only refer to catalog
+  checkers; it can never add executable code.
+- **Before approval** the forge shows the old and new rule side by
+  side with the source quote. A finding that failed the source-support
+  check cannot be adopted. When the override loosens or retires an
+  `error` rule or a security rule, the forge says so explicitly before
+  the user decides.
+- **In verification** overrides are bound inputs like the Harness KB
+  version. The report states "verified with N overrides" and lists
+  each one, so an override is never silent.
+- **On a Harness KB update** the forge compares each override with the
+  new release. If the release contains the correction, it proposes
+  removing the override; if the release keeps the old rule, it asks
+  the user whether to keep the override.
 
 **Harness support.** Both harnesses support web search. Codex defaults
 to cached search; live search needs `web_search = "live"` or
@@ -482,8 +511,8 @@ A part is `verified` only when all of these hold:
   applies and fails stays failed;
 - no `error` rule failed;
 - the bound inputs are unchanged: the sha256 of every checked file,
-  the Harness KB version, the Idea KB revision, the decision record's
-  answers and the checker versions. A change to any of them returns
+  the Harness KB version, the rule overrides, the Idea KB revision,
+  the decision record's answers and the checker versions. A change to any of them returns
   the affected parts to `built`, even when the generated files did not
   change.
 
@@ -512,6 +541,9 @@ again on the fixed parts, on every part linked to them through
 The files under review may be hostile, so the security guide applies
 to harness-forge itself:
 
+- Rule overrides change rules only through catalog checkers and
+  exist only after the user approved them; an override file without
+  a recorded decision is rejected.
 - Mechanism rules and every executable checker come only from the
   pinned Harness KB snapshot inside the plugin. Accepted idea rules
   come from the Idea KB and can only be judged or call a catalog
@@ -540,7 +572,9 @@ to harness-forge itself:
   cases with stubbed fetches cover: a trusted source whose text does
   not contain the quote; a real quote that does not support its
   claim ("supported only on Linux" cited for "supported on every
-  platform"); research reused after the goal
+  platform"); an override file without a recorded user decision; an
+  override that loosens a security rule without the explicit warning
+  having been shown; research reused after the goal
   changed; injected instructions in a fetched page; a requirement the
   user did not accept reaching a builder; an idea rule that names a
   checker outside the catalog or a script path. Each must be rejected.
