@@ -2,8 +2,8 @@
 
 Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; outside controls added
-user-decided rule overrides and the goal-conflict question on
-2026-10-07; spec awaiting review.
+user-decided rule overrides, the goal-conflict question and the
+re-verification choice on 2026-10-07; spec awaiting review.
 
 ## Goal
 
@@ -46,7 +46,7 @@ Success criteria:
 | Granularity | Deciding questions per part of an idea | One round for the whole idea: fails when parts need different mechanisms |
 | Build order | A thin slice for the skills concept, end to end in both harnesses, before extracting the other concepts | Extracting every rule first: the schema and contracts would only be tested after hundreds of rules depend on them |
 | Overrides | Choosing another mechanism only warns; a chosen mechanism that cannot meet a stated goal stays an error | Downgrading every fit failure to a warning: "verified" would hide unmet goals |
-| Re-verification | Fixed parts plus every part linked to them | Fixed parts only: a change can break the part that calls it |
+| Re-verification | The user chooses a narrow review (fixed parts, linked parts, parts with changed inputs) or a full re-review | Fixed parts only: a change can break the part that calls it. Always full: costs a full reviewer run for every small fix |
 | Idea research | A separate `harness-research` skill, run twice by the intake: a short survey before the split, and a deep pass per chosen part before building | Research only before the intake: the goal is not yet clear, so it covers too much or the wrong topic. Research only before building: the recommendation cannot use it, and existing solutions surface too late. A tool the user runs alone: the forge could not rely on its output |
 | Outside controls | Recommended with prerequisites and listed in the result's README as "recommended, not verified"; never built, configured or checked on the platform | Building them through platform APIs: the forge would need admin tokens, which the identity research advises against. Checking them with a read-only token: not wanted; the README makes each recommendation visible instead |
 | Harness KB drift | The user decides: adopt the correction at once as a documented per-repository rule override, or keep the pinned rule; an issue or comment on `agent-harness-kb` is proposed for approval | Waiting for a reviewed Harness KB release: blocks the user's work on a correction they already accepted. Research changing rules without a user decision: fetched content could steer the build |
@@ -552,9 +552,19 @@ The answer and its reason are recorded in the decision record.
 
 ### Re-verification
 
-On request, builders fix the failing parts. Verification then runs
-again on the fixed parts, on every part linked to them through
-`connects_to`, and on the link checks.
+On request, builders fix the failing parts. The user then chooses the
+scope of the next run in one multiple-choice question that shows, for
+each option, the parts and the number of judged rules it covers:
+
+1. **Narrow review** (listed first): the fixed parts, every part linked
+   to them through `connects_to`, every part whose bound inputs
+   changed, and the link checks. This is the smallest allowed scope;
+   there is no option to check the fixed parts alone.
+2. **Full re-review**: every part against every applicable rule, with
+   a fresh reviewer. It also catches effects that `connects_to` does
+   not show, such as files shared between parts.
+
+The choice is recorded in the report.
 
 ### Security of the verifier
 
