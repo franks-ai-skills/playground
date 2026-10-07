@@ -2,7 +2,8 @@
 
 Status: approved in brainstorming on 2026-10-06; revised after three
 reviews and to add idea research on 2026-10-06; outside controls added
-and user-decided rule overrides on 2026-10-07; spec awaiting review.
+user-decided rule overrides and the goal-conflict question on
+2026-10-07; spec awaiting review.
 
 ## Goal
 
@@ -223,7 +224,8 @@ page, plus the security guide, not only the checklists.
    - **nothing fits:** no researched mechanism or control meets the
      part's goal, and the intake says so instead of forcing a choice.
 8. **The user decides**, and may override. An override and its reason
-   are recorded.
+   are recorded. An override that cannot meet a stated goal triggers
+   the goal-conflict question (see "Overrides").
 
 One question per message, multiple choice where possible. The intake
 stops asking about a part once all remaining answers lead to the same
@@ -527,8 +529,26 @@ When the user chose a mechanism other than the recommended one:
 - rules that only say "a different mechanism was recommended" report
   as warnings;
 - rules that say "the chosen mechanism cannot meet a goal the user
-  stated" stay errors, until the user changes that goal in the
-  decision record.
+  stated" stay errors and trigger a goal-conflict question.
+
+**Goal-conflict question.** One multiple-choice question per part,
+asked when the intake detects the conflict from `rules/selection.yaml`
+right after the override, and again in verification when an error of
+this kind appears there. It first shows the current state: the part's
+goal, the chosen mechanism, the failing rule ids with their sources,
+and the recommended mechanism with its pros and cons. Then:
+
+1. **Use the recommended mechanism** (listed first). The part returns
+   to its builder; it and its linked parts are re-verified.
+2. **Adjust the goal.** The forge proposes a concrete wording the
+   chosen mechanism can meet, for example "must hold under prompt
+   injection" → "should hold for honest work", and accepts free text.
+   The decision record keeps the old goal as history, and verification
+   results bound to the goal are invalidated.
+3. **Keep as is.** Nothing changes. The error stays in the report and
+   the part is never `verified`.
+
+The answer and its reason are recorded in the decision record.
 
 ### Re-verification
 
