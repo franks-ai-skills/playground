@@ -4,8 +4,8 @@ Researched and sources fetched on 2026-10-07. These notes cover
 controls outside the agent harness ("outside gates") that can enforce
 a rule when the agent errs, is prompt-injected, or has its
 configuration changed by a pull request. They back the condensed
-[outside-gates guide](../../guide/outside-gates.md) and the
-"control outside the harness" outcome of the
+[outside-gates guide](../../guide/outside-gates.md) and the outside
+control recommendations in the
 [harness-forge design](../../../specs/2026-10-06-harness-forge-design.md).
 
 Scope: general concepts that work on any platform. Products and

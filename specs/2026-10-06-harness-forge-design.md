@@ -1,7 +1,8 @@
 # harness-forge design
 
 Status: approved in brainstorming on 2026-10-06; revised after three
-reviews and to add idea research on 2026-10-06; spec awaiting review.
+reviews and to add idea research on 2026-10-06; outside controls added
+on 2026-10-07; spec awaiting review.
 
 ## Goal
 
@@ -46,6 +47,7 @@ Success criteria:
 | Overrides | Choosing another mechanism only warns; a chosen mechanism that cannot meet a stated goal stays an error | Downgrading every fit failure to a warning: "verified" would hide unmet goals |
 | Re-verification | Fixed parts plus every part linked to them | Fixed parts only: a change can break the part that calls it |
 | Idea research | A separate `harness-research` skill, run twice by the intake: a short survey before the split, and a deep pass per chosen part before building | Research only before the intake: the goal is not yet clear, so it covers too much or the wrong topic. Research only before building: the recommendation cannot use it, and existing solutions surface too late. A tool the user runs alone: the forge could not rely on its output |
+| Outside controls | Recommended with prerequisites and listed in the result's README as "recommended, not verified"; never built, configured or checked on the platform | Building them through platform APIs: the forge would need admin tokens, which the identity research advises against. Checking them with a read-only token: not wanted; the README makes each recommendation visible instead |
 | License | AGPL-3.0 for every repository in the organization, with an additional permission that excludes files harness-forge generates in a user's repository | Plain AGPL-3.0: leaves open whether generated configuration in a user's repository is covered |
 
 ## Repositories
@@ -172,8 +174,11 @@ page, plus the security guide, not only the checklists.
 2. **The user's picture.** How the user imagines it working, recorded
    verbatim.
 3. **Whole-idea questions, asked once.** Target harnesses; reach (this
-   repo, all of the user's repos, public). The survey uses both to
-   look only for compatible existing solutions.
+   repo, all of the user's repos, public); where the code is hosted,
+   on which plan, and whether the repository is public or private,
+   because many outside gates enforce only on some plans or for some
+   visibilities (`docs/guide/outside-gates.md`). The survey uses
+   targets and reach to look only for compatible existing solutions.
 4. **Survey research.** `harness-research` runs its survey pass on
    the goal, picture, targets and reach (see "harness-research"). The
    user confirms which findings to use before the split.
@@ -186,6 +191,15 @@ page, plus the security guide, not only the checklists.
 6. **Per-part questions, asked only when the part's description does
    not already answer them.**
    - Must it hold every time, or may the agent occasionally skip it?
+   - Must it still hold if the agent is prompt-injected or its
+     configuration is changed by a pull request?
+   - Who may turn it off: the agent, any contributor, or only an
+     admin?
+   - Does the event happen without an agent, such as a merge, deploy,
+     publish or credential scope?
+   - Is the action irreversible, about money, or does it publish or
+     disclose data?
+   - Is earlier feedback wanted than an outside gate gives?
    - Who starts it: the user, the model, or an event?
    - Does it need its own context, other tools or another model?
    - Does it reach an external system, and does a CLI exist for it?
@@ -193,19 +207,20 @@ page, plus the security guide, not only the checklists.
    and cons, each citing rule ids and pages, plus how the parts
    connect, for example "B starts A; C enforces A's result". An
    outcome is one of:
-   - a harness mechanism, such as a skill, hook or subagent;
-   - a control outside the harness, such as a CI check or repository
-     settings. The knowledge base assigns the authoritative merge gate
-     to CI because committed agent configuration can be changed by a
-     pull request (`docs/overview.md`, `docs/guide/hooks.md`). A CI job
-     is a gate only once the repository requires it to pass, for
-     example through GitHub branch protection, so the recommendation
-     lists that setting as a prerequisite;
-   - reuse what exists: the survey found an existing skill, plugin or
-     tool that meets the part's goal; the recommendation names it with
-     its source, license and maintenance state;
-   - nothing fits: the part's goal cannot be met by any researched
-     mechanism, and the intake says so instead of forcing a choice.
+   - **harness only:** a harness mechanism, such as a skill, hook or
+     subagent, or OS isolation for local actions no outside system
+     sees;
+   - **outside control alongside a harness mechanism:** the rule must
+     survive a compromised agent and in-loop feedback saves
+     iterations, or the rule protects the agent's own configuration;
+   - **outside control instead of any harness build:** the event
+     happens without an agent, such as a merge or deploy, so a harness
+     build adds no enforcement;
+   - **reuse what exists:** the survey found an existing skill, plugin
+     or tool that meets the part's goal; the recommendation names it
+     with its source, license and maintenance state;
+   - **nothing fits:** no researched mechanism or control meets the
+     part's goal, and the intake says so instead of forcing a choice.
 8. **The user decides**, and may override. An override and its reason
    are recorded.
 
@@ -214,10 +229,49 @@ stops asking about a part once all remaining answers lead to the same
 outcome. Parts that turn out to be the same, or a part that mixes two
 jobs, trigger a proposal to re-split.
 
-Builders exist only for researched outcomes. An outside control that
-the knowledge base has not researched with sources, such as GitHub
-branch protection today, is named in the recommendation but not
-built.
+### Outside controls
+
+An outside control is any control outside the agent harness: merge
+rules, CI checks, scanners, identity and credentials, network and DNS
+boundaries, isolation, policy engines, limits, recovery. A *gate* is an
+outside control that prevents an action; detection and recovery
+controls are outside controls but not gates.
+`docs/guide/outside-gates.md` is the Harness KB source for all of
+them.
+
+- The forge recommends outside controls and never builds or
+  configures them. It holds no token that could change platform
+  settings.
+- Each recommended control comes with its prerequisites as Harness KB
+  rules, from the guide's seven conditions, for example "the agent's
+  identity is on no bypass list" and "approvals reset on new pushes".
+  A CI job, for example, is a gate only once the repository requires
+  it to pass and its workflow definition is protected.
+- Every recommendation in which an agent opens pull requests includes
+  a merge rule, and every built harness setup includes code owners for
+  the agent's own configuration files, as recommended outside
+  controls.
+- Bypass modes, untrusted repositories, or untrusted input combined
+  with secrets and egress always add an isolation recommendation.
+- When a control is unavailable on the user's plan or visibility, the
+  recommendation says so. If the part's goal requires a guarantee, the
+  outcome is "nothing fits" unless the user overrides.
+- "Build it anyway": the user may choose a harness mechanism where an
+  outside control was recommended. The forge builds it and labels it
+  advisory, because the agent or a pull request can change it. A
+  stated goal it cannot meet, such as "must hold under prompt
+  injection", stays an error (see "Overrides").
+
+**README.** Every recommended outside control, including those for
+parts with no harness build, is listed in an "Outside controls"
+section of the README that belongs to the result: the result's own
+README when it has one, such as a plugin's, otherwise the README of
+the repository that holds `.harness/`. Each entry names the control,
+the part letter it serves, its prerequisites, and its status
+"recommended, not verified". `build-*` skills write the section;
+`harness-verify` checks with a script that every outside control in
+the decision record appears there. Verification never checks whether
+the control is actually configured on the platform.
 
 `rules/selection.yaml` holds the questions and what each answer
 implies, so the recommendation is computed from data. The model only
@@ -253,9 +307,13 @@ parts:
   - id: C
     slug: merge-gate
     goal: Never merge without a review
-    outcome: outside-harness
-    recommended: automation-ci   # a CI job that runs A and must pass
-    chosen: automation-ci
+    outcome: outside-alongside     # harness-only | outside-alongside | outside-instead | reuse | nothing-fits
+    recommended: automation        # a CI workflow that runs A; built
+    chosen: automation
+    outside_controls:              # recommended only; listed in the README
+      - control: required-review-and-check
+        prerequisites: [outside.merge.no-agent-bypass, outside.merge.requester-cannot-approve,
+                        outside.ci.required-on-ref, outside.ci.source-pinned, outside.ci.workflow-protected]
     alternatives:
       - {concept: hook, pros: [...], cons: ["agent config can be changed by a pull request"], rules: [...]}
     connects_to: [{to: A, how: enforces}]
@@ -511,6 +569,8 @@ Each gets its own spec, plan and implementation, in this order.
      intake can still recommend another mechanism than a skill;
    - `harness-intake`, `harness-research` (both passes), `build-skill`
      and `harness-verify`, including idea rules;
+   - outside-control recommendations with prerequisite rules, and the
+     README section with its check;
    - the plugin packaged for Claude Code and Codex and run in both,
      in a clean environment without the author's personal plugins.
 2. **Rules for the remaining concepts**, with fixtures, using the
@@ -523,6 +583,8 @@ Each gets its own spec, plan and implementation, in this order.
 ## Out of scope for now
 
 - Builders that target OpenCode.
+- Building, configuring or verifying outside controls on a platform.
+  The forge recommends them and lists them in the README.
 - A Claude Code workflow add-on for running the stages.
 - Porting an existing setup from one harness to another; the
   `agent-harness` skill covers part of this.
