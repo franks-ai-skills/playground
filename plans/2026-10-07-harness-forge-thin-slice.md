@@ -113,6 +113,11 @@ so updating the KB checkout does not silently change an existing run.
 | M4: remaining flows | T12 | Override/drift conversations, goal conflicts, fixes and both review choices |
 | M5: distribution | T13-T14 | Clean installs, published destinations, KB move, full routing evaluation and final reference evidence |
 
+M1 checkpoint on 2026-10-07: T1 is complete; T2's negative/inconclusive
+feasibility report is recorded in [M1 results](2026-10-07-harness-forge-m1-results.md).
+No launcher is declared production-supported. Stop before T3 as the user
+requested; the unchecked positive-certification items below remain open.
+
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
 Once execution is authorized, milestone reports do not create automatic
@@ -240,8 +245,9 @@ feasibility probe, without runtime dependencies or a KB migration.
 
 ## Task 2: Spike worker isolation in both harnesses before core work
 
-**Files:** FORGE `tools/live_checks.py`, `evals/canaries/{research,review}.yaml`,
-`evals/canaries/results/worker-boundaries.md`; candidate adapter modules
+**Files:** FORGE `tools/live_checks.py`, `tests/test_live_checks.py`,
+`evals/canaries/{research,review}.yaml`,
+`evals/canaries/results/{worker-boundaries.md,evidence-index.json}`; candidate adapter modules
 and role files are disposable probes at this stage. T11 adopts the
 supported launcher into `src/harness_forge/adapters/` and documents it.
 
@@ -257,7 +263,7 @@ OS and architecture. No library dependencies are needed for the probe.
   and an outside file. Research receives only an approved brief and
   source policy; support receives only claim/quote/context; review
   receives frozen candidate files, decisions and applicable rules.
-- [ ] Run the canary runner before restrictions exist; expect capability
+- [x] Run the canary runner before restrictions exist; expect capability
   failures rather than a successful isolation result. A worker merely
   declining to disclose data it can access is not a passing restriction.
 - [ ] Probe a fresh native subagent and an independent process in Codex;
@@ -273,7 +279,7 @@ OS and architecture. No library dependencies are needed for the probe.
   Verify named permission profiles actually apply: legacy sandbox keys
   and `--sandbox` can change precedence. A new process remains subject
   to any outer OS restrictions; it is not an escape from them.
-- [ ] Run the CLI above for each harness/launcher candidate. Research
+- [x] Run the CLI above for each harness/launcher candidate. Research
   must have functioning web access and no repository reads or writes
   outside research; the parent may write its returned structured output.
   Support must have no file/web/write tools. Review must have read-only
@@ -281,14 +287,24 @@ OS and architecture. No library dependencies are needed for the probe.
   context as well as actual blocked attempts. Test broad parent runtime
   overrides and record their effect. Save redacted evidence and versions;
   claim support only for tested OS/architecture/version combinations.
-- [ ] Record one supported launcher per role/harness or mark unavailable.
+- [x] Record one supported launcher per role/harness or mark unavailable.
   Equal guarantees are required; identical launch methods are not. If
   no tested approach meets the restrictions, stop before substantial
   implementation and present alternatives with their design impact.
   Failed candidates do not prove all Codex approaches impossible. Retain
   the evidence; adopt probe code only after its implementation contracts
   are defined and tested in T11. No Claude workflow add-on is introduced.
-- [ ] Commit: `test: record worker isolation feasibility`.
+- [x] Commit: `test: record worker isolation feasibility`.
+
+Execution evidence: 23 attempts tested native and independent-process
+candidates in both harnesses, broad Codex parent overrides, startup
+canaries, actual tools and side effects. No tested Codex candidate proved
+the complete restrictions; Claude process observations are promising but
+not a production support declaration. Full role payloads, managed/user
+configuration positive controls, authentication isolation, supplied-data
+reads and every discovery surface remain open certification checks.
+Those unchecked items are not waived; M1 stops with this evidence before
+core work or dependency pins.
 
 ## Task 3: Choose distribution before pinning dependencies
 
