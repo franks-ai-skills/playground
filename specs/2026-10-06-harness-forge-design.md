@@ -559,15 +559,21 @@ Harness result, for what was built:
 - `verified`: all conditions above hold;
 - `not verified`: the part was built but at least one condition fails;
 - `not applicable`: nothing is built for the part, as for an
-  outside-only part.
+  outside-only or "nothing fits" part;
+- `not checked`: the part reuses an existing artifact whose files are
+  not yet available locally. Once the artifact is installed or
+  vendored, `harness-verify` checks its files read-only like a build,
+  and the result becomes `verified` or `not verified`.
 
 Goal result, for the part's accepted goal, decided in this order:
 
-1. `not assessed`: the contract is unconfirmed or the part is
-   `blocked`, so nothing was assessed against a trusted goal.
+1. `not assessed`: the contract is unconfirmed, the part is
+   `blocked`, or the harness result is `not checked`, so nothing was
+   assessed against a trusted goal.
 2. `not met`: the harness result is `not verified`, whether or not the
-   goal also needs outside controls; a failed build is reported as a
-   failure, never as a dependency.
+   goal also needs outside controls, or the confirmed outcome is
+   "nothing fits". A failed build is reported as a failure, never as a
+   dependency.
 3. `depends on outside controls`: the goal needs at least one outside
    control, listed by name, and the harness result is `verified` or
    `not applicable`. The forge never checks platform settings, so it
@@ -588,9 +594,11 @@ runs as the user.
 
 So each intake and verification run starts with one confirmation
 question showing the current contract, per part: the goal, the chosen
-outcome and mechanism, the outside controls, the sha256 of the
-accepted Idea KB revision, and every rule override with its content
-and sha256. Differences from the last confirmation recorded in the
+outcome and mechanism, the outside controls, the accepted Idea KB
+requirements as readable text together with the revision's sha256,
+and every rule override with its content and sha256. The hash binds
+the confirmation to exact content; the text lets the user understand
+what they confirm. Differences from the last confirmation recorded in the
 repository are highlighted as a hint, labelled as coming from an
 untrusted record. Only a contract the user confirms in the session is
 used. A part whose contract is not confirmed is `blocked`, and its
@@ -691,7 +699,10 @@ to harness-forge itself:
   accepted requirements weakened with the history removed, which the
   contract confirmation must show; a failed build, reported `not met`;
   an outside-only part, reported `not applicable` and `depends on
-  outside controls`; an
+  outside controls`; a confirmed "nothing fits" part, reported `not
+  applicable` and `not met`; a reuse part before and after its
+  artifact is available, reported `not checked` and `not assessed`,
+  then checked like a build; an
   override that loosens a security rule without the explicit warning
   having been shown; research reused after the goal
   changed; injected instructions in a fetched page; a requirement the
