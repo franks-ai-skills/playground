@@ -5,7 +5,9 @@ reviews and to add idea research on 2026-10-06; outside controls added
 user-decided rule overrides, the goal-conflict question and the
 re-verification choice on 2026-10-07; contracts for approval, outside
 dependencies and routing tightened, and contract confirmation and
-result states added on 2026-10-07; spec awaiting review.
+result states added on 2026-10-07; design, thin-slice scope and plan
+approved by the user on 2026-10-07. Execution starts natively and stops
+after M1 for review of worker-isolation feasibility.
 
 ## Goal
 

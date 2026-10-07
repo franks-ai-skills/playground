@@ -4,8 +4,8 @@ Status: implementation scope derived on 2026-10-07 from the
 [harness-forge design](2026-10-06-harness-forge-design.md). The parent
 design governs conflicts; revised after review on 2026-10-07. The design,
 this scope and the [implementation plan](../plans/2026-10-07-harness-forge-thin-slice.md)
-await execution review together; this document does not approve changes
-to the parent design.
+were approved together by the user on 2026-10-07. Execute natively and
+stop after M1 for feasibility review; the parent design governs conflicts.
 
 ## Deliverable
 
@@ -19,10 +19,11 @@ the author's personal plugins.
 This is sub-project 1 of the parent design. Implement its contracts
 before extracting detailed rules or building the other mechanisms.
 
-## Proposed decisions beyond the parent design
+## Implementation decisions beyond the parent design
 
-These choices make the implementation concrete; they are not previously
-approved requirements. Review them with the plan before execution.
+These choices make the implementation concrete and were approved with
+the plan. The feasibility and distribution investigations still decide
+their explicitly open implementation options.
 
 - Use Python 3.11+ and JSON Schema Draft 2020-12 for the shared core.
   YAML record formats stay as designed. PyYAML/jsonschema and their

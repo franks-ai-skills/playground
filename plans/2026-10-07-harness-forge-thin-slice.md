@@ -22,11 +22,10 @@ direct model API integration or personal plugins.
 
 **Spec:** [Thin-slice scope](../specs/2026-10-07-harness-forge-thin-slice.md)
 and [parent design](../specs/2026-10-06-harness-forge-design.md).
-Read both before execution. Review the design, scope and plan together,
-settle the design's “spec awaiting review” status and choose the execution
-method before implementation. The user's request authorized drafting;
-these drafts do not establish execution approval. The scope's decision
-list distinguishes implementation proposals from the parent requirements.
+Read both before execution. The user approved the design, scope and plan
+together on 2026-10-07 and chose native execution with a stop after M1.
+The scope's decision list distinguishes implementation choices from the
+parent requirements. Later milestones require a further execution handoff.
 
 ## Global Constraints
 
@@ -225,19 +224,19 @@ Live skills use adapters for the conversation-dependent finalization.
 local checkouts and an importable empty `harness_forge` package for the
 feasibility probe, without runtime dependencies or a KB migration.
 
-- [ ] Write `test_bootstrap_has_no_personal_plugin_dependency`: import the
+- [x] Write `test_bootstrap_has_no_personal_plugin_dependency`: import the
   package with an empty temporary user configuration directory. Assert
   `self.assertEqual(import_result.returncode, 0)` and verify no third-party
   modules are required by this bootstrap.
-- [ ] Run `python -m unittest discover -s tests -p test_bootstrap.py -v`
+- [x] Run `python -m unittest discover -s tests -p test_bootstrap.py -v`
   from FORGE; expect failure until the package exists.
-- [ ] Create or reuse the sibling checkouts and minimal Python package.
+- [x] Create or reuse the sibling checkouts and minimal Python package.
   Copy the existing AGPL text. Leave runtime distribution to T3, research
   migration to T5 and exact generated-output permission to T13. Keep
   source research available in playground for the probe's approved brief.
-- [ ] Re-run bootstrap tests. Expected: the package imports using only
+- [x] Re-run bootstrap tests. Expected: the package imports using only
   the standard library. Do not publish these preliminary repositories.
-- [ ] Commit: `chore: establish harness KB and forge workspaces`.
+- [x] Commit: `chore: establish harness KB and forge workspaces`.
 
 ## Task 2: Spike worker isolation in both harnesses before core work
 
