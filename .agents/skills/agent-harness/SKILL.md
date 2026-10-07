@@ -30,6 +30,8 @@ names are identical across layers, so `<concept>` below is one of: `instructions
 | How the concept works in general, how the harnesses compare, how to write one setup for several harnesses | `docs/concepts/<concept>.md` |
 | Exact file names, fields, defaults and flags for one harness | `docs/vendors/<harness>/<concept>.md` (`claude-code`, `codex`, `opencode`) |
 | Which approach to choose, how to do it well, security, verification, review checklist | `docs/best-practices/<concept>.md` (no `commands` page; commands are covered in `skills`) |
+| Security across all concepts: attacks, defenses, proposed checks | `docs/guide/security.md` |
+| Rules that must hold even if the agent errs or is compromised: merge rules, CI, scanners, identity, network and DNS, isolation, policy engines; when to use them alongside or instead of a harness mechanism | `docs/guide/outside-gates.md` |
 | Detail a page lacks, or the source behind a claim | `docs/research-notes/` |
 
 Concept pages end with "Dropped from the generalization": features only

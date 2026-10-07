@@ -59,6 +59,33 @@ evidence. Prompt reminders and schema validation support security;
 authorization and isolation must enforce the actual boundary. Proposed
 canaries have not yet been executed against our deployments.
 
+## Outside gates
+
+Every harness control above is configuration the agent's own process
+enforces, and a pull request can change it. A rule that must hold when
+the agent errs, is prompt-injected or has its configuration changed
+belongs in a control the agent's identity cannot reach. The
+[outside-gates guide](guide/outside-gates.md), researched on
+2026-10-07, covers ten families and when each fits:
+
+| Family | Real gate only if |
+| --- | --- |
+| Merge rules (protected branches, rulesets, code owners) | The agent is on no bypass list; the requester and last pusher cannot approve; approvals reset on new pushes |
+| Required CI checks | Required on the ref, pinned to a source, workflow definition protected, no privileged trigger on agent code |
+| Scanners (SAST, SCA, secrets, IaC) | Ignore files, baselines and workflows are under code owners or org configuration |
+| Identity and credentials | No broader credential is reachable; the ceiling sits outside the agent's admin rights |
+| Network egress and DNS | Enforced outside the agent's environment, with the resolver controlled; DNS filtering alone is not a boundary |
+| Domain and DNS records | Separate accounts, registry lock, approval-gated apply |
+| Isolation | No host secrets inside; the boundary is not editable from the repository |
+| Policy engines | The agent cannot override the policy |
+| Limits (spend, rate, time) | Hard caps, not alerts |
+| Recovery and DLP | Immutable backups; DLP in-line on the channel |
+
+All rows are **[Inference]** from the cited research. The guide also
+gives intake questions that place each part of an idea in one of four
+outcomes: harness mechanism only, outside gate alongside it, outside
+gate instead of any harness build, or nothing.
+
 ## Instructions
 
 **Used for:** standing guidance that every session starts with: build

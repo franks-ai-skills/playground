@@ -12,6 +12,12 @@ across all ten concepts, defenses, proposed benign verification and
 recovery. The [research audit](../research-notes/agent-harness-security.md)
 explains what was already covered and what the deeper review added.
 
+For rules that must hold even when the agent errs, is prompt-injected
+or has its configuration changed, read
+[outside-gates.md](outside-gates.md): merge rules, CI checks,
+scanners, identity, network and DNS, isolation and policy engines, and
+when to recommend them alongside or instead of a harness mechanism.
+
 Start with the [overview](../overview.md) to choose a concept. The
 condensed detail is still available in `../concepts/`,
 `../best-practices/`, `../vendors/` and `../research-notes/`.

@@ -14,6 +14,11 @@ attacks across concepts, defensive controls and proposed canary checks.
 Use the [security guide](guide/security.md) to apply the findings across
 the concepts; the proposed adversarial checks have not yet been run.
 
+The [outside-gates guide](guide/outside-gates.md), dated 2026-10-07,
+covers controls outside the harness (merge rules, CI checks, scanners,
+identity, network and DNS, isolation, policy engines) for rules that
+must hold even when the agent errs or is compromised.
+
 ## Layout
 
 | Directory | Content |
