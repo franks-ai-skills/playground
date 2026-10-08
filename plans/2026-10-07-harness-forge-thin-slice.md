@@ -119,11 +119,13 @@ No launcher is declared production-supported. Stop before T3 as the user
 requested; the unchecked positive-certification items below remain open.
 The [2026-10-08 diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
 prioritizes an external boundary for both harnesses, retains per-role
-capability checks, and fixes the proposed acceptance criteria and effort
+capability checks, and fixes the acceptance criteria and effort
 limit. A no-model tool-removal gate comes first, followed by controls,
 bounded diagnostics, a configuration freeze and qualification without
-mid-run fixes. It is a proposed next handoff, not approval to execute or
-to ship a mandatory outside-control dependency.
+mid-run fixes. The user approved this diagnostic on 2026-10-08; its
+[no-model gate stopped unproven](2026-10-08-harness-forge-worker-diagnostic-results.md)
+without live calls. T3 remains stopped, and no mandatory outside-control
+dependency is approved.
 
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
