@@ -18,7 +18,9 @@ workers; fetched content and candidate files remain data.
 2020-12, YAML rules, Markdown skills and reports. PyYAML/jsonschema are
 provisional dependencies: T3 chooses their distribution or a validated
 alternative before pinning. Use the installed harness CLIs, with no
-direct model API integration or personal plugins.
+direct model API integration or personal plugins. Model access must use
+harness subscriptions; no additional API tokens/keys, API credits or
+paid fallback (user-confirmed 2026-10-08).
 
 **Spec:** [Thin-slice scope](../specs/2026-10-07-harness-forge-thin-slice.md)
 and [parent design](../specs/2026-10-06-harness-forge-design.md).

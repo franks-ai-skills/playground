@@ -1,9 +1,20 @@
-# Proposed offline startup-inventory follow-up
+# Offline startup-inventory follow-up
 
-Status: **draft, not authorized for prompt-bearing execution**. This
-adopts the useful leads from Claude Opus 5.5's review of the
+Status: **authorized on 2026-10-08, subject to no extra cost**. The user
+requires subscription usage only: no API keys/tokens, API credits or paid
+fallback. This authorizes the two network-blocked startup probes below
+only after the external network-denial controls pass. It adopts the
+useful leads from Claude Opus 5.5's review of the
 [resumed diagnostic](2026-10-08-harness-forge-worker-diagnostic-results.md).
 The existing result remains unproven; T3 remains stopped.
+
+Execution result: the positive control exposed `Read`, and the restricted
+candidate exposed `tools: []` in `system/init` under externally verified
+network denial. See [the result](2026-10-08-harness-forge-offline-init-results.md).
+This resolves the host startup-inventory gap only. Two prompt-bearing
+launches are charged; no provider response was obtained. The CLI emitted
+internal retry events in both processes, which the result records
+separately from process launches.
 
 ## Review disposition
 
@@ -121,8 +132,13 @@ indexes and append a new evidence index and result.
 
 ## API option and billing
 
-A tool-free source-support API adapter remains a reasonable design
-option to investigate, not an approved replacement. Its role takes
+User decision on 2026-10-08: **subscription-only**. Direct API usage,
+API tokens/keys and API credits are excluded, even if credits could
+cover the cost. The historical option below is not an approved path.
+No account linking, credit claiming or billing changes are authorized.
+
+A tool-free source-support API adapter was discussed before the user's
+subscription-only decision and is now excluded. Its role takes
 claim/quote/context data and does not inherently need local harness
 tools. It would still introduce API authentication and distribution
 requirements and would not resolve the research/reviewer boundaries.
@@ -139,6 +155,7 @@ checked. Do not promise either additional out-of-pocket cost or free API
 usage for these accounts. A CLI/subscription-only requirement still
 requires an explicit design decision before adding a direct API adapter.
 
-Recommendation: authorize the narrow Claude startup experiment before
-choosing a core design change. The Codex schema lead has already been
-checked. No design option is selected by this document.
+Execute only the authorized, network-blocked Claude startup experiment.
+The Codex schema lead has already been checked. No core design option
+is selected by this document, and the API alternative is excluded by
+the user's subscription-only constraint.

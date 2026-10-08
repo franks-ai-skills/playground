@@ -4,8 +4,9 @@ Status: **stopped, unproven after resumption** on 2026-10-08. No launcher
 is certified. The resumed gate stopped for missing capability evidence,
 before its remaining time allowance expired.
 The user approved the [bounded diagnostic](2026-10-08-harness-forge-worker-diagnostic.md),
-and its no-model gate ran. Zero live harness/model invocations were
-made; container setup, controls, qualification and T3 did not start.
+and its no-model gate ran. During that gate, zero prompt-bearing
+harness/model invocations were made; container setup, live controls,
+qualification and T3 did not start.
 The M1 code, grader and evidence index remain unchanged.
 
 Subsequent review identified a distinct Claude `system/init` lead. The
@@ -15,6 +16,13 @@ an amendment to the no-model-request condition. The suggested Codex
 protocol-schema search was completed during review without model calls;
 no complete thread-tool inventory method was found. Neither changes the
 unproven result or authorizes T3.
+
+The user subsequently authorized that network-blocked follow-up under a
+subscription-only, no-extra-cost constraint. It
+[observed Claude's empty host startup inventory](2026-10-08-harness-forge-offline-init-results.md)
+with a valid `Read` control. The earlier missing-inventory observation
+below is historical; guest/isolation and Codex capability proof remain
+open. Direct API access, API tokens/keys and API credits are now excluded.
 
 ## Budget and stopping point
 
@@ -198,8 +206,9 @@ requirement by itself. The approved diagnostic provides these choices:
    but exposing it may require a custom host/build; that has not been
    assessed or approved as distribution work. Claude still needs a
    qualifying observation path for the selected launcher.
-2. **Amend the design to investigate a dedicated tool-free API adapter
-   for source support.** This could avoid the CLI's tool-registration
+2. **Excluded by the user's 2026-10-08 subscription-only decision:**
+   amend the design to investigate a dedicated tool-free API adapter
+   for source support. This could avoid the CLI's tool-registration
    surface, but adds authentication, billing and distribution decisions
    and still needs verification. It would not solve the untested
    research/reviewer boundaries automatically.
@@ -208,5 +217,6 @@ requirement by itself. The approved diagnostic provides these choices:
    builds. This option also leaves Claude's current gate unproven; it
    does not produce one certified end-to-end launcher.
 
-None has been selected. T3 remains stopped under the approved diagnostic's
+No replacement launcher has been selected; option 2 is excluded by the
+later user constraint. T3 remains stopped under the approved diagnostic's
 decision gate, not because reviewer agreement requires another approval.
