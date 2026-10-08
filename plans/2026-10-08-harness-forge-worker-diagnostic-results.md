@@ -8,6 +8,14 @@ and its no-model gate ran. Zero live harness/model invocations were
 made; container setup, controls, qualification and T3 did not start.
 The M1 code, grader and evidence index remain unchanged.
 
+Subsequent review identified a distinct Claude `system/init` lead. The
+[follow-up proposal](2026-10-08-harness-forge-offline-init-follow-up.md)
+records the challenges and a bounded prompt-bearing experiment requiring
+an amendment to the no-model-request condition. The suggested Codex
+protocol-schema search was completed during review without model calls;
+no complete thread-tool inventory method was found. Neither changes the
+unproven result or authorizes T3.
+
 ## Budget and stopping point
 
 The first gate segment started at 10:36:04 UTC. At resumption the clock

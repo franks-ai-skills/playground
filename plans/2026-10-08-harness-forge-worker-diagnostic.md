@@ -18,6 +18,11 @@ The approval above records the completed handoff; it does not restart
 the diagnostic budget. Exclude external rate-limit/user waits from active
 investigation time; the report records the conservative remaining allowance.
 
+The [offline-init follow-up](2026-10-08-harness-forge-offline-init-follow-up.md)
+is a separate draft handoff after review. Its proposed blocked
+prompt-bearing launches amend the no-model-request condition and phase
+accounting; the authorization above does not silently approve that change.
+
 ## Review conclusions
 
 The M1 result stands. On 2026-10-08, all 21 tests ran successfully,
