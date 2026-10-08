@@ -76,11 +76,18 @@ no real repository data or credential values were requested by probes.
 
 ## Proposed next step
 
-Recommend a bounded Codex diagnostic before building the offline core:
-obtain an authoritative tool inventory, verify the selected child profile,
-and force harmless read/write denials while retaining web access for
-research and zero tools for source support. A controlled external launch
-environment or more observable launcher is a candidate, with the same
-guarantees. Full certification also needs positive controls for the
-remaining input/discovery surfaces. Review this M1 result before choosing
-the next execution handoff; no weaker parity decision is assumed.
+Revised on 2026-10-08 after Claude Opus 5.5's review: prioritize a
+disposable external boundary and independent processes in both harnesses.
+The [bounded diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
+sets explicit model selection, common role/input/discovery/authentication
+criteria, external enforcement evidence and a four-hour/30-invocation
+ceiling. Tool absence and read-only capabilities remain separate checks;
+a container does not automatically meet them.
+
+Both tested native configurations have failures, including Claude's
+review worker. This prioritizes the next candidate without ruling out
+all native workers. Authentication material and supplied inputs remain
+sensitive inside an external environment. A production container/VM
+dependency also needs a design decision about who provides and controls
+it, because Forge currently recommends rather than provisions outside
+controls. The diagnostic is proposed; the M1 stop remains in effect.

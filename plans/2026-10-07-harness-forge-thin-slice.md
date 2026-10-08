@@ -117,6 +117,11 @@ M1 checkpoint on 2026-10-07: T1 is complete; T2's negative/inconclusive
 feasibility report is recorded in [M1 results](2026-10-07-harness-forge-m1-results.md).
 No launcher is declared production-supported. Stop before T3 as the user
 requested; the unchecked positive-certification items below remain open.
+The [2026-10-08 diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
+prioritizes an external boundary for both harnesses, retains per-role
+capability checks, and fixes the proposed acceptance criteria and effort
+limit. It is a proposed next handoff, not approval to execute or to ship
+a mandatory outside-control dependency.
 
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
@@ -305,6 +310,13 @@ configuration positive controls, authentication isolation, supplied-data
 reads and every discovery surface remain open certification checks.
 Those unchecked items are not waived; M1 stops with this evidence before
 core work or dependency pins.
+
+Follow-up proposal: explicitly select models and test both harnesses
+against the same role payload, supplied-data, discovery, authentication
+and external-boundary matrix. A container/VM is the primary experiment,
+while source-support tool absence and reviewer read-only tools remain
+required. Its ownership and installation impact must be settled before
+adopting it for production; see the bounded diagnostic proposal above.
 
 ## Task 3: Choose distribution before pinning dependencies
 
