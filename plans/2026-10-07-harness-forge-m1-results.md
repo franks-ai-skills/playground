@@ -81,8 +81,11 @@ disposable external boundary and independent processes in both harnesses.
 The [bounded diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
 sets explicit model selection, common role/input/discovery/authentication
 criteria, external enforcement evidence and a four-hour/30-invocation
-ceiling. Tool absence and read-only capabilities remain separate checks;
-a container does not automatically meet them.
+ceiling. A 30-minute no-model capability gate precedes environment setup
+and live calls. The live phases are six controls, up to six diagnostic
+attempts, a configuration freeze, then eighteen qualifying runs with no
+mid-run correction. Tool absence and read-only capabilities remain
+separate checks; a container does not automatically meet them.
 
 Both tested native configurations have failures, including Claude's
 review worker. This prioritizes the next candidate without ruling out

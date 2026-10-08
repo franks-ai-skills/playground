@@ -56,6 +56,9 @@ exception for Forge's own runtime. This proposal selects neither.
 
 ## Candidate and preparation
 
+First complete the no-model capability gate below. External-environment
+setup and live calls start only after that gate is eligible to proceed.
+
 Investigate one disposable externally controlled environment first, for
 both independent harness processes. Prefer a container if an appropriate
 runtime is already available; a VM is an alternative whose setup counts
@@ -63,6 +66,56 @@ against the same effort limit. These are candidates, not equivalent
 security guarantees. Docker's security guidance identifies the daemon,
 mounts, capabilities and kernel as relevant boundaries
 ([Docker Engine security](https://docs.docker.com/engine/security/)).
+
+### No-model capability gate
+
+Spend at most 30 minutes, within the overall budget, determining whether
+the selected Codex build/launcher can remove the source-support worker's
+tools. Apply the same requirement to Claude. The binding restriction is
+in the approved implementation plan's T2: no file/web/write tools; this
+diagnostic retains the tool-free source-support target used by M1.
+
+Enumerate the effective tool-registration paths, rather than assuming
+the review's list is exhaustive: shell/command execution, file editing,
+local images, web, apps/connectors, MCP, delegation and any other exposed
+capabilities. For each, record the removal control and evidence tied to
+the exact installed build, selected model and configuration. Inspect
+version-matched implementation/configuration or a supported offline
+startup manifest with no model request and no outbound traffic.
+The intended guest build matters; acceptance by the host CLI alone
+cannot qualify a different guest binary or platform.
+
+Separate two questions:
+
+1. Does the installed parser accept the proposed controls under strict
+   validation? `--help` output or an ignored/accepted key is not evidence
+   of effective removal. Do not invent a validation-only CLI command or
+   assume that starting `codex exec` is free of model requests.
+2. Does trusted tool-registration or enforcement evidence show an empty
+   source-support capability set after all effective overrides? Parser
+   acceptance alone cannot answer this. A supervisor that merely denies
+   filesystem effects does not remove a file tool.
+
+M1 recorded `tools.view_image` rejected as an unknown field by
+codex-cli 0.160.1. The current official reference still describes that
+key ([configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)).
+This rejects the tested override for that build; it does not establish
+that the image tool is always present, that no other removal mechanism
+exists, or that every Codex launcher/version fails.
+
+Gate outcomes:
+
+- **Eligible:** accepted controls plus build/configuration-specific
+  evidence of effective tool removal. Continue to setup and the live
+  matrix; this is not runtime certification.
+- **Candidate fails:** evidence shows a required capability remains
+  exposed. Reject that candidate before container setup or live calls.
+- **Unproven/unavailable:** no trustworthy offline capability evidence,
+  an unvalidated configuration, or the 30-minute limit is reached.
+  Stop without live calls and present the source-support decision below.
+  Missing observability is not proof of general Codex impossibility.
+
+### Environment and inputs
 
 Before any live invocation, record:
 
@@ -81,8 +134,9 @@ Before any live invocation, record:
 - The authentication route and its access boundary. Do not mount a
   personal home/config tree, expose host credential stores or forward
   a broadly privileged agent socket. Test synthetic auth canaries in
-  the equivalent paths/environment/process surfaces, plus an ordinary
-  authenticated model request. Do not ask a worker to print a real
+  the equivalent paths/environment/process surfaces. An ordinary
+  authenticated model request belongs to the budgeted live phases below,
+  never the no-model gate. Do not ask a worker to print a real
   credential. If protection cannot be demonstrated, record that gap.
 
 Mount only the role's inputs read-only; expose no host repository,
@@ -134,21 +188,50 @@ index with the diagnostic's grader hash.
 ## Effort limit and stopping rule
 
 Proposed budget, fixed before execution: four hours elapsed work,
-including environment setup, with at most two launcher configuration
-revisions and 30 harness invocations total. Each invocation has a
-180-second timeout and a 2 MiB combined captured-output ceiling.
-Timeouts, setup failures and rejected configurations count; no hidden
-retry loop or automatic model fallback. Record model/turn/token usage
-where exposed. Stop at whichever limit is reached first.
+including the 30-minute capability gate and environment setup, with an
+initial launcher configuration set and at most two corrections to it
+across both harnesses, then at most 30 live harness invocations total.
+A correction creates a new recorded configuration revision; this permits
+at most three versions of the configuration set, not two corrections
+per role or harness. Corrections are allowed only before the freeze.
+Each live invocation has a 180-second timeout and a 2 MiB combined
+captured-output ceiling.
+Every attempted live launch counts, including timeouts, authentication
+failures and rejected configurations. Offline work consumes elapsed time
+and the configuration-correction allowance but no live-call slots.
+No hidden retry loop or automatic model fallback. Record model/turn/token
+usage where exposed. Stop at whichever limit is reached first.
 
-Reserve six permissive controls (one per role/harness) and eighteen
-restricted runs (three per role/harness). Up to six additional attempts
-may diagnose or verify one configuration correction, within the total.
-All final qualifying runs must use the same recorded configuration per
-role/harness. If the remaining budget cannot demonstrate that matrix,
-report it incomplete. Run non-model policy/fixture checks before spending
-live calls; do not proceed to authenticated probes if the outer boundary
-or authentication prerequisites fail.
+Run the phases in this order:
+
+1. **No-model checks:** capability gate, then environment, policy,
+   authentication-canary and fixture checks. Freeze the acceptance
+   criteria, fixture definitions and tested grader before any live call.
+   Do not proceed if a prerequisite fails or remains unproven.
+2. **Six permissive controls:** one per role/harness. The intended
+   canaries must be detectable. These synthetic controls stay inside
+   the development safety boundary and never use real secrets as test
+   data. A broken control ends the diagnostic as incomplete.
+3. **Up to six diagnostic attempts:** inspect the restricted launcher
+   and use any remaining allowance for the two configuration corrections.
+   Recheck offline capability and boundary evidence after each correction.
+   These attempts never count as qualifying runs. A correction that
+   invalidates the existing controls, fixtures or grader ends this
+   diagnostic; it does not silently restart the budget.
+4. **Freeze:** record the final per-role/harness configurations, requested
+   models, image/runtime identity, tool controls, network/mount policy,
+   input-case definitions and grader hash. No subsequent configuration
+   correction, model switch or grader change is allowed in this budget.
+5. **Eighteen qualifying runs:** three per role/harness against that
+   frozen setup. A violation fails the configuration and stops this
+   qualification phase. Missing evidence or an interrupted run leaves
+   it incomplete/unproven or unavailable. No retries, mid-run fixes or
+   reuse of earlier diagnostic successes as qualifying evidence.
+
+The maximum is 6 + 6 + 18 = 30 live invocations. Unused diagnostic slots
+do not authorize retries after the freeze. If the elapsed-time limit
+prevents finishing the matrix, report it incomplete and present a
+decision; do not reset the timer or revise the frozen candidate.
 
 Success requires every acceptance row and all final repeated runs for
 all three roles in both harnesses. A witnessed violation fails that
@@ -164,9 +247,24 @@ possible hostile prompt.
    ownership question before making a container/VM mandatory. Then T3
    can evaluate the complete distribution requirement.
 2. **Codex still fails or remains unproven:** keep T3 stopped. Propose a
-   different observable launcher or a further bounded investigation
-   with specific new evidence to obtain. A documented Codex gap is an
-   alternative only if the user changes the parity requirement.
+   concrete source-support decision, including when the no-model gate
+   stops the diagnostic before any container setup or live call:
+
+   - Preserve the current CLI-only/tool-free contracts and mark this
+     build/launcher unavailable. A later attempt requires an identified
+     alternative build or adapter, specific new capability evidence and
+     its own bounded handoff; there is no automatic exploration loop.
+   - Amend the CLI-only constraint to investigate a dedicated tool-free
+     model API adapter for source support. This requires an explicit
+     design change and new authentication/distribution assessment;
+     it is not an already proven solution.
+   - Accept a documented Codex capability gap by changing the parity
+     requirement. Findings that lack the required independent support
+     verdict remain blocked; this does not silently waive validation.
+
+   Present the observed blocker and costs of these options at the stop.
+   None is selected by this proposal. Other role failures get the same
+   concrete blocker-and-contract decision, not a source-support workaround.
 3. **Claude or both fail:** record the same unavailable outcome under
    the same rules; do not promote an M1 `observed` result to support.
 
