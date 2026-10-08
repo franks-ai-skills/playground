@@ -1,6 +1,8 @@
 # Worker diagnostic: no-model gate result
 
-Status: **stopped, unproven** on 2026-10-08. No launcher is certified.
+Status: **stopped, unproven after resumption** on 2026-10-08. No launcher
+is certified. The resumed gate stopped for missing capability evidence,
+before its remaining time allowance expired.
 The user approved the [bounded diagnostic](2026-10-08-harness-forge-worker-diagnostic.md),
 and its no-model gate ran. Zero live harness/model invocations were
 made; container setup, controls, qualification and T3 did not start.
@@ -8,15 +10,24 @@ The M1 code, grader and evidence index remain unchanged.
 
 ## Budget and stopping point
 
-The gate started at 10:36:04 UTC with a deadline of 11:06:04 UTC.
-After the conversation interruption/resumption, the clock read
-12:58:28 UTC. The deadline had elapsed with incomplete evidence; the
-diagnostic was closed rather than resetting its budget. This does not
-mean that 142 minutes of active gate investigation were performed.
-Subsequent work records and reviews the result, rather than running
-new capability probes. There were zero configuration corrections and
-zero live calls. The approved four-hour ceiling was not used to extend
-the shorter gate.
+The first gate segment started at 10:36:04 UTC. At resumption the clock
+read 12:58:28 UTC, and the initial report incorrectly counted the
+rate-limit interruption against the 30-minute investigation allowance.
+That stop was premature; elapsed waiting did not exhaust active work.
+
+After the user authorized continuation, the resumed gate conservatively
+charged twenty minutes for the first segment because its exact active
+duration was not logged. Ten additional uninterrupted minutes were
+available from 14:40:14 UTC. The gate stopped at 14:45:31 UTC, after
+5 minutes 17 seconds, for missing tool-removal evidence. The conservative
+total is 25 minutes 17 seconds, not an assertion of exact earlier usage.
+The remaining time did not justify proceeding past an unmet prerequisite.
+
+The original thirty-live-call allowance was not reset; usage remains
+zero. One pre-live configuration correction is conservatively charged
+for the temporary Claude account selection and completed Codex controls.
+The four-hour active-work ceiling remains in effect, excluding external
+rate-limit/user waits; no live phase or container setup was reached.
 
 ## Codex findings
 
@@ -60,11 +71,28 @@ the two feature overrides and `features list`. The CLI rejected the
 command combination: `--strict-config` is not supported for
 `codex features`. It never validated those overrides. This failed
 check is preserved rather than represented as parser acceptance.
-No Codex model was pinned and no guest capability set was established.
+That was the first segment's result; the resumed parser checks below
+supersede its missing parser/model evidence. No guest capability set
+was established in either segment.
+
+On resumption, `codex debug models --bundled` returned the installed
+binary's model catalog without a model request. The offline app-server
+startup was configured with `gpt-6-sol` and that catalog. Strict validation
+accepted `features.view_image=false` and `features.shell_tool=false`;
+an otherwise equivalent control with an invented feature key failed
+with an unknown-field error. Both ran under OS network denial and sent
+only an app-server initialization request, with no thread or model turn.
+This establishes acceptance in app-server startup, not a qualified
+`codex exec` worker or an empty effective tool set.
+
+The bundled `gpt-6-sol` record still selects freeform `apply_patch`,
+an asynchronous user-input tool and `clock`. The inspected registration
+conditions therefore require more than shell/image feature switches.
+No complete selected-model removal configuration was established.
 
 | Registration surface | Gate evidence and remaining gap |
 | --- | --- |
-| Shell and local images | Source controls identified; complete effective configuration not validated. |
+| Shell and local images | Source controls identified and strict app-server acceptance checked; complete effective configuration not validated. |
 | File editing and model-selected utilities | Registration conditions identified; no selected-model removal proof. |
 | Web, apps, MCP, dynamic tools and extensions | Source includes filtering paths; no complete launcher/configuration proof. |
 | Delegation and other generated/utility tools | Partial source inspection only; exhaustive effective inventory not established. |
@@ -91,7 +119,7 @@ was not evidence of login or filesystem isolation. The accompanying
 network negative returned a DNS-resolution error; it was not a complete
 egress-control qualification.
 
-The user's subsequent instruction selects `claude-frank` for future
+The user's subsequent instruction selected `claude-frank` for future
 Claude runs. Inspection of `.zshrc` showed that it is a function using
 `_claude_as`: it selects the personal `~/.claude-frank` configuration,
 checks the expected account, and may log out or start interactive login
@@ -101,12 +129,30 @@ live work must use the selected account while separately proving the
 worker's authentication boundary; copying the personal profile into a
 worker would not establish isolation.
 
-Claude is also **unproven**. M1's historical empty startup list cannot
-substitute for the required offline evidence on the chosen launcher.
+The user then authorized **`claude-tp` for this diagnostic only** because
+the personal account's token limit was reached. `claude-frank` remains
+the default afterward. The resumed check used the actual `_claude_as`
+and `claude-tp` function definitions copied from `.zshrc`, with a guard
+that refused login/logout changes and an OS network-denial profile.
+The existing account check succeeded, and `claude-tp --help` exited zero.
+No alternate account fallback or login mutation was attempted.
+
+One initialization-only process used `claude-opus-5-5`, the same empty
+tool/MCP and restrictive flags, and an empty temporary working directory.
+It sent no user prompt and was terminated after 15 seconds. Its response
+again had no effective tool inventory. Additional debug logging did not
+provide one either. The selected account profile was available to this
+host-side check; this is explicitly not proof of worker authentication
+isolation. The raw CLI observation above remains separate historical
+evidence.
+
+Claude is also **unproven** after this resumed check. M1's historical
+empty startup list cannot substitute for the required offline evidence
+on the chosen launcher.
 
 ## Evidence and preserved state
 
-The local forge checkout contains a separate portable index at
+The local forge checkout contains the initial portable index at
 `evals/canaries/results/diagnostic-2026-10-08-index.json`: twenty hashed
 artifacts covering vendor metadata/source, release/schema digests,
 parser output, and the Claude command/request/event stream. Raw files
@@ -114,6 +160,14 @@ remain ignored under `evals/canaries/results/private/diagnostic-2026-10-08/`.
 The exploratory SDK source snapshot was fetched from a moving branch;
 it is retained as a hashed artifact, not used as version-matched proof
 of the Claude CLI's behavior.
+
+The additional `evals/canaries/results/diagnostic-2026-10-08-resumed-index.json`
+records the corrected accounting and twenty-three new hashed artifacts,
+including the wrapper, startup/debug output, bundled model catalog and
+positive/negative strict-parser checks. Raw files remain ignored under
+`evals/canaries/results/private/diagnostic-2026-10-08-resumed/`.
+The first index remains unchanged as a historical record of the first
+segment; its stop time and counters are not the resumed final totals.
 
 No new grader was run: the diagnostic stopped before the live grading
 phase. Its index records this explicitly with a null grader hash.

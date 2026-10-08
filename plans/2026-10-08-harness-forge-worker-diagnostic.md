@@ -8,11 +8,15 @@ investigation only. It does not amend the approved
 T3 waits for this feasibility decision because a worker runtime
 requirement affects distribution.
 
-Execution outcome: stopped at the no-model gate on 2026-10-08 with
-both launchers **unproven** and zero live invocations. See the
+Execution outcome: after correcting an interruption-accounting error,
+the resumed no-model gate stopped on 2026-10-08 with both launchers
+**unproven** and zero live invocations. The stop is for missing capability
+evidence, not exhausted waiting time. The user selected `claude-tp` for
+this diagnostic only; `claude-frank` remains the later default. See the
 [diagnostic results](2026-10-08-harness-forge-worker-diagnostic-results.md).
 The approval above records the completed handoff; it does not restart
-the diagnostic budget.
+the diagnostic budget. Exclude external rate-limit/user waits from active
+investigation time; the report records the conservative remaining allowance.
 
 ## Review conclusions
 
