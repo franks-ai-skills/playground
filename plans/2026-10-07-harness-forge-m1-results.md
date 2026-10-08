@@ -93,4 +93,6 @@ all native workers. Authentication material and supplied inputs remain
 sensitive inside an external environment. A production container/VM
 dependency also needs a design decision about who provides and controls
 it, because Forge currently recommends rather than provisions outside
-controls. The diagnostic is proposed; the M1 stop remains in effect.
+controls. The user approved the diagnostic on 2026-10-08. Its
+[no-model gate stopped unproven](2026-10-08-harness-forge-worker-diagnostic-results.md)
+with zero live calls; the M1 evidence is unchanged and T3 remains stopped.

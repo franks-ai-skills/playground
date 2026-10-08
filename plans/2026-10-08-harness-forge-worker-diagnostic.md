@@ -1,12 +1,18 @@
-# Proposed worker-boundary diagnostic after M1
+# Worker-boundary diagnostic after M1
 
-Status: proposed on 2026-10-08 after reviewing the M1 evidence and
-Claude Opus 5.5's review. This document refines the next investigation;
-it does not authorize a new execution stage or amend the approved
-[design](../specs/2026-10-06-harness-forge-design.md).
-The user-selected stop after M1 remains in effect. T3 waits for this
-feasibility decision because a worker runtime requirement affects
-distribution.
+Status: approved for native execution by the user on 2026-10-08 after
+reviewing the M1 evidence and Claude Opus 5.5's reviews. This authorizes
+the bounded diagnostic below and supersedes the M1 stop for this
+investigation only. It does not amend the approved
+[design](../specs/2026-10-06-harness-forge-design.md) or authorize T3.
+T3 waits for this feasibility decision because a worker runtime
+requirement affects distribution.
+
+Execution outcome: stopped at the no-model gate on 2026-10-08 with
+both launchers **unproven** and zero live invocations. See the
+[diagnostic results](2026-10-08-harness-forge-worker-diagnostic-results.md).
+The approval above records the completed handoff; it does not restart
+the diagnostic budget.
 
 ## Review conclusions
 
@@ -84,6 +90,14 @@ version-matched implementation/configuration or a supported offline
 startup manifest with no model request and no outbound traffic.
 The intended guest build matters; acceptance by the host CLI alone
 cannot qualify a different guest binary or platform.
+
+The vendor's source at the release tag matching the selected Codex
+build is a candidate for this evidence. Record the immutable commit,
+release-asset identity and registration conditions; a matching version
+string alone does not bind a locally modified binary to that source.
+For Claude, a startup capability manifest is a candidate only if it can
+be obtained without a model request. M1's empty list is historical
+evidence, not a substitute for checking the selected model/configuration.
 
 Separate two questions:
 
@@ -187,7 +201,7 @@ index with the diagnostic's grader hash.
 
 ## Effort limit and stopping rule
 
-Proposed budget, fixed before execution: four hours elapsed work,
+Approved budget, fixed before execution: four hours elapsed work,
 including the 30-minute capability gate and environment setup, with an
 initial launcher configuration set and at most two corrections to it
 across both harnesses, then at most 30 live harness invocations total.
@@ -261,6 +275,9 @@ possible hostile prompt.
    - Accept a documented Codex capability gap by changing the parity
      requirement. Findings that lack the required independent support
      verdict remain blocked; this does not silently waive validation.
+     Without another approved support checker, Codex research cannot
+     advance findings into acceptance or builds, making that workflow
+     unusable under the remaining contracts.
 
    Present the observed blocker and costs of these options at the stop.
    None is selected by this proposal. Other role failures get the same
