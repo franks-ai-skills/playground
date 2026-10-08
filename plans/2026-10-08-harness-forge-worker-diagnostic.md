@@ -19,9 +19,11 @@ the diagnostic budget. Exclude external rate-limit/user waits from active
 investigation time; the report records the conservative remaining allowance.
 
 The [offline-init follow-up](2026-10-08-harness-forge-offline-init-follow-up.md)
-is a separate draft handoff after review. Its proposed blocked
-prompt-bearing launches amend the no-model-request condition and phase
-accounting; the authorization above does not silently approve that change.
+was separately authorized after review, subject to subscription-only
+usage and no extra cost. Its blocked prompt-bearing launches explicitly
+amend the no-model-request condition and phase accounting. It
+[observed an empty Claude host inventory](2026-10-08-harness-forge-offline-init-results.md);
+this does not qualify the guest environment or Codex launcher.
 
 ## Review conclusions
 
@@ -277,7 +279,8 @@ possible hostile prompt.
      build/launcher unavailable. A later attempt requires an identified
      alternative build or adapter, specific new capability evidence and
      its own bounded handoff; there is no automatic exploration loop.
-   - Amend the CLI-only constraint to investigate a dedicated tool-free
+   - **Excluded by the user's later subscription-only decision:** amend
+     the CLI-only constraint to investigate a dedicated tool-free
      model API adapter for source support. This requires an explicit
      design change and new authentication/distribution assessment;
      it is not an already proven solution.

@@ -8,6 +8,8 @@ dependencies and routing tightened, and contract confirmation and
 result states added on 2026-10-07; design, thin-slice scope and plan
 approved by the user on 2026-10-07. Execution starts natively and stops
 after M1 for review of worker-isolation feasibility.
+On 2026-10-08 the user confirmed subscription-only model access: no
+additional API tokens/keys, API credits or paid fallback.
 
 ## Goal
 
@@ -45,6 +47,7 @@ Success criteria:
 | --- | --- | --- |
 | Structure | A pipeline of focused skills plus a reviewer subagent | One large skill: body too long for the research's skill-size guidance, the builder would review its own work, and one description would have to trigger for too many tasks. A Claude Code workflow script: Codex has no equivalent, which breaks harness parity |
 | Harnesses | Claude Code and Codex equally | Claude Code first: gives up the parity the knowledge base itself keeps |
+| Model access | Subscription-authenticated harness CLIs only; user-confirmed on 2026-10-08 | Direct model API adapters, additional API tokens/keys, API credits and paid fallback: outside the user's subscription-only constraint, even if promotional credits could cover usage |
 | Knowledge-base home | Its own repo; the plugin bundles a pinned snapshot | Same repo as the tooling: couples research and tooling releases. Fetching pages at run time: non-deterministic, needs network, and brings outside content into context, which the security guide warns against |
 | Verification | Scripts first, then a fresh-context reviewer subagent on a fixed rule list | Model-only review: not deterministic |
 | Granularity | Deciding questions per part of an idea | One round for the whole idea: fails when parts need different mechanisms |

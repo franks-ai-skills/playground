@@ -6,6 +6,9 @@ design governs conflicts; revised after review on 2026-10-07. The design,
 this scope and the [implementation plan](../plans/2026-10-07-harness-forge-thin-slice.md)
 were approved together by the user on 2026-10-07. Execute natively and
 stop after M1 for feasibility review; the parent design governs conflicts.
+The user's 2026-10-08 subscription-only constraint also applies: no
+direct model API integration, additional API tokens/keys, API credits
+or paid fallback.
 
 ## Deliverable
 
