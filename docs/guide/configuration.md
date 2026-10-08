@@ -8,7 +8,7 @@ This page covers the settings system itself and which layer a setting belongs in
 
 | Dimension | Claude Code | Codex | OpenCode |
 | --- | --- | --- | --- |
-| Format | Strict JSON, no comments; `$schema` available ([CC](../vendors/claude-code/configuration.md#format)) | TOML; no config JSON Schema found ([Codex](../vendors/codex/configuration.md#format)) | JSON or JSONC; `$schema` available ([OC](../vendors/opencode/configuration.md#format)) |
+| Format | Strict JSON, no comments; `$schema` available ([CC](../vendors/claude-code/configuration.md#format)) | TOML; versioned config JSON Schema published in 0.160.1 ([Codex](../vendors/codex/configuration.md#limits-and-gotchas)) | JSON or JSONC; `$schema` available ([OC](../vendors/opencode/configuration.md#format)) |
 | User file | `~/.claude/settings.json`; `CLAUDE_CONFIG_DIR` relocates `~/.claude` ([CC](../vendors/claude-code/configuration.md#settings-files)) | `~/.codex/config.toml`; `CODEX_HOME` relocates `~/.codex` ([Codex](../vendors/codex/configuration.md#codex-home)) | `~/.config/opencode/opencode.json` ([OC](../vendors/opencode/configuration.md#layers)) |
 | Project file | `.claude/settings.json` in the primary working directory, no parent fallback ([CC](../vendors/claude-code/configuration.md#settings-files)) | `.codex/config.toml` in every directory from the project root to the cwd; closest wins ([Codex](../vendors/codex/configuration.md#config-layers-values)) | `opencode.json[c]` walked up to the worktree root, plus `.opencode/opencode.json[c]` ([OC](../vendors/opencode/configuration.md#layers)) |
 | Personal project file | `.claude/settings.local.json`, auto-added to global git excludes ([CC](../vendors/claude-code/configuration.md#settings-files)) | None | None |
