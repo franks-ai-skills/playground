@@ -83,7 +83,9 @@ their explicitly open implementation options.
 - Test each live generated reference skill with small activation cases
   in throwaway test workspaces that Forge creates automatically and that
   use the existing login (user decision, 2026-10-09), separately from the
-  forge's own routing suite. Offline reports say `none run`; unsupported modes carry reasons,
+  forge's own routing suite. Each test runs with declared permitted tools;
+  remaining executable components or a competing skill make the affected
+  test unavailable or `not-run`, as the parent design classifies. Offline reports say `none run`; unsupported modes carry reasons,
   and the live build requires observed explicit activation in both harnesses.
 - Draft the exact generated-output permission and obtain approval of
   its wording before repository/plugin publication. The parent settled

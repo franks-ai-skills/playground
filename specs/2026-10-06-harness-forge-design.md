@@ -816,9 +816,26 @@ to harness-forge itself:
   its account location, passed through unchanged; Forge creates no test
   login or profile (user decision, 2026-10-09). Suppress user-level
   skills, plugins, instructions, hooks and MCP servers where the harness
-  allows, and record what remains loaded and the account exposure. Candidate
-  code a test executes runs only under the harness sandbox limited to
-  that workspace; if that cannot be applied, the test is unavailable.
+  allows, and record what remains loaded and the account exposure.
+  Each test declares its permitted tools and launches with matching
+  harness controls; an observed tool call outside that list fails the
+  test. A skill without bundled code can still cause tool calls, and
+  file/web tools, hooks and MCP servers can run outside a harness's
+  shell sandbox ([sandboxing](https://code.claude.com/docs/en/sandboxing)),
+  so the sandbox alone does not cover a test. Candidate code a test
+  executes runs only under the harness sandbox limited to that workspace.
+  What remains loaded is classified:
+  - executable components (hooks, MCP servers, apps, plugin monitors or
+    other plugin executables) must be off; if one stays active, the
+    test is unavailable;
+  - a competing skill (Forge's own skills, one with the candidate's name,
+    or one that could answer the test prompt in its place) invalidates
+    the affected activation test, which is `not-run` with the reason;
+  - context only (instruction files, unrelated skills) is disclosed; the
+    test remains functional evidence with that extra context.
+  Clean-installation evidence additionally needs an observed inventory
+  with no user-level skills or plugins; otherwise that evidence is
+  unavailable and needs a user decision, not a disclosure.
 - Check scripts run with time and output limits and do not execute
   the files they check.
 - The reviewer is instructed to use read-only supplied data and no network
