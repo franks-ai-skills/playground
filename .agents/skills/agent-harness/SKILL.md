@@ -18,6 +18,11 @@ questions about models themselves (pricing, model choice).
 
 ## The knowledge base
 
+The authoritative knowledge base is the sibling checkout
+`../agent-harness-kb`; the `docs/` paths below are relative to it.
+Playground's own `docs/` is a frozen copy of 2026-10-09: read it only
+when the sibling checkout is missing, say so, and never edit it.
+
 An overview page plus four layers, one page per concept in each. Page
 names are identical across layers, so `<concept>` below is one of: `instructions`,
 `configuration`, `permissions-and-sandbox`, `mcp`, `skills`,
@@ -61,8 +66,9 @@ one harness has. Check it before calling something portable.
    best-practices page and report each item that fails, with the page
    section that explains it.
 6. **Keep the knowledge base current.** When a fact turns out to be
-   outdated or wrong, fix the vendor page with the new source and date
-   (the source rules in `AGENTS.md` apply),
+   outdated or wrong, fix it in `../agent-harness-kb`, never in the
+   frozen playground copy: fix the vendor page with the new source and
+   date (the source rules in the KB's `AGENTS.md` apply),
    then every page that repeats it (`docs/concepts/`,
    `docs/best-practices/`, `docs/guide/`, `docs/overview.md`). Mention
    the update in the answer.
