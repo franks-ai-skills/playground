@@ -171,6 +171,14 @@ README disclosure. The strict isolation gate is superseded by the parent's
 support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
+M2 checkpoint on 2026-10-09: T3-T10 are complete on the `feature/thin-slice`
+branches of KB (`c6c6618`) and Forge (`1b08355`), both local only. The
+offline workflow passes 219 tests with stubbed research and review
+workers; Forge's four skills pass its own script rules. Rulings and
+verification details are in the execution ledger. No harness is
+supported yet: T11 adds the worker launchers and the first live runs,
+which need the user in each session and subscription usage.
+
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
 Once execution is authorized, milestone reports do not create automatic
@@ -745,7 +753,7 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
 `write_report(repository: Path, slug: str, rendered: str) -> Path` writes
 `.harness/reports/<slug>.md` under that target repository.
 
-- [ ] Write table-driven tests for exact result precedence:
+- [x] Write table-driven tests for exact result precedence:
   unconfirmed/blocked→`not assessed`; failed build→`not verified` and
   `not met` even with outside dependencies; outside-only→`not applicable`
   and `depends on outside controls`; confirmed nothing-fits→
@@ -768,9 +776,9 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
   the live producer is implemented in T11.
   Assert the exact report path and reject slug traversal or symlinks that
   would escape the target repository.
-- [ ] Run `python -m unittest tests.test_verify tests.test_scope tests.test_report -v`;
+- [x] Run `python -m unittest tests.test_verify tests.test_scope tests.test_report -v`;
   expect result, applicability and invalidation assertions to fail.
-- [ ] Implement applicability before review, with explicit out-of-scope
+- [x] Implement applicability before review, with explicit out-of-scope
   reasons. Run all applicable script rules and link/README checks.
   Request exactly one judged verdict per applicable id plus a per-part
   goal verdict linked to accepted goal/requirement ids. Goal ids remain
@@ -792,7 +800,7 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
   the bounded target-repository path, including the chosen review scope.
   Expose `check`, `report` and `scope` through T4's CLI. Unattended
   reporting has no live confirmation and leaves goals unassessed.
-- [ ] Test transitive links, shared-file owners, deleted files and every
+- [x] Test transitive links, shared-file owners, deleted files and every
   bound input changing independently. `Review` includes fixed parts,
   transitive linked parts, all parts with changed inputs and link checks;
   shared checked files invalidate every owner. `Extensive review` covers
@@ -800,7 +808,7 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
   unchanged historical checks only when all bound inputs still match
   and the current whole contract has been confirmed. No-user runs
   perform static checks but assess no goals. Run the test suite again.
-- [ ] Commit: `feat: report contract-bound verification results`.
+- [x] Commit: `feat: report contract-bound verification results`.
 
 ## Task 11: Prove the live vertical workflow before extending it
 
