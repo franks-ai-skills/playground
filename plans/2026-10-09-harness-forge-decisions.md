@@ -25,16 +25,21 @@ blocks launch; unproved runtime isolation remains disclosed.
 Research is instructed to use the web for the supplied brief; source
 support to judge only the supplied claim/quote/context without tools;
 review to use frozen supplied files read-only, without network access.
-Configure these limits where supported and report residual capabilities.
+Apply the parent's mandatory per-role launch controls (Claude tool lists;
+Codex filesystem, web-search and source-support shell/image restrictions)
+and report residual capabilities. Known setting rejection blocks launch;
+unproved enforcement remains the accepted gap.
 Complete tool absence and context/file/network isolation are not
 guaranteed. Use trusted projects and operator-approved inputs; this is
 not a boundary for secrets or hostile workloads. Human acceptance does
 not undo an earlier out-of-scope action.
 Research still processes untrusted pages. Forge's README recommends an
 operator-provided disposable environment without project secrets or
-unrelated credentials and with restricted egress, labelled `recommended,
-not verified`. The harness's subscription login remains necessary and
-its isolation unproved; no credential-free guarantee is made.
+unrelated credentials, with operator-managed blocking of private, loopback,
+link-local and metadata destinations, labelled `recommended, not verified`.
+Public-web transmission remains possible. The harness's subscription login
+remains necessary and its isolation unproved; no credential-free guarantee
+is made.
 
 ## What remains mandatory
 
@@ -55,8 +60,14 @@ its isolation unproved; no credential-free guarantee is made.
   A goal requiring enforced isolation still needs the existing conflict or
   outside-control flow. No general security rule is silently downgraded.
 - Subscription-only model access, with no direct model API, extra API keys,
-  credits or paid fallback. The owner's Claude default is `claude-frank`;
-  the completed `claude-tp` diagnostic exception is not renewed.
+  credits or paid fallback. As clarified by the user on 2026-10-09, public
+  adapters use standard vendor CLIs and an existing subscription login at
+  vendor-default account locations. No required custom profiles, login/logout,
+  credential copying, account switching or saved-configuration changes.
+  The owner's setup is temporary development-only configuration; see the
+  [local development note](harness-forge-local-development.md). This applies
+  to all subsequent agents. Temporary worker restrictions remain required;
+  dedicated profiles remain optional precautions with unproved isolation.
 
 The exception covers Forge's three workers. It does not relax the
 security of catalog checkers, candidate runtime-test environments or

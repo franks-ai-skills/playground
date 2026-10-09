@@ -36,6 +36,21 @@ coding-agent harnesses: Claude Code, Codex and OpenCode.
   `claude.md` load as instruction files on case-insensitive file
   systems.
 
+## Harness Forge account boundary
+
+For this and every subsequent agent: the public product assumes standard
+`claude` and `codex` CLIs, vendor-default account locations and an existing
+subscription login. Never make the owner's aliases, profile paths, plugins
+or shell configuration a product default, dependency or installation step.
+Keep temporary worker restrictions; do not change saved user configuration
+or initiate login, logout or account switching. Subscription usage only;
+no direct model API, additional API keys/credits or paid fallback.
+
+The owner's configuration is a temporary exception for development on
+this machine only. Read [the local development note](plans/harness-forge-local-development.md)
+before local harness runs. Historical diagnostics describe observations,
+not public defaults. Keep their raw evidence and graders unchanged.
+
 ## Attribution
 
 Commit and PR attribution follows the `git-flow` skill's "Attribution

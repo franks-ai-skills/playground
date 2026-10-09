@@ -12,7 +12,10 @@ Execution outcome: after correcting an interruption-accounting error,
 the resumed no-model gate stopped on 2026-10-08 with both launchers
 **unproven** and zero live invocations. The stop is for missing capability
 evidence, not exhausted waiting time. The user selected `claude-tp` for
-this diagnostic only; `claude-frank` remains the later default. See the
+this diagnostic only; `claude-frank` remains the later local-development
+selection on this machine only, not a public adapter default. See the
+[development boundary](harness-forge-local-development.md) for subsequent
+work. See the
 [diagnostic results](2026-10-08-harness-forge-worker-diagnostic-results.md).
 The approval above records the completed handoff; it does not restart
 the diagnostic budget. Exclude external rate-limit/user waits from active

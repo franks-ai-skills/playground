@@ -23,6 +23,16 @@ direct model API integration or personal plugins. Model access must use
 harness subscriptions; no additional API tokens/keys, API credits or
 paid fallback (user-confirmed 2026-10-08).
 
+**Account boundary (clarified 2026-10-09):** public adapters invoke standard
+`claude`/`codex` with an existing subscription login at vendor-default
+locations. The owner's profile and wrapper choices apply only to temporary
+development on this machine; see the [local development note](harness-forge-local-development.md).
+All subsequent agents must preserve this boundary. Do not require custom
+profiles, manage logins, copy credentials or modify saved settings.
+Temporary per-worker restrictions remain required. Optional operator-managed
+profiles do not establish credential isolation. Historical diagnostic
+profiles and synthetic test environments are not public installation steps.
+
 **Spec:** [Thin-slice scope](../specs/2026-10-07-harness-forge-thin-slice.md)
 and [parent design](../specs/2026-10-06-harness-forge-design.md).
 Read both before execution. The user approved the design, scope and plan
@@ -191,8 +201,8 @@ separate evidence rather than reinterpreting the M1 results.
 | FORGE | `skills/<name>/references/{contract,claude-code,codex}.md`, `agents/{harness-researcher,harness-reviewer}.md`, `adapters/codex/{researcher,reviewer}.toml` | Stage contracts and harness-specific worker instructions |
 | FORGE | `templates/skill/`, `snapshot/`, `tools/pin_snapshot.py`, `tools/live_checks.py`, `evals/`, `tests/` | Build defaults, pinned KB, packaging, live checks and tests |
 | FORGE | `packaging/assessment.md`, `evals/canaries/`, `evals/smoke/`, `legal/generated-output-permission.md` | Distribution decision, early evidence and exact license permission proposed for approval |
-| FORGE | `plugin.json`, `.claude-plugin/{plugin,marketplace}.json`, `LICENSE`, `README.md` | Public installation and licensing |
-| PLAY | `examples/reproduction-checklist/`, `examples/pipeline-outcomes/`, `tools/check_references.py`, `README.md`, `AGENTS.md` | Reference results and KB migration pointers |
+| FORGE | `plugin.json`, `.claude-plugin/{plugin,marketplace}.json`, `LICENSE`, `README.md`, `AGENTS.md` | Public installation, licensing and contributor account boundary |
+| PLAY | `examples/reproduction-checklist/`, `examples/pipeline-outcomes/`, `tools/check_references.py`, `README.md`, `AGENTS.md`, `plans/harness-forge-local-development.md` | Reference results, KB migration pointers and local-only development instructions |
 | Target repository | `.harness/reports/<slug>.md`, `.harness/overrides/<rule-id>.yaml` | Verification reports and repository-scoped rule overrides; reference targets live under PLAY examples |
 
 Shared types live in `models.py` as dataclasses. JSON Schema defines the
@@ -820,6 +830,13 @@ milestone proves the primary workflow, not the completed slice.
   `self.assertFalse(worker_was_started)`. A disclosed extra tool or
   unproven denial under the accepted policy alone does not prevent launch.
   Native worker launch requests fail before spawning. Test mandatory
+  account behavior: standard executable names and vendor-default account
+  resolution without owner-specific paths or aliases. Test that local
+  development overrides never become defaults or packaged requirements,
+  missing subscription authentication returns unavailable, no login/logout
+  or account fallback is attempted, and saved settings remain unchanged.
+  Check role-specific tool/web/filesystem settings against the matrix below;
+  reject a known failure to apply one. Test mandatory
   baseline preparation: a temporary cwd outside the target repository with
   only staged role inputs, a small environment allowlist, closed extra
   descriptors, no resume/fork and suppressed optional discovery. Include
@@ -837,19 +854,39 @@ milestone proves the primary workflow, not the completed slice.
   with stub workers; expect the new integration assertions to fail.
 - [ ] Connect the active skills to independent CLI worker processes in each
   harness; never fall back to native subagents. Use
-  subscription-authenticated `claude-frank` by default for Claude;
-  `claude-tp` was a completed one-time diagnostic exception. Give each
+  standard subscription-authenticated `claude` and `codex` executables
+  with vendor-default account resolution. Personal setup belongs only to
+  the local development launch configuration, never adapter defaults. Give
+  each
   worker only its role's request and validate its output against T4's
   schemas; relay human confirmation under T7's acceptance rule. Return
   to intake if research changes fit. Pass only necessary OS environment
   names (HOME, PATH, USER, LOGNAME, LANG, TMPDIR, plus documented platform
-  needs) and explicitly selected subscription-profile paths. Do not forward
+  needs) for the existing vendor login. Any account-location override used
+  on this machine is an explicit development-only setting. Do not forward
   arbitrary parent variables, API credentials or provider endpoint overrides.
   Disable optional hooks/plugins/settings discovery. Codex must include
   `apps._default.enabled=false` and disable the apps feature and any
   conflicting per-app overrides; suppress user/project MCP discovery and
   disable remaining configured servers by ID. Claude uses strict empty-MCP
-  configuration and explicit role tool lists. These are adapter preparation
+  configuration and explicit role tool lists. Required per-role controls:
+
+  | Role | Claude launch controls | Codex launch controls |
+  | --- | --- | --- |
+  | Research | `--tools WebFetch,WebSearch` with the matching allowlist | Web search enabled; no-write filesystem policy with reads limited to required inputs where configurable; remove unrelated tools where supported |
+  | Source support | `--tools ""` and an empty allowlist | Web search disabled; `features.shell_tool=false`, `features.unified_exec=false`, `features.view_image=false`; no-write filesystem policy and minimum configurable read access |
+  | Review | `--tools Read,Grep,Glob` with the matching allowlist | Web search disabled; no-write filesystem policy; scope reads to frozen candidate/rules where configurable; disable unrelated tools where supported |
+
+  These are starting settings from the recorded CLI/source evidence,
+  not permanent vendor syntax guarantees. Verify them for supported builds
+  during T11, including file-editing restrictions and network controls
+  beyond web search. M1 used a named filesystem permission policy; a
+  generic read-only sandbox does not by itself restrict which files can
+  be read. All roles retain the common apps/MCP/discovery restrictions.
+  Model-service access remains necessary even when role web access is off.
+  Known setting rejection blocks launch; remaining built-in tools or
+  unproved enforcement stay explicit gaps, not silent control removal.
+  These are adapter preparation
   requirements, not claims that every tool-registration path is observable.
   Inspect known managed-policy conflicts and fail if required settings
   cannot apply; keep unknown runtime access labelled unknown.
@@ -863,13 +900,21 @@ milestone proves the primary workflow, not the completed slice.
   Override/drift and fix/review conversations
   defer to T12; unsupported inputs block rather than being ignored.
   Implement the runtime producer using separate disposable harness
-  profiles, synthetic credentials and explicit network allowance. Load
+  profiles, synthetic credentials and explicit network allowance. Synthetic
+  credentials serve only as candidate fixtures; they cannot authenticate
+  model calls. Live model access uses the existing subscription without
+  copying login material. Document that exposure separately; if required
+  candidate-test isolation cannot be achieved, record unavailable rather
+  than relaxing it. Load
   the actual generated skill and its needed references, with no forge
   skills available to substitute for it. Static checkers never launch
   candidate behavior. Record observed activation signals; absence of an
   observable signal is `not-run` with a reason, never an invented pass.
 - [ ] Run `python tools/live_checks.py --harness claude-code --case vertical`
-  and the Codex equivalent from clean profiles. Use the same confirmed
+  and the Codex equivalent from clean test installations using existing
+  subscription authentication. Keep this machine's development account
+  selection explicit; do not create/copy login profiles. Use the same
+  confirmed
   answers and record actual findings. Preserve a justified reuse outcome;
   exercise the build separately with a confirmed no-reuse fixture.
   Before finalizing its report, test the generated reproduction-checklist
@@ -1002,13 +1047,22 @@ are neither dependencies nor silently discovered as requirements.
   artifact-specific limitations and existing outside-control disclosure.
   Forge's own `Outside controls` section must recommend a disposable
   research environment with no project secrets/unrelated credentials and
-  controlled egress, labelled `recommended, not verified`; explicitly retain
-  the subscription-authentication exposure. This is not a mandatory container.
+  operator-managed blocking of private, loopback, link-local and metadata
+  destinations (including DNS resolution and redirects where controllable),
+  labelled `recommended, not verified`; explicitly retain
+  the subscription-authentication exposure and permitted-public-web egress
+  gap. Dedicated worker profiles are optional precautions, not installation
+  requirements or proof of keychain/credential isolation. This is not a
+  mandatory container. Document the standard vendor CLI/existing-login
+  setup; exclude owner-specific launchers and account paths from public
+  setup examples and defaults. Add packaging checks for that boundary.
   Document configured restrictions separately from unproved ones,
   unavailable capabilities, no-user reports, KB version and generated
   output permission. Runtime setup never modifies personal config
   implicitly. Run `claude plugin validate .` and each CLI's installation
-  procedure from an isolated profile; save the exact working commands.
+  procedure in an isolated test installation; save the exact working
+  commands and account-access limitations. Use the existing subscription
+  for live calls without copying credentials or silently creating logins.
 - [ ] Publish destination repositories when execution authorizes it,
   and the exact license permission has been approved; then remove only
   the copied knowledge-base files from playground. Keep `plans/` and
@@ -1052,7 +1106,7 @@ or raw private harness profiles.
 - [ ] Run `python tools/check_references.py`; expect absent reference
   evidence to fail. Run the FORGE unit suite to check its offline
   foundation before live execution.
-- [ ] In clean profiles, run
+- [ ] In clean test installations with existing subscription authentication, run
   `python tools/live_checks.py --harness claude-code --case reproduction-checklist`
   and the Codex equivalent. Use the same confirmed reference answers;
   record live survey differences rather than demanding identical

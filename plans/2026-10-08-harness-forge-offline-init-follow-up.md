@@ -38,7 +38,10 @@ separately from process launches.
   adding guards against login/logout and network access. Directly setting
   `CLAUDE_CONFIG_DIR` would bypass that wrapper's account check; it is
   unnecessary. Keep `claude-tp` only for this diagnostic's temporary
-  exception, with `claude-frank` the later default.
+  exception, with `claude-frank` the later local-development selection
+  on this machine only. These historical launch instructions are not
+  public adapter requirements; the [development boundary](harness-forge-local-development.md)
+  governs subsequent work.
 - **Correct: the time figure is an estimate.** The previous charge was
   twenty estimated minutes plus 317 measured resumed seconds. It is not
   a measurement of 25 minutes of uninterrupted investigation.
