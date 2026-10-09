@@ -398,12 +398,12 @@ Test helper `validate_fixture(name: str) -> bool` lives in
 `tests/test_dependency_conformance.py` and invokes the candidate library
 against the named fixture. It is not an independent validator.
 
-- [ ] Create conformance fixtures for closed objects, local references,
+- [x] Create conformance fixtures for closed objects, local references,
   enums, conditional schemas, wrong scalar types and forbidden remote
   resolution. Pin rejection with
   `self.assertFalse(validate_fixture("unknown-checker"))`. Assess parsing
   and validation of new idea/override/decision YAML, not just snapshots.
-- [ ] Compare (a) platform-specific bundles using existing upstream
+- [x] Compare (a) platform-specific bundles using existing upstream
   wheels where available, (b) a maintained pure-Python validator with
   Draft 2020-12 support, and (c) a documented one-time isolated setup.
   Fetch the entire dependency graph and record installation effort,
@@ -411,18 +411,18 @@ against the named fixture. It is not an independent validator.
   the native `rpds-py` dependency if retaining modern jsonschema; existing
   wheels may avoid source builds. Do not write a YAML parser or schema
   validator, or change the design's YAML formats to simplify packaging.
-- [ ] Run `python -m unittest tests.test_dependency_conformance -v`
+- [x] Run `python -m unittest tests.test_dependency_conformance -v`
   against viable candidates in disposable environments. Expected:
   required valid/invalid fixtures classified correctly, no remote
   resolution and a working install on every claimed environment.
   Untested environments are recorded rather than claimed supported.
-- [ ] Record the default and rationale in `packaging/assessment.md`.
+- [x] Record the default and rationale in `packaging/assessment.md`.
   Bound this assessment to the three options; it follows the capability
   answer in T2. If a choice changes formats, schema dialect or public
   platform requirements, show the design change before proceeding.
   Otherwise adopt the supported option, lock runtime dependencies and
   hashes, and document the exact bootstrap. No personal config changes.
-- [ ] Commit: `chore: select and pin forge runtime distribution`.
+- [x] Commit: `chore: select and pin forge runtime distribution`.
 
 ## Task 4: Define closed data schemas and a checkable rule inventory
 
