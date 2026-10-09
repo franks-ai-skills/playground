@@ -436,7 +436,7 @@ against the named fixture. It is not an independent validator.
 Canonical JSON uses sorted keys, compact separators and UTF-8; hashes
 of files use their actual bytes. Markdown records have YAML frontmatter.
 
-- [ ] Add `test_closed_rules_and_catalog_parameters`: both design rule
+- [x] Add `test_closed_rules_and_catalog_parameters`: both design rule
   examples validate; duplicate ids, unknown fields/checkers, script
   paths, invalid params, executable YAML tags and contested errors fail.
   Add `test_answer_scalars_and_contract_hashes`: answer key ordering
@@ -448,9 +448,9 @@ of files use their actual bytes. Markdown records have YAML frontmatter.
   as unknown. Validate the same evidence record in worker/report schemas.
   Pin rejection with
   `with self.assertRaises(ValueError): load_document(bad_path, "rule")`.
-- [ ] Run `python -m unittest tests.test_documents tests.test_rule_schema -v`;
+- [x] Run `python -m unittest tests.test_documents tests.test_rule_schema -v`;
   expect missing loaders/schemas or rejected-input assertions to fail.
-- [ ] Implement the three interfaces and the shared types. Define a
+- [x] Implement the three interfaces and the shared types. Define a
   1 MiB document limit and depth 32; reject external schema resolution.
   Define catalog parameter schemas, rule-kind semantics and severity
   caps. `pass` always means compliance, including `must-not` rules.
@@ -461,12 +461,12 @@ of files use their actual bytes. Markdown records have YAML frontmatter.
   initially with `validate-kb`; later tasks add their owned commands.
   Emit bounded JSON to stdout and diagnostics to stderr; use exit codes
   0 for success, 1 for failed checks and 2 for invalid input.
-- [ ] Run the same tests; validate a minimal KB with
+- [x] Run the same tests; validate a minimal KB with
   `python scripts/forge.py validate-kb --kb tests/fixtures/minimal-kb`.
   The minimal fixture is labelled synthetic; the real researched KB is
   copied and validated in T5. Expected: bounded JSON with no validation
   errors; intentional malformed fixtures fail.
-- [ ] Commit: `feat: define forge contracts and rule schemas`.
+- [x] Commit: `feat: define forge contracts and rule schemas`.
 
 ## Task 5: Extract skills rules and implement pinned checkers
 
