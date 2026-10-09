@@ -204,8 +204,9 @@ requirement by itself. The approved diagnostic provides these choices:
    unavailable.** A new investigation needs a specific new lead and a
    new bounded handoff. Codex's internal allowlist is a concrete lead,
    but exposing it may require a custom host/build; that has not been
-   assessed or approved as distribution work. Claude still needs a
-   qualifying observation path for the selected launcher.
+   assessed or approved as distribution work. Claude now has the narrow
+   host startup observation for `claude-tp`; context, profile portability,
+   guest and role qualification are still open.
 2. **Excluded by the user's 2026-10-08 subscription-only decision:**
    amend the design to investigate a dedicated tool-free API adapter
    for source support. This could avoid the CLI's tool-registration
@@ -220,3 +221,8 @@ requirement by itself. The approved diagnostic provides these choices:
 No replacement launcher has been selected; option 2 is excluded by the
 later user constraint. T3 remains stopped under the approved diagnostic's
 decision gate, not because reviewer agreement requires another approval.
+
+See the [2026-10-09 decision brief](2026-10-09-harness-forge-decisions.md)
+for current options. Keeping the requirements can include a specifically
+approved new experiment; it does not require indefinite inactivity, and
+the public-switch investigation has not established general impossibility.

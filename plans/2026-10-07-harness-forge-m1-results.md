@@ -74,9 +74,9 @@ no real repository data or credential values were requested by probes.
   destination publication and knowledge-base migration remain outside
   this execution handoff.
 
-## Proposed next step
+## Diagnostic follow-ups
 
-Revised on 2026-10-08 after Claude Opus 5.5's review: prioritize a
+On 2026-10-08, Claude Opus 5.5's review led to prioritizing a
 disposable external boundary and independent processes in both harnesses.
 The [bounded diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
 sets explicit model selection, common role/input/discovery/authentication
@@ -96,3 +96,13 @@ it, because Forge currently recommends rather than provisions outside
 controls. The user approved the diagnostic on 2026-10-08. Its
 [no-model gate stopped unproven](2026-10-08-harness-forge-worker-diagnostic-results.md)
 with zero live calls; the M1 evidence is unchanged and T3 remains stopped.
+
+Latest follow-up: the [offline-init result](2026-10-08-harness-forge-offline-init-results.md)
+observed `Read` in the control and an empty advertised tool list in the
+restricted `claude-tp` Team profile. This does not transfer to
+`claude-frank` or qualify model context, external DNS, guest isolation or
+the other worker roles. Two blocked prompt-bearing launches are charged,
+leaving 28 of 30 invocation slots; both configuration corrections are
+spent. A new experiment needs a bounded handoff. The user's constraint
+is subscription-only, with no API keys/tokens, API credits or paid
+fallback. See the [current decisions](2026-10-09-harness-forge-decisions.md).

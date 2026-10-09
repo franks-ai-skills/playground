@@ -129,6 +129,16 @@ mid-run fixes. The user approved this diagnostic on 2026-10-08; its
 without live calls. T3 remains stopped, and no mandatory outside-control
 dependency is approved.
 
+The later [offline-init follow-up](2026-10-08-harness-forge-offline-init-results.md)
+observed an empty advertised tool list for the tested `claude-tp` profile,
+with a valid `Read` control. Context/discovery, profile portability,
+external DNS, guest/authentication isolation and the other roles remain
+unqualified; Codex's complete tool-removal configuration is also unproven.
+Two blocked prompt-bearing launches are charged and both correction
+allowances are spent. No further experiment follows automatically from
+the 28 unused invocation slots. The [decision brief](2026-10-09-harness-forge-decisions.md)
+sets out the next choice; T3 remains stopped.
+
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
 Once execution is authorized, milestone reports do not create automatic
