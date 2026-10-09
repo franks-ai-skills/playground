@@ -81,8 +81,9 @@ their explicitly open implementation options.
 - Run a 24-case routing smoke suite at the first live milestone and the
   roughly 480-run routing evaluation at distribution, before baselines.
 - Test each live generated reference skill with small activation cases
-  in disposable harness profiles, separately from the forge's own routing
-  suite. Offline reports say `none run`; unsupported modes carry reasons,
+  in throwaway test workspaces that Forge creates automatically and that
+  use the existing login (user decision, 2026-10-09), separately from the
+  forge's own routing suite. Offline reports say `none run`; unsupported modes carry reasons,
   and the live build requires observed explicit activation in both harnesses.
 - Draft the exact generated-output permission and obtain approval of
   its wording before repository/plugin publication. The parent settled
