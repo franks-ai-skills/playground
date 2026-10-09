@@ -26,10 +26,14 @@ file/context/network access are not guaranteed. Functional live support
 is still being implemented; the diagnostics did not certify containment.
 
 Use this mode for trusted projects, and do not rely on it to hide secrets
-or contain hostile content. Reports and generated-result READMEs must
+or contain hostile content. Forge's README and per-run reports must
 disclose the gap even when the built artifact is `verified`. See the
-[accepted policy](plans/2026-10-09-harness-forge-decisions.md) and the
-sibling [Forge README](../harness-forge/README.md) for the per-harness evidence.
+[accepted policy](plans/2026-10-09-harness-forge-decisions.md) and
+[M1 report](plans/2026-10-07-harness-forge-m1-results.md) for the evidence.
+Forge is currently an unpublished sibling checkout; its local README is
+at `../harness-forge/README.md`. Public cross-repository links will be
+added at distribution. Generic Forge-build provenance is not mandatory
+in every generated README; artifact-specific outside controls still are.
 
 ## License
 

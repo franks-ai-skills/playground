@@ -69,9 +69,28 @@ Success criteria:
 Claude Code and Codex retain the same automated workflow and functional
 acceptance requirements. Their tool and context restrictions may differ;
 equal features do not imply equal or certified containment. Each harness
-uses separate worker sessions/processes with explicit role inputs, no
+uses independent CLI processes with explicit role inputs, no
 intentional builder/researcher conversation inheritance, and the strongest
 available restrictions selected and recorded by its adapter.
+Native subagents are excluded from this release's three worker adapters;
+the tested native launch paths had observed violations. This is a release
+choice, not a claim about every possible native configuration. M1's
+separate-process observations inform adapters but do not certify them.
+
+Mandatory baseline controls: an initially empty temporary working
+directory outside the target repository, only staged role inputs, a small
+environment allowlist, closed extra file descriptors, no session
+resume/fork, and suppressed optional settings/hooks/plugin discovery.
+Pass only necessary OS environment and explicitly selected subscription
+profile paths; do not inherit API keys, provider overrides, unrelated
+credentials or arbitrary parent variables. Disable apps and configured
+MCP servers in both adapters. Codex must explicitly disable apps,
+including `apps._default.enabled=false`, suppress user/project discovery
+and disable remaining configured MCP servers by ID; an empty merged table
+alone is insufficient. Claude uses strict empty-MCP configuration and
+explicit role tool lists. Record exact settings and any managed-policy
+conflicts. A known failure to apply these baseline controls blocks launch;
+lack of complete runtime containment proof remains the accepted gap.
 
 Research is instructed to use web access for its brief only. Source
 support is instructed to judge only the supplied claim, quotation and
@@ -87,6 +106,13 @@ Do not rely on it to keep secrets, unrelated files or credentials hidden
 from workers or to contain hostile content. Fetched pages and candidate
 text remain untrusted data even in a trusted project. Human acceptance of
 findings does not prevent access or transmission that already occurred.
+Apply Forge's own outside-control rule to research: recommend an
+operator-provided disposable environment without a target-repository mount,
+project secrets or unrelated credentials, with minimal supplied inputs and
+appropriate egress/DNS controls. Mark it `recommended, not verified` in
+Forge's README. Subscription authentication is still needed by the harness;
+its separation from worker-readable data is not proved. This is not a
+credential-free promise, a mandatory container or platform provisioning.
 
 Record `worker_policy: best-effort-v1` and `isolation_status: not-certified`
 with the harness/version/model, configured controls, observed tools and
@@ -100,8 +126,10 @@ tools or switch accounts silently to recover.
 All source checks, requirement acceptance, rule checks, current-session
 confirmation and result precedence remain mandatory. `verified` describes
 the built artifact against its confirmed rules and goals; it never certifies
-Forge's worker containment. Reports and the Forge and generated-result
-READMEs must display the gap alongside successful results. If a user's
+Forge's worker containment. Per-run reports and Forge's own README must
+display the gap alongside successful results. Generated READMEs need no
+generic section about Forge's build process; their artifact-specific
+limitations and `Outside controls` obligations remain unchanged. If a user's
 goal requires enforced isolation, this policy cannot establish that goal;
 use the existing conflict/outside-control flow without downgrading errors.
 This exception concerns Forge's three workers only; disposable runtime

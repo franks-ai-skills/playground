@@ -41,11 +41,15 @@ their explicitly open implementation options.
   Initial parser/checker limits are 1 MiB per document, nesting depth 32,
   five seconds per checker and 64 KiB of checker output; these are
   implementation defaults, not values prescribed by the parent.
-- Use separate worker sessions/processes with explicit role inputs and
+- Use independent CLI processes, excluding native subagents for this
+  release's three workers, with explicit role inputs and
   no intentional conversation inheritance. Configure available access
   limits, test discovery/context/tools and record the remaining gaps
   under `best-effort-v1`. An empty directory is not proof of isolation.
-  Both harnesses require functional live evidence; neither must prove
+  Require the parent's baseline controls: temporary working directory,
+  environment allowlist, no resume/fork, suppressed optional discovery,
+  apps disabled and no configured MCP servers. Both harnesses require
+  functional live evidence; neither must prove
   complete tool absence or enforced role containment to use this policy.
 - Define explicit contract confirmation: selected Confirm or unambiguous
   current-session text, relayed with the displayed digest, run and part
@@ -168,9 +172,13 @@ All three workers follow the parent's `best-effort-v1` policy. Tool-free
 source support, brief-only research and read-only/offline review remain
 role instructions and configured targets, not certified access guarantees.
 Record policy, controls, observations and unknowns in the run. Disclose
-the gap in Forge's README, generated-result READMEs and reports, including
-when the artifact is `verified`. Intake owns the generated README section
-`Worker isolation limitations` and preserves unrelated content.
+the gap in Forge's README and per-run reports, including when the artifact
+is `verified`. Generated READMEs retain artifact-specific limitations and
+their existing `Outside controls` section; no generic Forge-isolation
+section is mandatory. Forge's own README recommends a disposable research
+environment without project secrets/unrelated credentials, labelled
+`recommended, not verified`, while disclosing remaining subscription-login
+exposure. A trusted project does not make fetched pages trusted.
 
 Unproven containment alone does not block this accepted mode. Missing
 functional capabilities, invalid/missing verdicts, observed out-of-scope
