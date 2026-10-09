@@ -923,17 +923,29 @@ milestone proves the primary workflow, not the completed slice.
   Synthetic credentials serve only as candidate fixtures; they cannot
   authenticate model calls. Suppress user-level skills, plugins,
   instructions, hooks and MCP servers with version-checked flags, and
-  record what remains loaded and the account exposure. Candidate code a
-  test executes runs only under the harness sandbox limited to the
-  workspace; if required candidate-test isolation cannot be achieved,
-  record unavailable rather than relaxing it. Load
+  record what remains loaded and the account exposure. Declare each
+  test's permitted tools in `evals/smoke/vertical.yaml` (the
+  reproduction-checklist test needs no web access, writes or shell),
+  launch with the matching Claude tool list and Codex web/filesystem/shell
+  controls, and fail the test on any observed tool call outside that
+  list. The shell sandbox does not cover Claude's file/web tools, hooks
+  or MCP servers, so a skill without bundled code is not exempt. Candidate
+  code a test executes runs only under the harness sandbox limited to the
+  workspace. Classify what remains loaded as the parent design's
+  "Security of the verifier" requires: remaining executable components
+  make the test unavailable; a competing skill makes the affected
+  activation test `not-run`; context only is disclosed. If required
+  candidate-test isolation cannot be achieved, record unavailable rather
+  than relaxing it. Load
   the actual generated skill and its needed references, with no forge
   skills available to substitute for it. Static checkers never launch
   candidate behavior. Record observed activation signals; absence of an
   observable signal is `not-run` with a reason, never an invented pass.
 - [ ] Run `python tools/live_checks.py --harness claude-code --case vertical`
   and the Codex equivalent from clean test installations using existing
-  subscription authentication. Keep this machine's development account
+  subscription authentication. A run counts as clean only when its
+  observed inventory shows no user-level skills or plugins; otherwise
+  stop for a user decision instead of recording it as clean. Keep this machine's development account
   selection explicit; do not create/copy login profiles. Use the same
   confirmed
   answers and record actual findings. Preserve a justified reuse outcome;
@@ -1036,7 +1048,8 @@ are neither dependencies nor silently discovered as requirements.
 
 - [ ] Test manifest versions, four skill names, package-resource paths,
   identical snapshot hashes and all required runtime files. Include a
-  clean installation whose personal skill/plugin directories are empty.
+  clean installation whose personal skill/plugin directories are empty or
+  fully suppressed, as shown by the observed inventory.
   Assert installing/copying the package does not execute candidate code.
   Pin the inventory as
   `self.assertEqual(skill_names, {"harness-intake", "harness-research", "build-skill", "harness-verify"})`
