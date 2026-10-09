@@ -485,7 +485,7 @@ inventory; an empty list means no unexpected changes.
 `CheckResult` has part id, rule id, `pass | fail | not-applicable | error`,
 severity, reason and sources. Worker failure is never a pass.
 
-- [ ] Write a fixture-driven test for every script rule: good passes,
+- [x] Write a fixture-driven test for every script rule: good passes,
   bad fails. Pin description lengths at 1,024/1,025 and names at
   64/65 characters; malformed frontmatter, mismatched names, broken
   portable symlinks and dangling references fail. Test timeouts and
@@ -501,9 +501,9 @@ severity, reason and sources. Worker failure is never a pass.
   migration section of `kb-manifest.json`. Test that the playground
   instructions route corrections to KB after copying, and that changing,
   adding or deleting a retained research file fails T13's removal guard.
-- [ ] Run `python -m unittest tests.test_checks tests.test_rule_coverage tests.test_bootstrap -v`;
+- [x] Run `python -m unittest tests.test_checks tests.test_rule_coverage tests.test_bootstrap -v`;
   expect uncovered sections and missing checker ids to fail.
-- [ ] Copy the research, source policy, instructions and routing skill to
+- [x] Copy the research, source policy, instructions and routing skill to
   KB, preserving bytes except enumerated link repairs. Keep playground's
   original research files frozen until publication in T13. After the copy
   succeeds, update PLAY's AGENTS.md and routing skill to send research
@@ -520,7 +520,7 @@ severity, reason and sources. Worker failure is never a pass.
   intent and goal fit remain judged. Advisory size guidance warns.
   Run checkers in subprocesses with a 5-second/64-KiB limit and immutable
   input bytes; disable network and candidate imports.
-- [ ] Validate all fixtures and coverage, then pin `snapshot/` with
+- [x] Validate all fixtures and coverage, then pin `snapshot/` with
   `kb-manifest.json`: initial version, source commit and per-file hashes.
   Include docs, rules, schemas, policy, catalog and fixtures. No runtime
   KB fetch. Reproduce the manifest from the same commit and compare it.
@@ -533,7 +533,7 @@ severity, reason and sources. Worker failure is never a pass.
   Implement the migration guard and expose
   `python tools/pin_snapshot.py --check-migration-source <PLAY> --kb <KB>`
   as a read-only check with nonzero exit on unexpected source changes.
-- [ ] Commit: `feat: add sourced skills rules and deterministic checks`.
+- [x] Commit: `feat: add sourced skills rules and deterministic checks`.
 
 ## Task 6: Compute recommendations from confirmed answers
 
