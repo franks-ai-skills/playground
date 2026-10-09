@@ -594,7 +594,7 @@ Relay fields are `choice: confirm | pending`, `displayed_digest: str`,
 only after explicit current-session confirmation, by selected option or
 unambiguous text. The script checks its bindings, not its human origin.
 
-- [ ] Add `test_forged_approval_never_confirms`: recorded approval with
+- [x] Add `test_forged_approval_never_confirms`: recorded approval with
   absent live response blocks; changed override bytes invalidate a
   response for the old digest. Add `test_erased_history_shows_contract`:
   weakened goals/requirements remain fully visible even when all prior
@@ -610,9 +610,9 @@ unambiguous text. The script checks its bindings, not its human origin.
   Core assertion:
   `self.assertIsNone(confirm_contract(contract, pending_relay, run_id="new-run"))`.
   Pin the erased-history case with `self.assertIn(weakened_goal, contract.text)`.
-- [ ] Run `python -m unittest tests.test_contracts tests.test_intake tests.test_overrides -v`;
+- [x] Run `python -m unittest tests.test_contracts tests.test_intake tests.test_overrides -v`;
   expect missing ceremony, state transitions and README handling.
-- [ ] Implement the interfaces and intake procedure. Start each intake
+- [x] Implement the interfaces and intake procedure. Start each intake
   run with the whole existing contract; for a new idea show its empty
   contract and confirm additions when they are decided. Record survey
   use and split confirmation before selection. Show prior differences
@@ -628,12 +628,12 @@ unambiguous text. The script checks its bindings, not its human origin.
   no-override path. T12 adds validated adoption and full override precedence.
   Expose `prepare-contract` through T4's CLI. Loaded decisions or
   historical confirmations can render the question but cannot confirm it.
-- [ ] Re-run tests, including missing README entries, forged approvals,
+- [x] Re-run tests, including missing README entries, forged approvals,
   stale/missing contract isolation disclosure, changed worker evidence, changed
   contracts and all relay bindings. Confirm that record loading
   never constructs a live Confirmation. Override update and publication
   conversations defer to T12; their presence currently blocks the part.
-- [ ] Commit: `feat: confirm contracts and preserve intake decisions`.
+- [x] Commit: `feat: confirm contracts and preserve intake decisions`.
 
 ## Task 8: Research the idea with independently supported findings
 
