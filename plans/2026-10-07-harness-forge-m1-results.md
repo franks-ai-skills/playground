@@ -112,3 +112,8 @@ The user then authorized one final offline Codex catalog spike. Its
 accepts the configuration but leaves complete tool absence unproven.
 That round is finished. The requested next step is a choice of revised
 acceptance policy for both harnesses; no further experiment is automatic.
+
+**Policy decision, 2026-10-09:** the user chose automated workers with
+weaker isolation (option 3), disclosed in the relevant READMEs. The parent
+design and plan now use `best-effort-v1`; T3 can proceed. These original
+M1 results remain unchanged, and no containment certification is implied.

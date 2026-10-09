@@ -1,89 +1,75 @@
-# Moving forward with both harnesses
+# Accepted worker policy for both harnesses
 
-Status: **last diagnostic round finished; revised acceptance policy for
-the user to choose**. The user approved option A from the earlier version
-of this brief, and asked to move to acceptance choices if it did not close
-parity. The [catalog spike](2026-10-09-harness-forge-catalog-spike-results.md)
-accepted a candidate configuration but did not prove complete tool absence.
-No further Codex isolation investigation is proposed by default.
+Status: **option 3 selected by the user on 2026-10-09**, with the gap
+documented in the relevant READMEs. The [last catalog spike](2026-10-09-harness-forge-catalog-spike-results.md)
+accepted a configuration but did not prove complete tool absence. The
+user chose to proceed with automated workers under weaker isolation.
+No additional isolation investigation is required before T3.
 
-The goal is still a useful pipeline in both Claude Code and Codex, using
-subscriptions only. Direct model APIs, extra API keys/credits and paid
-fallbacks remain excluded. Native implementation was already selected.
-The following options change the original worker or parity contract;
-none is silently treated as satisfying the approved design.
+## Decision
 
-## Choose the first release's acceptance policy
+Use `best-effort-v1`: Claude Code and Codex each run their own research,
+source-support and review workers, with separate sessions/processes,
+explicit role inputs and available restrictions. Both retain the same
+functional workflow. A shared Claude backend and replacing workers with
+manual review were not selected.
 
-| Option | Claude Code and Codex experience | What changes | Main cost |
-| --- | --- | --- | --- |
-| **1. Human-gated first release (recommended)** | Either CLI runs intake, selection, contract confirmation, build and deterministic checks. The user supplies and checks research evidence and completes the independent review. | Defer autonomous research, source-support and review workers in both harnesses. Human evidence replaces those worker verdicts under an explicit revised contract. | More user work; reduced automation. No new isolation investigation is needed to start the revised core. |
-| **2. Shared Claude workers** | Either CLI runs the main workflow; both delegate restricted roles to the same Claude CLI backend. | Parity means equal front-end features, not a complete standalone implementation in each harness. | Requires Claude access alongside Codex, couples limits/availability, and still requires Claude worker qualification before those flows can run. |
-| **3. Automated workers with weaker isolation** | Each CLI runs its own separate workers with the controls actually available. | Replace proven tool absence and enforced role isolation with declared restrictions, separate contexts, observed behavior and human acceptance of the remaining exposure. | Retains automation but trusts more of the harness. Unrelated file/context access and tool use cannot be claimed prevented. |
+Research is instructed to use the web for the supplied brief; source
+support to judge only the supplied claim/quote/context without tools;
+review to use frozen supplied files read-only, without network access.
+Configure these limits where supported and report residual capabilities.
+Complete tool absence and context/file/network isolation are not
+guaranteed. Use trusted projects and operator-approved inputs; this is
+not a boundary for secrets or hostile workloads. Human acceptance does
+not undo an earlier out-of-scope action.
 
-I recommend option 1 for the first release. It lets both front ends make
-progress without calling unproved worker restrictions verified or requiring
-another diagnostic before implementation. Automated workers can return
-later as a separately qualified capability. This is a scope reduction,
-not completion of the original automated thin slice.
+## What remains mandatory
 
-## What the recommended option would accept
+- Both research passes, exact-quote checks and a distinct source-support
+  verdict, followed by explicit user acceptance before building.
+- Fresh worker sessions without intentionally inherited builder/researcher
+  conversations; role-specific inputs, structured outputs and schema checks.
+  Automatic context discovery remains a disclosed limitation.
+- Deterministic checks, complete judged-rule coverage, hash-bound evidence,
+  current-session contract confirmation and the existing result precedence.
+- Functional live checks in both harnesses before claiming workflow support.
+  Missing capabilities, malformed or missing verdicts, failed source checks
+  and observed out-of-scope actions block affected work. Known unproven
+  containment alone does not block this accepted mode.
+- Recorded policy, controls, observations and unknowns in each run, with
+  `isolation_status: not-certified`. An artifact may be `verified` only
+  under its confirmed rules/goals; that never certifies worker containment.
+  A goal requiring enforced isolation still needs the existing conflict or
+  outside-control flow. No general security rule is silently downgraded.
+- Subscription-only model access, with no direct model API, extra API keys,
+  credits or paid fallback. The owner's Claude default is `claude-frank`;
+  the completed `claude-tp` diagnostic exception is not renewed.
 
-Both research passes still produce explicit artifacts: survey evidence
-before selection and detailed evidence before requirement acceptance.
-For this release, the user supplies or manually checks those artifacts,
-including the source, quotation, context and whether each claim follows.
-Record that human source-support decision separately from the later
-decision to accept a requirement; accepting an idea is not source proof.
+The exception covers Forge's three workers. It does not relax the
+security of catalog checkers, candidate runtime-test environments or
+outside-control boundaries. Do not silently widen permissions or switch
+accounts when a worker fails.
 
-Builds still consume accepted requirements only. Scripts still check
-schemas, references, applicability and recorded inputs. A human completes
-judged-rule review against the frozen files and pinned KB, with the same
-part IDs, hashes and re-review invalidation rules. Missing human evidence
-blocks the affected step. The main building agent cannot label its own
-unreviewed judgment as an independent reviewer result.
+## README ownership
 
-The report identifies who or what supplied each check, says `none run`
-where runtime tests were absent, and does not claim certified worker
-isolation. The revised design must define whether and when human review
-satisfies a required check before any overall `verified` result is allowed.
-The current result strings and precedence stay unchanged unless the user
-explicitly approves a separate change. Worker certification is deferred;
-runtime tests of generated skills remain a separate release requirement.
+Forge's [README](../../harness-forge/README.md#worker-isolation-limitations)
+contains the policy and per-harness evidence. The playground and KB
+READMEs disclose and link the gap. Generated results must also contain
+`Worker isolation limitations`, maintained by intake independently of
+its existing `Outside controls` section. Preserve unrelated README text.
+Reports retain the disclosure even alongside successful artifact results.
 
-No autonomous restricted worker is launched in this first release. This
-avoids relying on a human approval to make an unisolated worker safe.
-Ordinary use of either coding assistant still has that session's normal
-permissions; this proposal adds no claim of containment for the parent.
+## Implementation consequence
 
-## Conditions on the alternatives
+The [parent design](../specs/2026-10-06-harness-forge-design.md),
+[scope](../specs/2026-10-07-harness-forge-thin-slice.md) and
+[plan](2026-10-07-harness-forge-thin-slice.md) now encode this choice.
+The M1 isolation-policy stop is resolved. Continue with T3's packaging
+assessment and then the planned core; T11 establishes functional worker
+support under the revised policy. Earlier evidence and the M1 grader
+remain unchanged, including their failed/unproven classifications.
 
-For option 2, use subscription-authenticated `claude-frank` as the default
-backend. The completed `claude-tp` exception is not renewed. Claude's
-empty host startup inventory does not establish context, guest, login,
-research or review isolation. This option therefore retains that future
-qualification work, and a missing or rate-limited backend blocks worker
-steps; no paid or permissive fallback is automatic.
-
-For option 3, the accepted limitation must cover all three worker roles,
-not only source support. Restrict work to a stated trusted-use scope,
-record available tools and isolation evidence, require approval of findings
-before builds, and keep policy compliance distinct from proven containment.
-Passing benign canaries cannot establish prevention of a hostile worker.
-This option needs revised acceptance criteria and basic live functional
-checks even though it stops pursuing the original isolation guarantee.
-
-## What follows the choice
-
-Update the parent design, thin-slice scope and implementation plan around
-the selected policy, with explicit manual/automatic steps and release
-criteria. The user's choice approves that direction; no changed policy
-is applied before the choice. T3 remains stopped while this decision is
-pending. There is no need to re-decide subscription-only use or native
-execution.
-
-Packaging follows the revised feasibility and runtime needs. If a later
-automated option requires a container/VM, decide its ownership before
-making it a public prerequisite. Exact generated-output license wording
-still needs approval before publication, once drafted. Those decisions
-can wait; the immediate choice is **1, 2 or 3** above.
+Native execution remains selected. No mandatory container or VM is
+introduced. Packaging and exact generated-output license wording remain
+later decisions at their planned tasks; publication is not authorized by
+this worker-policy decision.

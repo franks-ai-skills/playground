@@ -96,6 +96,11 @@ numbered source excerpts. All 76 hashes and the 19 prior offline-init
 hashes were checked. Earlier evidence and the M1 grader are unchanged.
 
 The [decision brief](2026-10-09-harness-forge-decisions.md) now presents
-ways to move forward with both harnesses. It recommends a human-gated
-first release. No relaxation is selected yet, and T3 remains stopped
-until the user chooses the revised scope and its acceptance policy.
+ways to move forward with both harnesses. At this experiment's stop,
+no relaxation had been selected and T3 awaited a policy decision.
+
+**Subsequent decision, 2026-10-09:** the user selected option 3, automated
+workers with weaker isolation, and required README disclosure. The amended
+design adopts `best-effort-v1` and releases the isolation gate before T3.
+This changes acceptance policy, not the experiment's unproven result or
+any recorded evidence. Functional worker support still needs live checks.

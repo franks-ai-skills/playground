@@ -153,5 +153,6 @@ separates the parity choice from the remaining qualification work.
 
 Subsequent work: the user approved one final [Codex catalog spike](2026-10-09-harness-forge-catalog-spike-results.md).
 It accepted the configuration but did not close parity. The decision brief
-now presents the requested ways to proceed with both harnesses; the
-Claude observations and accounting in this report are unchanged.
+records the user's subsequent choice of option 3: automated workers with
+weaker isolation and README disclosure. The Claude observations and
+accounting in this report are unchanged.

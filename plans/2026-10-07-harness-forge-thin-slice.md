@@ -11,8 +11,9 @@ and a contract-bound report in clean Claude Code and Codex installations.
 **Architecture:** A Python core owns schemas, selection, checkers and
 report calculation; four skills own conversations and stage handoffs.
 The plugin bundles an immutable snapshot from a separate Harness KB
-repository. Harness adapters run restricted research and fresh review
-workers; fetched content and candidate files remain data.
+repository. Harness adapters run separate research, source-support and
+review workers under `best-effort-v1`; configured restrictions and their
+gaps are reported. Fetched content and candidate files remain data.
 
 **Tech Stack:** Python 3.11+, standard-library `unittest`, JSON Schema
 2020-12, YAML rules, Markdown skills and reports. PyYAML/jsonschema are
@@ -27,7 +28,10 @@ and [parent design](../specs/2026-10-06-harness-forge-design.md).
 Read both before execution. The user approved the design, scope and plan
 together on 2026-10-07 and chose native execution with a stop after M1.
 The scope's decision list distinguishes implementation choices from the
-parent requirements. Later milestones require a further execution handoff.
+parent requirements. On 2026-10-09 the user selected option 3, documented
+in the amended parent and scope: automated workers with weaker isolation,
+with the gap in relevant READMEs. This resolves the M1 policy stop; T3 is
+the next implementation task. Native execution remains selected.
 
 ## Global Constraints
 
@@ -60,6 +64,11 @@ parent requirements. Later milestones require a further execution handoff.
 - Preserve AGENTS.md's instruction-file and attribution conventions.
   Repository skills use `.agents/skills/` and relative
   `.claude/skills/` symlinks. Packaged plugin skills use `skills/`.
+- Apply the parent's `best-effort-v1` worker policy in both harnesses.
+  Unproven isolation is disclosed, not counted as a passing restriction
+  or a functional blocker by itself. Invalid output, missing capabilities,
+  actual scope violations and unmet isolation goals still block affected
+  work. Artifact `verified` never certifies worker containment.
 
 ## Review Focus
 
@@ -117,8 +126,8 @@ so updating the KB checkout does not silently change an existing run.
 
 M1 checkpoint on 2026-10-07: T1 is complete; T2's negative/inconclusive
 feasibility report is recorded in [M1 results](2026-10-07-harness-forge-m1-results.md).
-No launcher is declared production-supported. Stop before T3 as the user
-requested; the unchecked positive-certification items below remain open.
+No launcher was declared production-supported. The requested stop before
+T3 remained in effect while the unchecked certification items were reviewed.
 The [2026-10-08 diagnostic proposal](2026-10-08-harness-forge-worker-diagnostic.md)
 prioritizes an external boundary for both harnesses, retains per-role
 capability checks, and fixes the acceptance criteria and effort
@@ -126,8 +135,8 @@ limit. A no-model tool-removal gate comes first, followed by controls,
 bounded diagnostics, a configuration freeze and qualification without
 mid-run fixes. The user approved this diagnostic on 2026-10-08; its
 [no-model gate stopped unproven](2026-10-08-harness-forge-worker-diagnostic-results.md)
-without live calls. T3 remains stopped, and no mandatory outside-control
-dependency is approved.
+without live calls. At that checkpoint T3 was stopped; no mandatory
+outside-control dependency was approved.
 
 The later [offline-init follow-up](2026-10-08-harness-forge-offline-init-results.md)
 observed an empty advertised tool list for the tested `claude-tp` profile,
@@ -137,15 +146,17 @@ unqualified; Codex's complete tool-removal configuration is also unproven.
 Two blocked prompt-bearing launches are charged and both correction
 allowances are spent. No further experiment follows automatically from
 the 28 unused invocation slots. The [decision brief](2026-10-09-harness-forge-decisions.md)
-sets out the next choice; T3 remains stopped.
+records the subsequent policy choice.
 
 On 2026-10-09, the user approved one final offline catalog spike. Its
 [result](2026-10-09-harness-forge-catalog-spike-results.md) establishes
 configuration acceptance but not complete tool absence. The diagnostic
-round is finished with no model calls. At the user's request, the next
-step is choosing a revised acceptance policy for both harnesses from the
-decision brief, rather than automatically extending the investigation.
-This plan's worker requirements remain in force until that choice.
+round finished with no model calls. The user then selected automated
+workers with weaker isolation in both harnesses (option 3), and requested
+README disclosure. The strict isolation gate is superseded by the parent's
+`best-effort-v1` policy. T3 can proceed; T11 must still establish functional
+support. Earlier failed/unproven evidence and the grader are unchanged.
+There is no automatic extension of the diagnostic or mandatory container.
 
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
@@ -155,10 +166,11 @@ user chooses milestone approval gates in the execution handoff.
 
 T2 precedes the substantial core work and dependency pins. T3 is a
 bounded packaging assessment before core implementation; it does not
-delay the feasibility answer. Native workers and separate processes are
-candidates to test, not guarantees. If neither tested approach satisfies
-the restrictions on a claimed environment, report the evidence and
-present a concrete design choice; do not silently reduce harness parity.
+delay the feasibility answer. Use separate sessions/processes with explicit
+role inputs and recorded controls. T11 proves functional parity under the
+accepted policy; unavailable functions still block, while unproven
+containment remains visible. A stronger containment claim would require
+separate evidence rather than reinterpreting the M1 results.
 
 ## File responsibilities and contracts
 
@@ -171,7 +183,7 @@ present a concrete design choice; do not silently reduce harness parity.
 | FORGE | `pyproject.toml`, `requirements.lock`, `scripts/forge.py`, `src/harness_forge/` | Installable deterministic core and CLI |
 | FORGE | `src/harness_forge/{documents,models,selection,contracts,overrides,research,build_skill,verify,scope,report,runtime}.py` | Focused stage implementations and disposable skill tests |
 | FORGE | `src/harness_forge/checks/{runner,skills,links,outside}.py` | Pinned static check implementations |
-| FORGE | `src/harness_forge/adapters/{base,claude_code,codex}.py` | Restricted worker calls and tool/version evidence; no user-message authentication |
+| FORGE | `src/harness_forge/adapters/{base,claude_code,codex}.py` | Worker calls, configured limits and recorded gaps; no user-message authentication |
 | FORGE | `schemas/{decision,research,source-support,override,review,report,worker-request,worker-response}.schema.json` | Closed inter-stage formats |
 | FORGE | `skills/{harness-intake,harness-research,build-skill,harness-verify}/SKILL.md` | User-facing pipeline procedures |
 | FORGE | `skills/<name>/references/{contract,claude-code,codex}.md`, `agents/{harness-researcher,harness-reviewer}.md`, `adapters/codex/{researcher,reviewer}.toml` | Stage contracts and harness-specific worker instructions |
@@ -185,7 +197,7 @@ Shared types live in `models.py` as dataclasses. JSON Schema defines the
 wire format; its unknown keys are rejected. `Rule`, `Decision`,
 `Recommendation`, `ResearchBrief`, `Finding`, `AcceptedRevision`,
 `Contract`, `Confirmation`, `CheckResult`, `ReviewResponse`,
-`VerificationRun`, `RuntimeResult` and `PartResult` have the fields described below.
+`VerificationRun`, `WorkerEvidence`, `RuntimeResult` and `PartResult` have the fields described below.
 No implicit YAML booleans: answer values are enums or JSON booleans,
 and ambiguous scalars are rejected rather than silently converted.
 Create `tests/__init__.py` in the bootstrap so the named unittest modules
@@ -204,13 +216,21 @@ other rules; changing prose alone cannot change computed routing.
 
 `Contract` contains readable per-part goals/outcomes/mechanisms,
 outside controls, accepted requirement text and revision hash, override
-text/hashes, rendered `text` and a digest. `Confirmation` contains run id,
+text/hashes, worker-policy disclosure and evidence digest, rendered `text`
+and a digest. `Confirmation` contains run id,
 contract digest and confirmed part ids. `Finding` contains id, pass/part,
 claim, source, fetch date, quote, context and brief digest. `AcceptedRevision` contains
 accepted rule ids/content, brief digest and content digest.
 `VerificationRun` contains run id, decision/contract digest, applicable
 rules per part, frozen inputs/hashes, static results and judged requests.
 `finish_run` attaches validated runtime results to it for reporting.
+`WorkerEvidence` records `worker_policy: best-effort-v1`,
+`isolation_status: not-certified`, role/harness/version/model, launcher and
+configuration digest, configured controls, observed tools/behavior,
+unknowns and evidence references. Unknown inventory remains unknown.
+Worker responses, research records and verification reports reference this
+record; existing closed worker/report schemas validate it. A changed worker
+policy/configuration invalidates affected evidence and contract confirmation.
 `RuntimeResult` records run/part/case ids, prompt and expected behavior,
 observed activation evidence, `pass | fail | error | not-run`, reason,
 checked-file hashes, harness/tool versions and disposable environment.
@@ -274,6 +294,12 @@ feasibility probe, without runtime dependencies or a KB migration.
 
 ## Task 2: Spike worker isolation in both harnesses before core work
 
+**Historical acceptance criteria:** the checklist below records the
+original strict-isolation experiment. Keep its failed/unproven findings
+and unchecked certification items as evidence. The user superseded that
+release gate with `best-effort-v1` on 2026-10-09; do not mark these checks
+passed or rerun them as a prerequisite for T3.
+
 **Files:** FORGE `tools/live_checks.py`, `tests/test_live_checks.py`,
 `evals/canaries/{research,review}.yaml`,
 `evals/canaries/results/{worker-boundaries.md,evidence-index.json}`; candidate adapter modules
@@ -332,15 +358,16 @@ the complete restrictions; Claude process observations are promising but
 not a production support declaration. Full role payloads, managed/user
 configuration positive controls, authentication isolation, supplied-data
 reads and every discovery surface remain open certification checks.
-Those unchecked items are not waived; M1 stops with this evidence before
-core work or dependency pins.
+Those unchecked items did not pass. They are now disclosed limitations
+under the accepted policy rather than prerequisites for core work or pins.
 
-Follow-up proposal: explicitly select models and test both harnesses
+Historical follow-up proposal: explicitly select models and test both harnesses
 against the same role payload, supplied-data, discovery, authentication
 and external-boundary matrix. A container/VM is the primary experiment,
 while source-support tool absence and reviewer read-only tools remain
 required. Its ownership and installation impact must be settled before
-adopting it for production; see the bounded diagnostic proposal above.
+adopting it for production. Those diagnostics are finished; the later
+accepted policy does not mandate a container or another isolation round.
 
 ## Task 3: Choose distribution before pinning dependencies
 
@@ -401,6 +428,9 @@ of files use their actual bytes. Markdown records have YAML frontmatter.
   preserves the digest; changed text changes it; `yes` is not silently
   normalized to a boolean. Add `test_document_limits`: duplicate keys,
   excessive YAML nesting, files over 1 MiB and `../` paths are rejected.
+  Add worker-evidence fixtures: reject missing policy/configuration
+  bindings and fabricated certified status; retain unknown tool inventory
+  as unknown. Validate the same evidence record in worker/report schemas.
   Pin rejection with
   `with self.assertRaises(ValueError): load_document(bad_path, "rule")`.
 - [ ] Run `python -m unittest tests.test_documents tests.test_rule_schema -v`;
@@ -574,14 +604,19 @@ unambiguous text. The script checks its bindings, not its human origin.
   only as an untrusted hint. No unattended confirmation path.
   Store `.harness/decisions/<date>-<slug>.md`; intake alone maintains
   the result README's `Outside controls` section, including no-build
-  parts, preserving unrelated README content. Display override content
+  parts, and its `Worker isolation limitations` section. The latter names
+  `best-effort-v1`, shows the per-harness gaps and links the run's evidence;
+  it does not certify worker isolation even for a verified artifact.
+  Show that disclosure in the contract and bind its policy/evidence digest
+  to confirmation. Preserve unrelated README content. Display override content
   even before override handling exists; block rather than silently ignore
   a nonempty override list. `effective_rules` initially handles the pinned,
   no-override path. T12 adds validated adoption and full override precedence.
   Expose `prepare-contract` through T4's CLI. Loaded decisions or
   historical confirmations can render the question but cannot confirm it.
 - [ ] Re-run tests, including missing README entries, forged approvals,
-  changed contracts and all relay bindings. Confirm that record loading
+  stale/missing isolation disclosure, changed worker evidence, changed
+  contracts and all relay bindings. Confirm that record loading
   never constructs a live Confirmation. Override update and publication
   conversations defer to T12; their presence currently blocks the part.
 - [ ] Commit: `feat: confirm contracts and preserve intake decisions`.
@@ -616,8 +651,12 @@ Support verdicts name finding ids and include quote/context reasoning.
 - [ ] Implement brief-bound survey and deep passes. Findings include
   source URL, fetch date, verbatim quote, surrounding context and source
   role. Run exact quote matching against fetched text, then a distinct
-  fresh support worker before showing the finding. Keep quoted material
-  within source reproduction limits. Record search mode and limits.
+  fresh support worker before showing the finding. Treat quoted material
+  as data; configure no-tool support where possible and record residual
+  capability under `best-effort-v1`. An observed out-of-scope action fails
+  that worker run; an unproven tool-removal setting alone does not waive
+  or fail the semantic support check. Respect source reproduction limits.
+  Record search mode and limits.
   Survey proposes candidates/parts/answers; user confirmation makes
   them selection inputs. Deep research proposes catalog-only/judged
   `idea.<slug>.` rules; acceptance creates the hashed revision in
@@ -701,6 +740,10 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
   goal dependencies→`met by the verified build`. Optional precautionary
   controls remain in README without silently becoming goal dependencies.
   Missing/error/duplicate/unknown verdicts prevent `verified`.
+  Test that `best-effort-v1` plus unproven containment alone does not block
+  an otherwise complete artifact result; reports must still display
+  `not-certified`. An actual worker scope violation or a goal requiring
+  enforced isolation cannot be converted into success by this policy.
   Pin each row as `self.assertEqual(result.harness_result, harness_expected)`
   and `self.assertEqual(result.goal_result, goal_expected)`; pin shared-file
   invalidation as `self.assertEqual(affected_parts, {"A", "B"})`.
@@ -726,7 +769,10 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
   before workers run and hash them again before finalization; changes
   invalidate the result even when file content stayed the same.
   Report runtime cases and their outcomes separately from static/judged
-  checks. Offline M2 runs execute no runtime tests and say `none run`;
+  checks. Include WorkerEvidence and the isolation disclosure beside
+  overall results, including `verified`; test policy/configuration changes
+  invalidate relevant evidence. Offline M2 runs execute no runtime tests
+  and say `none run`;
   empty evidence never implies runtime behavior was checked.
   Persist the rendered Markdown at `.harness/reports/<slug>.md` using
   the bounded target-repository path, including the chosen review scope.
@@ -752,7 +798,8 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
 `skills/harness-verify/SKILL.md`; PLAY
 `examples/reproduction-checklist/{claude-code,codex}/`.
 
-**Interfaces:** Adopt T2's tested launcher as
+**Interfaces:** Implement a separate-session/process adapter informed by
+T2's evidence, without claiming T2 certified it, as
 `preflight(harness: str, role: str) -> dict` and
 `run_worker(request: dict, harness: str) -> dict`.
 Add `run_skill_runtime(run: VerificationRun, harness: str,
@@ -766,20 +813,33 @@ milestone proves the primary workflow, not the completed slice.
   orchestration assertions. Require both research passes, independent
   source support, explicit requirement acceptance, a skill build and a
   fresh reviewer. Pin `report["idea_revision"] == decision["idea_revision"]`
-  and check expected rule ids appear exactly once. An unavailable
-  restriction prevents worker launch, with
-  `self.assertFalse(worker_was_started)`.
+  and check expected rule ids appear exactly once. Missing functional
+  capability, absent current policy disclosure/confirmation or a request
+  requiring certified containment prevents launch, with
+  `self.assertFalse(worker_was_started)`. A disclosed extra tool or
+  unproven denial under the accepted policy alone does not prevent launch.
+  Record unknown inventory honestly; test that actual out-of-scope behavior
+  discards the worker output and blocks its stage, without silent retries
+  that broaden access. Validate independent support/reviewer identities
+  and role input digests; do not reuse the builder's conversation.
   Test runtime orchestration with a fake launcher: only frozen candidate
   files enter a disposable profile, supplied fixtures bind to the current
   run, and unavailable/timeout/error outcomes are recorded explicitly.
 - [ ] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
   with stub workers; expect the new integration assertions to fail.
-- [ ] Connect the active skills to the launcher chosen in T2. Give each
+- [ ] Connect the active skills to separate workers in each harness. Use
+  subscription-authenticated `claude-frank` by default for Claude;
+  `claude-tp` was a completed one-time diagnostic exception. Give each
   worker only its role's request and validate its output against T4's
   schemas; relay human confirmation under T7's acceptance rule. Return
-  to intake if research changes fit. Re-run T2's boundary canaries on
-  the production adapter. Missing capabilities return unavailable,
-  never a broad fallback. Override/drift and fix/review conversations
+  to intake if research changes fit. Record actual tool/configuration
+  observations and run representative behavior/scope canaries on the
+  adapter under `best-effort-v1`; report denials, failures and unknowns
+  separately. Passing benign canaries is not containment certification.
+  Missing functional capabilities return unavailable, never a broad
+  fallback. Keep the M1 grader/evidence unchanged; use a distinct live
+  functional assessment that does not relabel original failures as passes.
+  Override/drift and fix/review conversations
   defer to T12; unsupported inputs block rather than being ignored.
   Implement the runtime producer using separate disposable harness
   profiles, synthetic credentials and explicit network allowance. Load
@@ -914,7 +974,10 @@ are neither dependencies nor silently discovered as requirements.
   Both manifests point to the same `skills/`. Recheck marketplace
   compatibility in both CLIs; add a generated Codex marketplace file
   only if the shared entry cannot represent both formats, documenting
-  evidence. Document Python dependency bootstrap, restricted workers,
+  evidence. Document Python dependency bootstrap, the `best-effort-v1`
+  worker policy and per-harness gaps in Forge's README, with links from
+  the KB/playground READMEs. Require the generated README disclosure too.
+  Document configured restrictions separately from unproved ones,
   unavailable capabilities, no-user reports, KB version and generated
   output permission. Runtime setup never modifies personal config
   implicitly. Run `claude plugin validate .` and each CLI's installation
@@ -989,7 +1052,9 @@ or raw private harness profiles.
   `python -m unittest discover -s tests -v` in FORGE and
   `python tools/validate.py` in KB. Skipped required live cases are
   completion blockers; unsupported optional modes retain explicit reasons
-  and never count as passing evidence. Record any capability needing a design change
+  and never count as passing evidence. Known worker-isolation gaps remain
+  disclosed under the accepted policy; this does not waive required
+  functional cases. Record any further capability needing a design change
   and return it for a concrete decision rather than weakening parity.
 - [ ] Commit: `test: record portable skills pipeline reference runs`.
 
@@ -1000,7 +1065,9 @@ current-session contract flow, all five outcomes, reproducible selection,
 supported research, portable skill build, static/judged verification,
 generated-skill runtime evidence, conflict rerouting and scoped review
 have the evidence above in both
-harnesses. Platform controls remain named dependencies, never verified
+harnesses under `best-effort-v1`, with matching README/report disclosures.
+Functional parity does not certify worker containment. Platform controls
+remain named dependencies, never verified
 by the forge. Automated snapshot sync and the other builders remain
 later sub-projects.
 
