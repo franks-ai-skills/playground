@@ -24,8 +24,10 @@ harness subscriptions; no additional API tokens/keys, API credits or
 paid fallback (user-confirmed 2026-10-08).
 
 **Account boundary (clarified 2026-10-09):** public adapters invoke standard
-`claude`/`codex` with an existing subscription login at vendor-default
-locations. The owner's profile and wrapper choices apply only to temporary
+`claude`/`codex` with the user's existing login at vendor-default
+locations. Before the first worker launch, the adapter reads the login
+type; for an API-key or unknown login it warns of possible extra cost and
+asks continue/stop (parent design, "Account and development boundary"). The owner's profile and wrapper choices apply only to temporary
 development on this machine; see the [local development note](harness-forge-local-development.md).
 All subsequent agents must preserve this boundary. Do not require custom
 profiles, manage logins, copy credentials or modify saved settings.
@@ -833,8 +835,16 @@ milestone proves the primary workflow, not the completed slice.
   account behavior: standard executable names and vendor-default account
   resolution without owner-specific paths or aliases. Test that local
   development overrides never become defaults or packaged requirements,
-  missing subscription authentication returns unavailable, no login/logout
-  or account fallback is attempted, and saved settings remain unchanged.
+  missing authentication returns unavailable, no login/logout or account
+  fallback is attempted, and saved settings remain unchanged. Test that a
+  set `CLAUDE_CONFIG_DIR`/`CODEX_HOME` reaches the worker and the
+  login-type check unchanged, and that an unset one stays unset. Test the
+  login-type check with stubbed `claude auth status`/`codex login status`
+  output: a subscription login launches without a question; an API-key or
+  unparseable result asks continue/stop before any worker starts, `Stop`
+  leaves `worker_was_started` false, the answer lands in WorkerEvidence,
+  and a run without a user stops. Record Claude's `apiKeySource` from the
+  init event as well.
   Check role-specific tool/web/filesystem settings against the matrix below;
   reject a known failure to apply one. Test mandatory
   baseline preparation: a temporary cwd outside the target repository with
@@ -854,16 +864,20 @@ milestone proves the primary workflow, not the completed slice.
   with stub workers; expect the new integration assertions to fail.
 - [ ] Connect the active skills to independent CLI worker processes in each
   harness; never fall back to native subagents. Use
-  standard subscription-authenticated `claude` and `codex` executables
-  with vendor-default account resolution. Personal setup belongs only to
-  the local development launch configuration, never adapter defaults. Give
+  standard `claude` and `codex` executables with the user's existing login,
+  vendor account resolution (default location or a user-set
+  `CLAUDE_CONFIG_DIR`/`CODEX_HOME`) and the login-type check above.
+  Personal setup belongs only to the local development note, never adapter
+  defaults. Give
   each
   worker only its role's request and validate its output against T4's
   schemas; relay human confirmation under T7's acceptance rule. Return
   to intake if research changes fit. Pass only necessary OS environment
   names (HOME, PATH, USER, LOGNAME, LANG, TMPDIR, plus documented platform
-  needs) for the existing vendor login. Any account-location override used
-  on this machine is an explicit development-only setting. Do not forward
+  needs) for the existing vendor login. Pass `CLAUDE_CONFIG_DIR` and
+  `CODEX_HOME` through unchanged when set; never set them. Run the
+  login-type check with the same environment as the workers, so it checks
+  the profile the workers will use. Do not forward
   arbitrary parent variables, API credentials or provider endpoint overrides.
   Disable optional hooks/plugins/settings discovery. Codex must include
   `apps._default.enabled=false` and disable the apps feature and any
@@ -1063,6 +1077,43 @@ are neither dependencies nor silently discovered as requirements.
   procedure in an isolated test installation; save the exact working
   commands and account-access limitations. Use the existing subscription
   for live calls without copying credentials or silently creating logins.
+- [ ] **Checkpoint before publication: remove personal configuration.**
+  Re-check every file that will be published in FORGE and KB, including
+  evidence reports, evidence indexes and contributor instructions, for the
+  owner's personal configuration: profile and wrapper names, account
+  directories, home-directory paths, email addresses and pointers to the
+  local development note. Replace each with neutral wording, such as
+  "a tested Team-plan profile" or "the user's account location". Where a
+  rule keeps evidence unchanged, do not edit it silently: present the
+  conflict and let the owner choose between neutral wording, keeping the
+  evidence unpublished, or publishing it as is. Confirm that ignored raw
+  evidence under `evals/canaries/results/private/` stays unpublished.
+  Findings on 2026-10-09, as examples:
+  - `evals/canaries/results/diagnostic-2026-10-08.md` and
+    `offline-init-2026-10-08.md` name `claude-frank`, `claude-tp` and
+    "a separate personal login profile".
+  - `diagnostic-2026-10-08-index.json`,
+    `diagnostic-2026-10-08-resumed-index.json` and
+    `offline-init-2026-10-08-index.json` name both profiles as launchers
+    (`"default_launcher_after_diagnostic": "claude-frank"`) and in
+    artifact file names such as `claude-tp-guarded.zsh`.
+  - FORGE `AGENTS.md` points contributors to
+    `../playground/plans/harness-forge-local-development.md`, the owner's
+    local setup note.
+  - The ignored raw evidence holds copies of the owner's `.zshrc` account
+    functions (`claude-tp-gate.zsh`, `claude-tp-guarded.zsh`) and a
+    startup event stream with the work account's email address.
+  - The README row that named both profiles was already made neutral on
+    2026-10-09; recheck it anyway.
+
+  Also check the Git history that will be published: list every author
+  and committer email per repository (`git log --format='%ae%n%ce' | sort
+  | uniq -c`). The owner's work email must not appear. Before the first
+  push of FORGE or KB, rewrite affected commits to the owner's chosen
+  address (for example with `git filter-repo --mailmap`), and check that
+  the global `user.email` will not reintroduce it. For playground, whose
+  history is already public, present the affected commits and let the
+  owner decide whether to rewrite and force-push.
 - [ ] Publish destination repositories when execution authorizes it,
   and the exact license permission has been approved; then remove only
   the copied knowledge-base files from playground. Keep `plans/` and

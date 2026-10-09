@@ -39,12 +39,14 @@ coding-agent harnesses: Claude Code, Codex and OpenCode.
 ## Harness Forge account boundary
 
 For this and every subsequent agent: the public product assumes standard
-`claude` and `codex` CLIs, vendor-default account locations and an existing
-subscription login. Never make the owner's aliases, profile paths, plugins
+`claude` and `codex` CLIs, vendor-default account locations and the user's
+existing login. Forge asks before continuing with an API-key or unknown
+login type, because it can cost extra. Never make the owner's aliases, profile paths, plugins
 or shell configuration a product default, dependency or installation step.
 Keep temporary worker restrictions; do not change saved user configuration
-or initiate login, logout or account switching. Subscription usage only;
-no direct model API, additional API keys/credits or paid fallback.
+or initiate login, logout or account switching. The owner's development
+runs are subscription-only: no direct model API, additional API
+keys/credits or paid fallback.
 
 The owner's configuration is a temporary exception for development on
 this machine only. Read [the local development note](plans/harness-forge-local-development.md)

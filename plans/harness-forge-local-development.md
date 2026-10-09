@@ -7,12 +7,13 @@ the distinction below when implementing or testing Forge.
 ## Public product
 
 Use the standard `claude` and `codex` executables with the user's existing
-subscription login and vendor-default account locations. No personal
-alias, shell function, profile path or plugin is a product requirement.
-Do not require a separate login/profile, copy credentials, initiate login
-or logout, switch accounts, or edit saved user configuration. A missing
-usable subscription login makes the run unavailable; there is no API-key,
-API-credit or alternate-account fallback.
+login and vendor-default account locations. No personal alias, shell
+function, profile path or plugin is a product requirement. Do not require
+a separate login/profile, copy credentials, initiate login or logout,
+switch accounts, or edit saved user configuration. A missing login makes
+the run unavailable. An API-key or unknown login type gets a cost warning
+and a continue/stop question; Forge never adds an API key or falls back
+to another account. Development on this machine stays subscription-only.
 
 Apply Forge's temporary per-worker tool, sandbox and discovery restrictions
 without changing that account assumption. Record remaining gaps under
@@ -22,13 +23,18 @@ not a prerequisite or proof of credential isolation.
 
 ## This machine only
 
-The owner's selected Claude account is the one associated with
-`claude-frank` and `~/.claude-frank`. The `.zshrc` function can change
-login state, so do not invoke it unguarded from automation. Use only a
-local development launch configuration that selects the existing account
-without login/logout side effects. Do not source the whole `.zshrc`,
-copy the profile or export this machine's setup into product defaults.
-If the selected login is unusable, report that instead of switching it.
+Local Forge development uses the `claude-frank` account. Start every
+local Forge run, test or probe with `CLAUDE_CONFIG_DIR=$HOME/.claude-frank`
+set; Forge passes the variable through to its workers and its login-type
+check. Never use or change `~/.claude`: the owner switches that default
+login as needed, normally to the `claude-tp` work subscription.
+
+Before a local run, check read-only that the profile is logged in with
+the expected account: `CLAUDE_CONFIG_DIR=$HOME/.claude-frank claude auth
+status`. If it is not, stop and report it. Do not run the `.zshrc`
+function `claude-frank` from automation: it can log out or start a login
+when the account differs. Do not source `.zshrc`, copy the profile or put
+this setup into product defaults, examples or fixtures.
 
 `claude-tp` was authorized only for the completed diagnostic. That
 exception is not renewed. Keep the existing Codex subscription account;
