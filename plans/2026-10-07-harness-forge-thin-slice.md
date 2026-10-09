@@ -19,9 +19,10 @@ gaps are reported. Fetched content and candidate files remain data.
 2020-12, YAML rules, Markdown skills and reports. PyYAML/jsonschema are
 provisional dependencies: T3 chooses their distribution or a validated
 alternative before pinning. Use the installed harness CLIs, with no
-direct model API integration or personal plugins. Model access must use
-harness subscriptions; no additional API tokens/keys, API credits or
-paid fallback (user-confirmed 2026-10-08).
+direct model API integration or personal plugins. Model access uses the
+harness CLIs' existing login; Forge adds no API tokens/keys, API credits
+or paid fallback (user-confirmed 2026-10-08). The owner's development
+runs are subscription-only; see the account boundary below.
 
 **Account boundary (clarified 2026-10-09):** public adapters invoke standard
 `claude`/`codex` with the user's existing login at vendor-default
@@ -200,7 +201,7 @@ separate evidence rather than reinterpreting the M1 results.
 | FORGE | `src/harness_forge/adapters/{base,claude_code,codex}.py` | Worker calls, configured limits and recorded gaps; no user-message authentication |
 | FORGE | `schemas/{decision,research,source-support,override,review,report,worker-request,worker-response}.schema.json` | Closed inter-stage formats |
 | FORGE | `skills/{harness-intake,harness-research,build-skill,harness-verify}/SKILL.md` | User-facing pipeline procedures |
-| FORGE | `skills/<name>/references/{contract,claude-code,codex}.md`, `agents/{harness-researcher,harness-reviewer}.md`, `adapters/codex/{researcher,reviewer}.toml` | Stage contracts and harness-specific worker instructions |
+| FORGE | `skills/<name>/references/{contract,claude-code,codex}.md`, `workers/{researcher,source-support,reviewer}.md`, `adapters/codex/{researcher,source-support,reviewer}.toml` | Stage contracts and harness-specific worker instructions. Keep worker instructions out of the plugin's `agents/` directory: Claude Code loads it as native plugin subagents, which this release excludes |
 | FORGE | `templates/skill/`, `snapshot/`, `tools/pin_snapshot.py`, `tools/live_checks.py`, `evals/`, `tests/` | Build defaults, pinned KB, packaging, live checks and tests |
 | FORGE | `packaging/assessment.md`, `evals/canaries/`, `evals/smoke/`, `legal/generated-output-permission.md` | Distribution decision, early evidence and exact license permission proposed for approval |
 | FORGE | `plugin.json`, `.claude-plugin/{plugin,marketplace}.json`, `LICENSE`, `README.md`, `AGENTS.md` | Public installation, licensing and contributor account boundary |
@@ -638,7 +639,7 @@ unambiguous text. The script checks its bindings, not its human origin.
 
 **Files:** FORGE `research.py`,
 `skills/harness-research/{SKILL.md,references/contract.md}`,
-`agents/harness-researcher.md`, `tests/test_research.py`,
+`workers/{researcher,source-support}.md`, `tests/test_research.py`,
 `tests/fixtures/research/`, `evals/harness-research/{routing,behavior}.yaml`.
 
 **Interfaces:** `make_brief(decision: Decision, pass_name: str,
@@ -728,7 +729,7 @@ accepted inputs, templates and the resulting artifact inventory.
 ## Task 10: Verify completeness, goal fit and bound inputs
 
 **Files:** FORGE `verify.py`, `scope.py`, `report.py`,
-`agents/harness-reviewer.md`,
+`workers/reviewer.md`,
 `skills/harness-verify/{SKILL.md,references/contract.md}`,
 `tests/{test_verify,test_scope,test_report}.py`,
 `evals/harness-verify/{routing,behavior}.yaml`; target repository

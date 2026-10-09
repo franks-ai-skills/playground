@@ -6,9 +6,10 @@ design governs conflicts; revised after review on 2026-10-07. The design,
 this scope and the [implementation plan](../plans/2026-10-07-harness-forge-thin-slice.md)
 were approved together by the user on 2026-10-07. Execute natively and
 stop after M1 for feasibility review; the parent design governs conflicts.
-The user's 2026-10-08 subscription-only constraint also applies: no
-direct model API integration, additional API tokens/keys, API credits
-or paid fallback.
+The user's 2026-10-08 model-access constraint also applies: no direct
+model API integration, additional API tokens/keys, API credits or paid
+fallback. The owner's development runs are subscription-only; public
+users keep their existing login, as described below.
 On 2026-10-09 the user selected option 3: automated workers in both
 harnesses under the parent's disclosed `best-effort-v1` policy. The M1
 isolation decision is settled; complete containment is no longer a
