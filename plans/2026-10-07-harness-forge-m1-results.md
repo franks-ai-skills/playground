@@ -1,5 +1,10 @@
 # Harness Forge M1 checkpoint
 
+> **Current status (2026-10-09):** the stop below is resolved. The user
+> selected `best-effort-v1`; T3 is the next task. See the
+> [decision](2026-10-09-harness-forge-decisions.md). The report below is
+> kept as recorded.
+
 The user approved the design, scope and plan on 2026-10-07, chose native
 execution and requested a stop after M1. The bootstrap exists and the
 worker feasibility spike has reached that checkpoint. Do not begin T3.

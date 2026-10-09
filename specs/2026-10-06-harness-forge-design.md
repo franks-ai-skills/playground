@@ -49,12 +49,12 @@ Success criteria:
 
 | Decision | Chosen | Rejected, and why |
 | --- | --- | --- |
-| Structure | A pipeline of focused skills plus a reviewer subagent | One large skill: body too long for the research's skill-size guidance, the builder would review its own work, and one description would have to trigger for too many tasks. A Claude Code workflow script: Codex has no equivalent, which breaks harness parity |
+| Structure | A pipeline of focused skills plus fresh-context worker processes for research, source support and review | One large skill: body too long for the research's skill-size guidance, the builder would review its own work, and one description would have to trigger for too many tasks. A Claude Code workflow script: Codex has no equivalent, which breaks harness parity |
 | Harnesses | Claude Code and Codex equally | Claude Code first: gives up the parity the knowledge base itself keeps |
 | Model access | Harness CLIs with the user's existing login. The owner's development is subscription-only, user-confirmed on 2026-10-08. Forge asks before continuing with an API-key login, which may cost extra (2026-10-09) | Direct model API adapters, additional API tokens/keys, API credits and paid fallback: outside the user's subscription-only constraint, even if promotional credits could cover usage |
 | Worker isolation | Automated workers in each harness under the disclosed `best-effort-v1` policy, user-approved on 2026-10-09 | Blocking all implementation until complete tool absence and containment are proved; shared Claude backend or manual replacement of workers were not selected |
 | Knowledge-base home | Its own repo; the plugin bundles a pinned snapshot | Same repo as the tooling: couples research and tooling releases. Fetching pages at run time: non-deterministic, needs network, and brings outside content into context, which the security guide warns against |
-| Verification | Scripts first, then a fresh-context reviewer subagent on a fixed rule list | Model-only review: not deterministic |
+| Verification | Scripts first, then a fresh-context review worker on a fixed rule list | Model-only review: not deterministic |
 | Granularity | Deciding questions per part of an idea | One round for the whole idea: fails when parts need different mechanisms |
 | Build order | A thin slice for the skills concept, end to end in both harnesses, before extracting the other concepts | Extracting every rule first: the schema and contracts would only be tested after hundreds of rules depend on them |
 | Overrides | Choosing another mechanism only warns; a chosen mechanism that cannot meet a stated goal stays an error | Downgrading every fit failure to a warning: "verified" would hide unmet goals |
@@ -197,7 +197,7 @@ AGPL-3.0. `harness-forge` adds the output exception from "Decisions".
 | Repo | Contents |
 | --- | --- |
 | `agent-harness-kb` | The current `playground/docs/`, plus `rules/<concept>.yaml`, `rules/selection.yaml`, the check scripts' fixtures, and tagged releases with a changelog |
-| `harness-forge` | The plugin: skills, the reviewer subagent, check scripts, a pinned knowledge-base snapshot, and `.claude-plugin/marketplace.json`, which Claude Code and Codex both read |
+| `harness-forge` | The plugin: skills, worker instructions and adapters, check scripts, a pinned knowledge-base snapshot, and `.claude-plugin/marketplace.json`, which Claude Code and Codex both read |
 | `playground` | Scratch and test area; runs the reference ideas end to end |
 
 ## Flow
@@ -222,7 +222,7 @@ idea → harness-intake
                               ▼
        harness-verify
          1. scripts: knowledge-base and idea rules with check: script, links between parts
-         2. reviewer subagent, fresh context: judged rules and goal fit
+         2. review worker, fresh context: judged rules and goal fit
          3. runtime tests where cheap
          4. report: .harness/reports/<slug>.md
 ```
@@ -474,8 +474,8 @@ The user's own description, and a summary of the trade-offs.
 
 ## harness-research
 
-A skill that researches the user's idea, not the harness. It runs in a
-subagent and can also be started on its own; a later intake then
+A skill that researches the user's idea, not the harness. Its research
+runs in a separate worker process and the skill can also be started on its own; a later intake then
 reuses the existing research file.
 
 **Survey pass**, after the goal, the user's picture, targets and
@@ -533,7 +533,7 @@ snapshot.
 
 **Safety.** Fetched pages are untrusted content.
 
-- The research subagent receives only an approved research brief: the
+- The research worker receives only an approved research brief: the
   goal, the user's picture, the parts and their accepted answers. The
   adapter limits access to other files where possible, because search
   arguments and fetched URLs can carry data out (OpenAI's deep-research
@@ -546,7 +546,7 @@ snapshot.
   subagents inherit the parent's sandbox and live runtime overrides
   even when the agent file says otherwise
   (`docs/vendors/codex/subagents.md`), so an agent file alone does not
-  enforce them.
+  enforce them; this release's workers are independent processes.
 - It returns structured findings, each with a source. Fetched text
   reaches builders only through findings the user confirmed, never as
   instructions.
@@ -647,7 +647,7 @@ user-invoked skills, so `build-skill` builds them too. Each one:
    exist (`claude plugin validate`, hook JSON schemas, size limits).
    Then check the links between parts: a named subagent, skill or hook
    event exists and its name matches. No model is involved.
-2. **Judged checks.** A reviewer subagent starts with a fresh context
+2. **Judged checks.** A review worker starts with a fresh context
    and receives only the built files, the decision record and the
    applicable `judged` rules, not the conversation. It returns one
    structured verdict per rule id: pass, fail or not applicable, each
@@ -827,7 +827,7 @@ to harness-forge itself:
 
 - **Rules:** every script check has good and bad fixtures in
   `agent-harness-kb` that show it fires on the bad case only.
-- **Research:** the subagent's output is validated against its schema,
+- **Research:** the research worker's output is validated against its schema,
   and every cited domain is checked against `docs/sources.md`. Fixture
   cases with stubbed fetches cover: a trusted source whose text does
   not contain the quote; a real quote that does not support its
@@ -854,7 +854,7 @@ to harness-forge itself:
   code-review example follows once the hook, subagent and automation
   builders exist. Their
   decision records and reports are kept as reference results.
-- **Self-check:** harness-forge's own skills and subagent pass
+- **Self-check:** harness-forge's own skills and worker instructions pass
   `harness-verify`.
 
 ## Sub-projects

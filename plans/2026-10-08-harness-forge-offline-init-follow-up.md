@@ -1,5 +1,8 @@
 # Offline startup-inventory follow-up
 
+> **Current status (2026-10-09):** the T3 stop below is resolved by the
+> [worker-policy decision](2026-10-09-harness-forge-decisions.md).
+
 Status: **authorized on 2026-10-08, subject to no extra cost**. The user
 requires subscription usage only: no API keys/tokens, API credits or paid
 fallback. This authorizes the two network-blocked startup probes below
