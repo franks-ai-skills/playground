@@ -650,7 +650,7 @@ support: dict) -> Finding | None`;
 brief_digest: str) -> AcceptedRevision`.
 Support verdicts name finding ids and include quote/context reasoning.
 
-- [ ] Test stubbed fetches: trusted domain but absent quote is dropped;
+- [x] Test stubbed fetches: trusted domain but absent quote is dropped;
   a real Linux-only quote with an all-platform claim is dropped by the
   independent support verdict; X/mirrors are dropped; an inaccessible
   source is dropped. Reject duplicate/unknown support ids. Assert page
@@ -660,9 +660,9 @@ Support verdicts name finding ids and include quote/context reasoning.
   Pin unsupported quotes as
   `self.assertIsNone(validate_finding(finding, text, unsupported_verdict))`
   and acceptance as `self.assertEqual(revision.rule_ids, accepted_ids)`.
-- [ ] Run `python -m unittest tests.test_research -v`; expect missing
+- [x] Run `python -m unittest tests.test_research -v`; expect missing
   source filtering, quote checks and acceptance transitions.
-- [ ] Implement brief-bound survey and deep passes. Findings include
+- [x] Implement brief-bound survey and deep passes. Findings include
   source URL, fetch date, verbatim quote, surrounding context and source
   role. Run exact quote matching against fetched text, then a distinct
   fresh support worker before showing the finding. Treat quoted material
@@ -679,12 +679,12 @@ Support verdicts name finding ids and include quote/context reasoning.
   On mechanism/goal incompatibility return to intake before building.
   Expose `research-check` through T4's CLI for deterministic validation;
   requirement acceptance remains the live agent's conversation.
-- [ ] Test security/compatibility drift blocks affected parts; ordinary
+- [x] Test security/compatibility drift blocks affected parts; ordinary
   drift keeps the pinned rule. Source-support failure prevents adoption.
   T12 adds the user decision, override and issue/comment conversations;
   until then unresolved security/compatibility drift stays blocked.
   Re-run tests with simulated drift and an edited accepted requirement.
-- [ ] Commit: `feat: research and accept sourced idea requirements`.
+- [x] Commit: `feat: research and accept sourced idea requirements`.
 
 ## Task 9: Build a portable skill from accepted inputs
 
