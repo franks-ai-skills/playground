@@ -1,80 +1,89 @@
-# Decisions after the offline-init review
+# Moving forward with both harnesses
 
-Status: **options for the user; none selected**. This brief does not
-amend the approved design or authorize another experiment. It accompanies
-the [corrected result](2026-10-08-harness-forge-offline-init-results.md).
+Status: **last diagnostic round finished; revised acceptance policy for
+the user to choose**. The user approved option A from the earlier version
+of this brief, and asked to move to acceptance choices if it did not close
+parity. The [catalog spike](2026-10-09-harness-forge-catalog-spike-results.md)
+accepted a candidate configuration but did not prove complete tool absence.
+No further Codex isolation investigation is proposed by default.
 
-## What is settled
+The goal is still a useful pipeline in both Claude Code and Codex, using
+subscriptions only. Direct model APIs, extra API keys/credits and paid
+fallbacks remain excluded. Native implementation was already selected.
+The following options change the original worker or parity contract;
+none is silently treated as satisfying the approved design.
 
-The intended outcome remains a skill pipeline with evidence-backed worker
-restrictions and equal Claude Code/Codex support. The user approved the
-design, scope and plan, selected native execution and a stop after M1,
-and requires subscription-only use. Direct model APIs, extra API keys or
-credits, and paid fallbacks are excluded.
+## Choose the first release's acceptance policy
 
-Claude's tested `claude-tp` profile advertised an empty tool list. That
-is a host startup observation, not a completed tool-free worker: context,
-automatic discovery, external DNS, authentication isolation and the guest
-environment remain unqualified. It does not transfer to the default
-`claude-frank` profile. The temporary Team-account exception is spent.
-Codex has no established configuration meeting the full tool-free rule;
-the evidence does not prove that every possible configuration fails.
+| Option | Claude Code and Codex experience | What changes | Main cost |
+| --- | --- | --- | --- |
+| **1. Human-gated first release (recommended)** | Either CLI runs intake, selection, contract confirmation, build and deterministic checks. The user supplies and checks research evidence and completes the independent review. | Defer autonomous research, source-support and review workers in both harnesses. Human evidence replaces those worker verdicts under an explicit revised contract. | More user work; reduced automation. No new isolation investigation is needed to start the revised core. |
+| **2. Shared Claude workers** | Either CLI runs the main workflow; both delegate restricted roles to the same Claude CLI backend. | Parity means equal front-end features, not a complete standalone implementation in each harness. | Requires Claude access alongside Codex, couples limits/availability, and still requires Claude worker qualification before those flows can run. |
+| **3. Automated workers with weaker isolation** | Each CLI runs its own separate workers with the controls actually available. | Replace proven tool absence and enforced role isolation with declared restrictions, separate contexts, observed behavior and human acceptance of the remaining exposure. | Retains automation but trusts more of the harness. Unrelated file/context access and tool use cannot be claimed prevented. |
 
-Both configuration corrections are spent. Two prompt-bearing launches
-were charged, leaving 28 of 30 invocation slots. Those slots do not
-authorize a new candidate revision. T3 remains stopped.
+I recommend option 1 for the first release. It lets both front ends make
+progress without calling unproved worker restrictions verified or requiring
+another diagnostic before implementation. Automated workers can return
+later as a separately qualified capability. This is a scope reduction,
+not completion of the original automated thin slice.
 
-## Decide now: the next direction
+## What the recommended option would accept
 
-The policy choice is whether to keep parity. The execution choice is
-whether to spend any more effort investigating it. These are distinct:
+Both research passes still produce explicit artifacts: survey evidence
+before selection and detailed evidence before requirement acceptance.
+For this release, the user supplies or manually checks those artifacts,
+including the source, quotation, context and whether each claim follows.
+Record that human source-support decision separately from the later
+decision to accept a requirement; accepting an idea is not source proof.
 
-| Option | What it preserves or changes | Consequence |
-| --- | --- | --- |
-| **A. Keep parity; approve one targeted Codex spike (recommended)** | Preserves the design and subscription-only constraint. | At most 20 active minutes, zero model calls, for the specific lead below. No promise of a working launcher. |
-| **B. Keep parity; park the current launcher** | Preserves all requirements; marks the launcher unavailable. | No further diagnostic work now. T3 stays stopped until a concrete new lead and handoff. |
-| **C. Accept a Codex parity gap** | Requires a design/scope/plan amendment defining the unsupported workflow. | Codex research findings without independent source support cannot proceed to acceptance or builds. Claude still needs qualification; this choice does not certify it or automatically release T3. |
+Builds still consume accepted requirements only. Scripts still check
+schemas, references, applicability and recorded inputs. A human completes
+judged-rule review against the frozen files and pinned KB, with the same
+part IDs, hashes and re-review invalidation rules. Missing human evidence
+blocks the affected step. The main building agent cannot label its own
+unreviewed judgment as an independent reviewer result.
 
-I recommend A because the gap would disable a central workflow, while
-there is a specific configuration lead that has not been qualified.
-If avoiding further investigation matters more, B preserves the agreed
-product requirements without spending more diagnostic effort.
+The report identifies who or what supplied each check, says `none run`
+where runtime tests were absent, and does not claim certified worker
+isolation. The revised design must define whether and when human review
+satisfies a required check before any overall `verified` result is allowed.
+The current result strings and precedence stay unchanged unless the user
+explicitly approves a separate change. Worker certification is deferred;
+runtime tests of generated skills remain a separate release requirement.
 
-### Proposed spike for option A
+No autonomous restricted worker is launched in this first release. This
+avoids relying on a human approval to make an unisolated worker safe.
+Ordinary use of either coding assistant still has that session's normal
+permissions; this proposal adds no claim of containment for the parent.
 
-Question: can the public `model_catalog_json` configuration, combined
-with feature controls, remove the model-driven tools that remain in the
-pinned Codex build? Inspect the existing matching source/schema and test
-strict configuration acceptance offline, capped at 20 active minutes and
-zero model calls; no custom binary, container, account changes or API
-access. Report which registration paths are eliminated or still
-unproven, then stop; parser acceptance alone is not tool-absence proof,
-and no live qualification is included or automatically authorized.
+## Conditions on the alternatives
 
-The concrete lead is the pinned source at commit
-`d27764b82f7118f674371e6d6e76271d9d606edb`:
-`codex-rs/core/src/config/mod.rs` loads `model_catalog_json`, while
-`codex-rs/core/src/tools/spec_plan.rs` registers tools from
-`apply_patch_tool_type` and `experimental_supported_tools`. The earlier
-[diagnostic](2026-10-08-harness-forge-worker-diagnostic-results.md)
-records this source's build correspondence. This is a hypothesis about
-configuration, not an established public tool allowlist or a support
-declaration. No new configuration trial was run during this review.
+For option 2, use subscription-authenticated `claude-frank` as the default
+backend. The completed `claude-tp` exception is not renewed. Claude's
+empty host startup inventory does not establish context, guest, login,
+research or review isolation. This option therefore retains that future
+qualification work, and a missing or rate-limited backend blocks worker
+steps; no paid or permissive fallback is automatic.
 
-## Decisions that come later
+For option 3, the accepted limitation must cover all three worker roles,
+not only source support. Restrict work to a stated trusted-use scope,
+record available tools and isolation evidence, require approval of findings
+before builds, and keep policy compliance distinct from proven containment.
+Passing benign canaries cannot establish prevention of a hostile worker.
+This option needs revised acceptance criteria and basic live functional
+checks even though it stops pursuing the original isolation guarantee.
 
-- **Claude qualification scope and account:** a bounded proposal must
-  cover the default `claude-frank` profile, advertised skills/plugins and
-  automatic discovery, resolver/egress limits, guest and authentication
-  isolation, and all three worker roles. Live work must use subscriptions
-  and an explicit budget. The old `claude-tp` observation is not enough.
-- **External runtime ownership:** if isolation needs a container or VM,
-  decide whether users provide it or Forge provisions it before making
-  it a public requirement. That result informs T3's packaging choice.
-- **Distribution and publication:** select packaging after feasibility
-  is settled, and approve the exact generated-output license exception
-  when its wording is available, before publication.
+## What follows the choice
 
-These later decisions need concrete proposals and evidence. They do not
-need to be answered together with the next-direction choice, and the
-already approved design/execution decisions need no blanket reapproval.
+Update the parent design, thin-slice scope and implementation plan around
+the selected policy, with explicit manual/automatic steps and release
+criteria. The user's choice approves that direction; no changed policy
+is applied before the choice. T3 remains stopped while this decision is
+pending. There is no need to re-decide subscription-only use or native
+execution.
+
+Packaging follows the revised feasibility and runtime needs. If a later
+automated option requires a container/VM, decide its ownership before
+making it a public prerequisite. Exact generated-output license wording
+still needs approval before publication, once drafted. Those decisions
+can wait; the immediate choice is **1, 2 or 3** above.

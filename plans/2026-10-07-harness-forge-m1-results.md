@@ -106,3 +106,9 @@ leaving 28 of 30 invocation slots; both configuration corrections are
 spent. A new experiment needs a bounded handoff. The user's constraint
 is subscription-only, with no API keys/tokens, API credits or paid
 fallback. See the [current decisions](2026-10-09-harness-forge-decisions.md).
+
+The user then authorized one final offline Codex catalog spike. Its
+[2026-10-09 result](2026-10-09-harness-forge-catalog-spike-results.md)
+accepts the configuration but leaves complete tool absence unproven.
+That round is finished. The requested next step is a choice of revised
+acceptance policy for both harnesses; no further experiment is automatic.
