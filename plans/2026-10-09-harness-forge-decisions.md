@@ -9,10 +9,18 @@ No additional isolation investigation is required before T3.
 ## Decision
 
 Use `best-effort-v1`: Claude Code and Codex each run their own research,
-source-support and review workers, with separate sessions/processes,
+source-support and review workers, using independent CLI processes,
 explicit role inputs and available restrictions. Both retain the same
 functional workflow. A shared Claude backend and replacing workers with
 manual review were not selected.
+Native subagents are excluded from this release's worker adapters because
+the tested launch paths had actual canary leaks or writes. Process probes
+are the better starting evidence, not proof of production containment.
+Require the parent's baseline: initially empty temporary working directory,
+staged role inputs, small environment allowlist, no resume/fork, closed
+extra file descriptors, suppressed optional discovery, disabled apps and
+no configured MCP servers. Known inability to apply a required control
+blocks launch; unproved runtime isolation remains disclosed.
 
 Research is instructed to use the web for the supplied brief; source
 support to judge only the supplied claim/quote/context without tools;
@@ -22,12 +30,17 @@ Complete tool absence and context/file/network isolation are not
 guaranteed. Use trusted projects and operator-approved inputs; this is
 not a boundary for secrets or hostile workloads. Human acceptance does
 not undo an earlier out-of-scope action.
+Research still processes untrusted pages. Forge's README recommends an
+operator-provided disposable environment without project secrets or
+unrelated credentials and with restricted egress, labelled `recommended,
+not verified`. The harness's subscription login remains necessary and
+its isolation unproved; no credential-free guarantee is made.
 
 ## What remains mandatory
 
 - Both research passes, exact-quote checks and a distinct source-support
   verdict, followed by explicit user acceptance before building.
-- Fresh worker sessions without intentionally inherited builder/researcher
+- Fresh worker processes without intentionally inherited builder/researcher
   conversations; role-specific inputs, structured outputs and schema checks.
   Automatic context discovery remains a disclosed limitation.
 - Deterministic checks, complete judged-rule coverage, hash-bound evidence,
@@ -52,12 +65,15 @@ accounts when a worker fails.
 
 ## README ownership
 
-Forge's [README](../../harness-forge/README.md#worker-isolation-limitations)
-contains the policy and per-harness evidence. The playground and KB
-READMEs disclose and link the gap. Generated results must also contain
-`Worker isolation limitations`, maintained by intake independently of
-its existing `Outside controls` section. Preserve unrelated README text.
-Reports retain the disclosure even alongside successful artifact results.
+Forge's local sibling README, `../harness-forge/README.md` relative to the
+playground root, contains the policy and per-harness evidence. The
+playground and KB READMEs disclose the gap and label local-only paths;
+public cross-repository links follow publication. Per-run
+`.harness/reports/<slug>.md` retains the disclosure alongside successful
+artifact results. A generic `Worker isolation limitations` section is
+not required in generated READMEs: it describes Forge's build process,
+not the generated artifact's behavior. Artifact-specific limitations and
+intake's existing `Outside controls` section remain required.
 
 ## Implementation consequence
 

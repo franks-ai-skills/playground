@@ -11,8 +11,8 @@ and a contract-bound report in clean Claude Code and Codex installations.
 **Architecture:** A Python core owns schemas, selection, checkers and
 report calculation; four skills own conversations and stage handoffs.
 The plugin bundles an immutable snapshot from a separate Harness KB
-repository. Harness adapters run separate research, source-support and
-review workers under `best-effort-v1`; configured restrictions and their
+repository. Harness adapters run independent CLI processes for research,
+source-support and review under `best-effort-v1`; configured restrictions and their
 gaps are reported. Fetched content and candidate files remain data.
 
 **Tech Stack:** Python 3.11+, standard-library `unittest`, JSON Schema
@@ -166,9 +166,11 @@ user chooses milestone approval gates in the execution handoff.
 
 T2 precedes the substantial core work and dependency pins. T3 is a
 bounded packaging assessment before core implementation; it does not
-delay the feasibility answer. Use separate sessions/processes with explicit
-role inputs and recorded controls. T11 proves functional parity under the
-accepted policy; unavailable functions still block, while unproven
+delay the feasibility answer. Use independent CLI processes with explicit
+role inputs and mandatory baseline controls from the parent design;
+native delegation is excluded from this release's worker adapters.
+T11 proves functional parity under the accepted policy; unavailable
+functions still block, while unproven
 containment remains visible. A stronger containment claim would require
 separate evidence rather than reinterpreting the M1 results.
 
@@ -604,18 +606,17 @@ unambiguous text. The script checks its bindings, not its human origin.
   only as an untrusted hint. No unattended confirmation path.
   Store `.harness/decisions/<date>-<slug>.md`; intake alone maintains
   the result README's `Outside controls` section, including no-build
-  parts, and its `Worker isolation limitations` section. The latter names
-  `best-effort-v1`, shows the per-harness gaps and links the run's evidence;
-  it does not certify worker isolation even for a verified artifact.
-  Show that disclosure in the contract and bind its policy/evidence digest
-  to confirmation. Preserve unrelated README content. Display override content
+  parts, preserving unrelated README content. No generic Forge-isolation
+  section is mandatory in a generated README. Show the `best-effort-v1`
+  disclosure in the current contract and bind its policy/evidence digest
+  to confirmation; T10 persists it in the run report. Display override content
   even before override handling exists; block rather than silently ignore
   a nonempty override list. `effective_rules` initially handles the pinned,
   no-override path. T12 adds validated adoption and full override precedence.
   Expose `prepare-contract` through T4's CLI. Loaded decisions or
   historical confirmations can render the question but cannot confirm it.
 - [ ] Re-run tests, including missing README entries, forged approvals,
-  stale/missing isolation disclosure, changed worker evidence, changed
+  stale/missing contract isolation disclosure, changed worker evidence, changed
   contracts and all relay bindings. Confirm that record loading
   never constructs a live Confirmation. Override update and publication
   conversations defer to T12; their presence currently blocks the part.
@@ -798,7 +799,7 @@ runtime_results: list[RuntimeResult], current_inputs: dict) -> list[PartResult]`
 `skills/harness-verify/SKILL.md`; PLAY
 `examples/reproduction-checklist/{claude-code,codex}/`.
 
-**Interfaces:** Implement a separate-session/process adapter informed by
+**Interfaces:** Implement an independent-process adapter informed by
 T2's evidence, without claiming T2 certified it, as
 `preflight(harness: str, role: str) -> dict` and
 `run_worker(request: dict, harness: str) -> dict`.
@@ -818,6 +819,13 @@ milestone proves the primary workflow, not the completed slice.
   requiring certified containment prevents launch, with
   `self.assertFalse(worker_was_started)`. A disclosed extra tool or
   unproven denial under the accepted policy alone does not prevent launch.
+  Native worker launch requests fail before spawning. Test mandatory
+  baseline preparation: a temporary cwd outside the target repository with
+  only staged role inputs, a small environment allowlist, closed extra
+  descriptors, no resume/fork and suppressed optional discovery. Include
+  seeded user/project MCP and per-app overrides; assert configured servers
+  and apps are disabled, rather than assuming an empty overlay removes
+  lower-layer entries. A known control-application failure blocks launch.
   Record unknown inventory honestly; test that actual out-of-scope behavior
   discards the worker output and blocks its stage, without silent retries
   that broaden access. Validate independent support/reviewer identities
@@ -827,13 +835,26 @@ milestone proves the primary workflow, not the completed slice.
   run, and unavailable/timeout/error outcomes are recorded explicitly.
 - [ ] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
   with stub workers; expect the new integration assertions to fail.
-- [ ] Connect the active skills to separate workers in each harness. Use
+- [ ] Connect the active skills to independent CLI worker processes in each
+  harness; never fall back to native subagents. Use
   subscription-authenticated `claude-frank` by default for Claude;
   `claude-tp` was a completed one-time diagnostic exception. Give each
   worker only its role's request and validate its output against T4's
   schemas; relay human confirmation under T7's acceptance rule. Return
-  to intake if research changes fit. Record actual tool/configuration
-  observations and run representative behavior/scope canaries on the
+  to intake if research changes fit. Pass only necessary OS environment
+  names (HOME, PATH, USER, LOGNAME, LANG, TMPDIR, plus documented platform
+  needs) and explicitly selected subscription-profile paths. Do not forward
+  arbitrary parent variables, API credentials or provider endpoint overrides.
+  Disable optional hooks/plugins/settings discovery. Codex must include
+  `apps._default.enabled=false` and disable the apps feature and any
+  conflicting per-app overrides; suppress user/project MCP discovery and
+  disable remaining configured servers by ID. Claude uses strict empty-MCP
+  configuration and explicit role tool lists. These are adapter preparation
+  requirements, not claims that every tool-registration path is observable.
+  Inspect known managed-policy conflicts and fail if required settings
+  cannot apply; keep unknown runtime access labelled unknown.
+  Record actual tool/configuration observations and run representative
+  behavior/scope canaries on the
   adapter under `best-effort-v1`; report denials, failures and unknowns
   separately. Passing benign canaries is not containment certification.
   Missing functional capabilities return unavailable, never a broad
@@ -975,8 +996,14 @@ are neither dependencies nor silently discovered as requirements.
   compatibility in both CLIs; add a generated Codex marketplace file
   only if the shared entry cannot represent both formats, documenting
   evidence. Document Python dependency bootstrap, the `best-effort-v1`
-  worker policy and per-harness gaps in Forge's README, with links from
-  the KB/playground READMEs. Require the generated README disclosure too.
+  worker policy, actual failed-launch evidence and remaining per-harness
+  gaps in Forge's README, with links from the KB/playground READMEs.
+  Keep per-run provenance in reports; generated READMEs only need their
+  artifact-specific limitations and existing outside-control disclosure.
+  Forge's own `Outside controls` section must recommend a disposable
+  research environment with no project secrets/unrelated credentials and
+  controlled egress, labelled `recommended, not verified`; explicitly retain
+  the subscription-authentication exposure. This is not a mandatory container.
   Document configured restrictions separately from unproved ones,
   unavailable capabilities, no-user reports, KB version and generated
   output permission. Runtime setup never modifies personal config
@@ -990,6 +1017,10 @@ are neither dependencies nor silently discovered as requirements.
   fetch live pages to select forge rules. Update README and AGENTS.md so
   they do not claim a KB still lives locally. Inspect both install
   inventories and all migration links; re-run packaging/bootstrap tests.
+  Replace local sibling paths with verified public cross-repository URLs
+  on publication. Test README links as GitHub repository-relative paths:
+  a link cannot traverse into a sibling checkout. Before publication,
+  describe those locations as local code paths, not public Markdown links.
 - [ ] Commit per repository: `feat: package forge for Claude Code and Codex`
   / `docs: move harness knowledge base to its own repository`.
 
@@ -1046,7 +1077,11 @@ or raw private harness profiles.
   not required to reach the first live workflow. Record activation signals
   and baseline behavior. Do not invent a Codex trace marker.
   Run harness-verify against forge's own skills, using its accepted
-  contract and pinned rules. Fix errors; retain warnings and contested
+  contract and pinned rules. Include Forge's own research-isolation
+  recommendation: untrusted fetched content plus login material and egress
+  triggers it even for a trusted project. Do not automatically mark the
+  recommendation as an installed control or a required goal dependency.
+  Fix errors; retain warnings and contested
   positions in reports. Assert exact file/hash and rule coverage using
   `python tools/check_references.py`, then run
   `python -m unittest discover -s tests -v` in FORGE and
@@ -1065,7 +1100,7 @@ current-session contract flow, all five outcomes, reproducible selection,
 supported research, portable skill build, static/judged verification,
 generated-skill runtime evidence, conflict rerouting and scoped review
 have the evidence above in both
-harnesses under `best-effort-v1`, with matching README/report disclosures.
+harnesses under `best-effort-v1`, with Forge README and per-run report disclosures.
 Functional parity does not certify worker containment. Platform controls
 remain named dependencies, never verified
 by the forge. Automated snapshot sync and the other builders remain
