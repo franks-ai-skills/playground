@@ -139,6 +139,14 @@ allowances are spent. No further experiment follows automatically from
 the 28 unused invocation slots. The [decision brief](2026-10-09-harness-forge-decisions.md)
 sets out the next choice; T3 remains stopped.
 
+On 2026-10-09, the user approved one final offline catalog spike. Its
+[result](2026-10-09-harness-forge-catalog-spike-results.md) establishes
+configuration acceptance but not complete tool absence. The diagnostic
+round is finished with no model calls. At the user's request, the next
+step is choosing a revised acceptance policy for both harnesses from the
+decision brief, rather than automatically extending the investigation.
+This plan's worker requirements remain in force until that choice.
+
 Each milestone presents evidence, limitations and changes for review.
 M1-M4 are intermediate results, not completion of the entire slice.
 Once execution is authorized, milestone reports do not create automatic
