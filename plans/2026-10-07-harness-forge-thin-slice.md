@@ -859,7 +859,7 @@ milestone proves the primary workflow, not the completed slice.
   that broaden access. Validate independent support/reviewer identities
   and role input digests; do not reuse the builder's conversation.
   Test runtime orchestration with a fake launcher: only frozen candidate
-  files enter a disposable profile, supplied fixtures bind to the current
+  files enter a disposable test workspace, supplied fixtures bind to the current
   run, and unavailable/timeout/error outcomes are recorded explicitly.
 - [ ] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
   with stub workers; expect the new integration assertions to fail.
@@ -914,13 +914,19 @@ milestone proves the primary workflow, not the completed slice.
   functional assessment that does not relabel original failures as passes.
   Override/drift and fix/review conversations
   defer to T12; unsupported inputs block rather than being ignored.
-  Implement the runtime producer using separate disposable harness
-  profiles, synthetic credentials and explicit network allowance. Synthetic
-  credentials serve only as candidate fixtures; they cannot authenticate
-  model calls. Live model access uses the existing subscription without
-  copying login material. Document that exposure separately; if required
-  candidate-test isolation cannot be achieved, record unavailable rather
-  than relaxing it. Load
+  Implement the runtime producer with automatically created throwaway
+  test workspaces, synthetic credentials and explicit network allowance
+  (parent design, "Security of the verifier"). No manual setup step:
+  the harness uses the existing login at its account location, passed
+  through unchanged, and Forge creates no test login or profile (user
+  decision, 2026-10-09).
+  Synthetic credentials serve only as candidate fixtures; they cannot
+  authenticate model calls. Suppress user-level skills, plugins,
+  instructions, hooks and MCP servers with version-checked flags, and
+  record what remains loaded and the account exposure. Candidate code a
+  test executes runs only under the harness sandbox limited to the
+  workspace; if required candidate-test isolation cannot be achieved,
+  record unavailable rather than relaxing it. Load
   the actual generated skill and its needed references, with no forge
   skills available to substitute for it. Static checkers never launch
   candidate behavior. Record observed activation signals; absence of an

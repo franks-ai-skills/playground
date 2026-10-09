@@ -46,6 +46,8 @@ Earlier diagnostic reports name personal profiles to explain their
 observations. Those observations do not establish public installation
 support or transfer to other accounts. Validate public behavior against
 the standard CLI/account contract as well as local development runs.
-Disposable candidate-test environments remain required; their fixture
+Disposable candidate-test environments remain required. Forge creates
+them automatically as throwaway workspaces that use the selected account
+location, not as separate login profiles. Their fixture
 credentials must never become a model API fallback. Live model access
 still needs the existing subscription, with its exposure documented.

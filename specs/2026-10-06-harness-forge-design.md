@@ -809,7 +809,16 @@ to harness-forge itself:
   checked is executed as a check.
 - Runtime tests run the candidate's own code, so they run in a
   separate, disposable environment with synthetic credentials and an
-  explicit network allowlist.
+  explicit network allowlist. Forge sets this environment up
+  automatically as a throwaway workspace holding only the candidate,
+  its needed references and synthetic fixtures, with a small environment
+  allowlist. The harness authenticates with the user's existing login at
+  its account location, passed through unchanged; Forge creates no test
+  login or profile (user decision, 2026-10-09). Suppress user-level
+  skills, plugins, instructions, hooks and MCP servers where the harness
+  allows, and record what remains loaded and the account exposure. Candidate
+  code a test executes runs only under the harness sandbox limited to
+  that workspace; if that cannot be applied, the test is unavailable.
 - Check scripts run with time and output limits and do not execute
   the files they check.
 - The reviewer is instructed to use read-only supplied data and no network
