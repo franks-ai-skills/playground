@@ -172,8 +172,11 @@ support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
 M2 checkpoint on 2026-10-09: T3-T10 are complete on the `feature/thin-slice`
-branches of KB (`c6c6618`) and Forge (`1b08355`), both local only. The
-offline workflow passes 219 tests with stubbed research and review
+branches of KB (`af23a10`) and Forge (`a62652e`), both local only. A
+review found eight defects in rule kinds, confirmation binding, bound
+inputs, path containment, blocked parts, runtime records, report
+provenance and selection citations; each now has a regression test. The
+offline workflow passes 241 tests with stubbed research and review
 workers; Forge's four skills pass its own script rules. Rulings and
 verification details are in the execution ledger. No harness is
 supported yet: T11 adds the worker launchers and the first live runs,
