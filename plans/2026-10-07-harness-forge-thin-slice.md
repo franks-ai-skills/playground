@@ -547,7 +547,7 @@ rules: list[Rule], candidates: list[dict]) -> Recommendation`;
 `Recommendation` contains outcome, mechanism, alternatives, controls,
 pros/cons and cited rule ids/pages. All inputs must be confirmed facts.
 
-- [ ] Add fixed answer sets for every overview concept and all five
+- [x] Add fixed answer sets for every overview concept and all five
   outcomes. Assert the same result under reordered input keys. Assert
   a missing decisive answer produces a question, not a default choice;
   remaining answers that all lead to one outcome stop questions.
@@ -560,9 +560,9 @@ pros/cons and cited rule ids/pages. All inputs must be confirmed facts.
   and `self.assertEqual(actual.mechanism, expected_mechanism)`;
   `self.assertEqual(next_question(resolved_part, facts, table), None)`
   proves the stop condition.
-- [ ] Run `python -m unittest tests.test_selection -v`; expect failures
+- [x] Run `python -m unittest tests.test_selection -v`; expect failures
   until the declarative tables and evaluator exist.
-- [ ] Encode the overview's use/avoid distinctions for all ten concepts
+- [x] Encode the overview's use/avoid distinctions for all ten concepts
   and outside-control conditions in selection data. Keep detailed
   non-skills rules out of this slice. Name priorities and tie-breaking
   in the data; ambiguous facts request a deciding answer. Normalize
@@ -571,10 +571,10 @@ pros/cons and cited rule ids/pages. All inputs must be confirmed facts.
   controls for agent-created PRs and isolation for the design's forced
   cases. Include prerequisites and known/unknown plan availability.
   Expose `select` through T4's CLI using confirmed normalized inputs.
-- [ ] Re-run all selection fixtures and KB validation. Expected:
+- [x] Re-run all selection fixtures and KB validation. Expected:
   recommendations cite existing rules/pages and stop-question logic
   agrees with enumerated remaining answer sets.
-- [ ] Commit: `feat: compute reproducible mechanism recommendations`.
+- [x] Commit: `feat: compute reproducible mechanism recommendations`.
 
 ## Task 7: Bind conversations to the current contract and decision
 
