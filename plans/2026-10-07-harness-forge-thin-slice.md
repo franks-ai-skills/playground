@@ -698,7 +698,7 @@ revision: AcceptedRevision, rules: list[Rule]) -> dict[str, str]`;
 The skill's model writes domain procedure text; scripts validate paths,
 accepted inputs, templates and the resulting artifact inventory.
 
-- [ ] Add tests for canonical `.agents/skills/reproduction-checklist/SKILL.md`
+- [x] Add tests for canonical `.agents/skills/reproduction-checklist/SKILL.md`
   and relative `.claude/skills/reproduction-checklist` symlink; include
   only accepted requirements and runtime-needed sourced references.
   Assert traversal/symlink escapes and overwriting unrelated files fail.
@@ -710,9 +710,9 @@ accepted inputs, templates and the resulting artifact inventory.
   recommendation as data for the later builder; never mark it built.
   Pin portability as `self.assertTrue(claude_path.is_symlink())` and
   `self.assertEqual(claude_path.resolve(), canonical_path.resolve())`.
-- [ ] Run `python -m unittest tests.test_build_skill -v`; expect the
+- [x] Run `python -m unittest tests.test_build_skill -v`; expect the
   accepted-input and portable-artifact assertions to fail initially.
-- [ ] Implement planning/writing and the focused builder procedure.
+- [x] Implement planning/writing and the focused builder procedure.
   Commands use this builder, with both leads' user-only invocation
   controls when required by the sourced rules. Do not include personal
   skill names or assume their installation. Never interpolate source
@@ -721,10 +721,10 @@ accepted inputs, templates and the resulting artifact inventory.
   Set successful builds to `built`, never `verified`. Update artifact
   lists for configuration-protection advice through intake, which owns
   README writes; builders do not write the outside section.
-- [ ] Run builder and static-check tests on the reference fixture;
+- [x] Run builder and static-check tests on the reference fixture;
   inspect its files and symlink. Expected: procedure requests a checklist
   without executing the reproducer; rejected requirements are absent.
-- [ ] Commit: `feat: build portable skills from accepted research`.
+- [x] Commit: `feat: build portable skills from accepted research`.
 
 ## Task 10: Verify completeness, goal fit and bound inputs
 
