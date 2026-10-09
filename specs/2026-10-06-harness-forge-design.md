@@ -64,6 +64,23 @@ Success criteria:
 | Harness KB drift | The user decides: adopt the correction at once as a documented per-repository rule override, or keep the pinned rule; an issue or comment on `agent-harness-kb` is proposed for approval | Waiting for a reviewed Harness KB release: blocks the user's work on a correction they already accepted. Research changing rules without a user decision: fetched content could steer the build |
 | License | AGPL-3.0 for every repository in the organization, with an additional permission that excludes files harness-forge generates in a user's repository | Plain AGPL-3.0: leaves open whether generated configuration in a user's repository is covered |
 
+## Account and development boundary
+
+Clarified by the user on 2026-10-09: public Forge uses standard `claude`
+and `codex` CLIs, vendor-default account locations and the user's existing
+subscription login. No personal alias, profile directory or plugin is a
+public prerequisite. Forge does not initiate login/logout, switch accounts,
+copy credentials or change saved configuration. An unavailable subscription
+login blocks the run rather than selecting an API or another account.
+
+The owner's configuration is a temporary local-development exception on
+this machine only, governed by the [development note](../plans/harness-forge-local-development.md).
+It must not become a product default, including through later agents.
+Worker-specific restrictions remain temporary launch settings. Separate
+worker profiles are optional operator precautions, not required setup or
+proof of authentication isolation. Existing account storage may expose
+unrelated data as well as login material; that remains a disclosed gap.
+
 ## Accepted worker isolation gap
 
 Claude Code and Codex retain the same automated workflow and functional
@@ -81,9 +98,10 @@ Mandatory baseline controls: an initially empty temporary working
 directory outside the target repository, only staged role inputs, a small
 environment allowlist, closed extra file descriptors, no session
 resume/fork, and suppressed optional settings/hooks/plugin discovery.
-Pass only necessary OS environment and explicitly selected subscription
-profile paths; do not inherit API keys, provider overrides, unrelated
-credentials or arbitrary parent variables. Disable apps and configured
+Pass only necessary OS environment for vendor-default subscription access;
+local development overrides stay outside product defaults. Do not inherit
+API keys, provider overrides, unrelated credentials or arbitrary parent
+variables. Disable apps and configured
 MCP servers in both adapters. Codex must explicitly disable apps,
 including `apps._default.enabled=false`, suppress user/project discovery
 and disable remaining configured MCP servers by ID; an empty merged table
@@ -96,7 +114,21 @@ Research is instructed to use web access for its brief only. Source
 support is instructed to judge only the supplied claim, quotation and
 context without tools. Review is instructed to read only the frozen
 candidate and supplied rules, without network access or writes. Configure
-those limits wherever supported. Remaining tools, automatic discovery,
+the following role controls as mandatory launch settings for supported
+versions; T11 records exact version-checked syntax:
+
+- Claude: web tools only for research, an empty tool list for source
+  support, and read-only file tools for review.
+- Codex: a filesystem policy allowing no writes and only required input
+  reads where configurable; web search enabled only for research and
+  disabled for support/review. Disable shell execution and local-image
+  tools for source support. Apply supported tool-removal settings for
+  each role; do not interpret a read-only sandbox as scoped read access.
+
+Known inability to apply a required setting blocks launch. Residual
+model-added tools and unproved enforcement remain disclosed under this
+policy, not counted as successful containment. Remaining tools, automatic
+discovery,
 inherited settings, credential access and outbound channels may exceed
 them: complete absence or denial is not guaranteed. An empty directory,
 tool list or cooperative refusal does not prove containment.
@@ -109,8 +141,12 @@ findings does not prevent access or transmission that already occurred.
 Apply Forge's own outside-control rule to research: recommend an
 operator-provided disposable environment without a target-repository mount,
 project secrets or unrelated credentials, with minimal supplied inputs and
-appropriate egress/DNS controls. Mark it `recommended, not verified` in
-Forge's README. Subscription authentication is still needed by the harness;
+operator-managed network controls blocking private, loopback, link-local
+and cloud metadata destinations, including resolved/redirect destinations
+where the operator controls fetching. Public-web access still permits
+outbound transmission; this is not an exfiltration guarantee. Mark it
+`recommended, not verified` in Forge's README. Subscription authentication
+is still needed by the harness;
 its separation from worker-readable data is not proved. This is not a
 credential-free promise, a mandatory container or platform provisioning.
 

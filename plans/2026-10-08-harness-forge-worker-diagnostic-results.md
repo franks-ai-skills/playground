@@ -136,7 +136,9 @@ network negative returned a DNS-resolution error; it was not a complete
 egress-control qualification.
 
 The user's subsequent instruction selected `personal-profile` for future
-Claude runs. Inspection of `.zshrc` showed that it is a function using
+local-development Claude runs on this machine only, not the public product
+(see the [development boundary](harness-forge-local-development.md)).
+Inspection of `.zshrc` showed that it is a function using
 `_claude_as`: it selects the personal `~/.personal-profile` configuration,
 checks the expected account, and may log out or start interactive login
 when the account differs. It was not executed after the gate expired.
@@ -147,8 +149,8 @@ worker would not establish isolation.
 
 The user then authorized **`team-profile` for this diagnostic only** because
 the personal account's token limit was reached. `personal-profile` remains
-the default afterward. The resumed check used the actual `_claude_as`
-and `team-profile` function definitions copied from `.zshrc`, with a guard
+the local-development selection afterward. The resumed check used the
+actual `_claude_as` and `team-profile` function definitions copied from `.zshrc`, with a guard
 that refused login/logout changes and an OS network-denial profile.
 The existing account check succeeded, and `team-profile --help` exited zero.
 No alternate account fallback or login mutation was attempted.

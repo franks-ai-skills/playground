@@ -35,6 +35,15 @@ at `../harness-forge/README.md`. Public cross-repository links will be
 added at distribution. Generic Forge-build provenance is not mandatory
 in every generated README; artifact-specific outside controls still are.
 
+## Forge account setup
+
+The public product assumes standard vendor CLIs and an existing subscription
+login at vendor-default locations. Temporary worker restrictions remain
+required; login management and saved-configuration changes are outside Forge.
+The owner's custom setup applies only to temporary development on this
+machine. All agents must follow the [local development boundary](plans/harness-forge-local-development.md);
+historical profile names are evidence labels, not product requirements.
+
 ## License
 
 [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0-only).

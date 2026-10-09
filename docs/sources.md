@@ -66,6 +66,7 @@ Assessed on 2026-10-05; extended on 2026-10-07.
 | Company engineering blogs, first-hand | `developer.nvidia.com`, `aws.amazon.com`, `blog.cloudflare.com`, `github.blog`, `docs.docker.com`, `vercel.com`, `cognition.com`, `checklyhq.com` |
 | Practitioners, first-hand | `simonwillison.net`, `humanlayer.dev`, `mariozechner.at`, `scottspence.com`, `martinfowler.com`; GitHub `obra/superpowers` |
 | Trade press (rule 7) | `csoonline.com`, `securityweek.com` |
+| Security guidance | `cheatsheetseries.owasp.org` (OWASP's own cheat sheets; assessed 2026-10-09) |
 
 A trusted domain does not make every page on it a valid source: rule 1
 still applies to each claim.

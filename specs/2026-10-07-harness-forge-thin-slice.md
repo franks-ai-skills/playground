@@ -21,7 +21,14 @@ deterministic selection, deep research, requirement acceptance, a
 portable skill build and verification in both Claude Code and Codex.
 The same confirmed inputs, pinned Harness KB and confirmed overrides
 produce the same recommendation. A clean installation needs none of
-the author's personal plugins.
+the author's personal plugins, aliases or account directories. Public
+adapters use standard vendor CLIs and an existing subscription login at
+vendor-default locations. The owner's setup is temporary local development
+only, as clarified on 2026-10-09 and recorded in the
+[development note](../plans/harness-forge-local-development.md).
+Do not manage logins, copy credentials or change saved configuration.
+Separate worker profiles are optional; temporary role restrictions remain
+mandatory and remaining account/context exposure stays disclosed.
 
 This is sub-project 1 of the parent design. Implement its contracts
 before extracting detailed rules or building the other mechanisms.
@@ -48,7 +55,8 @@ their explicitly open implementation options.
   under `best-effort-v1`. An empty directory is not proof of isolation.
   Require the parent's baseline controls: temporary working directory,
   environment allowlist, no resume/fork, suppressed optional discovery,
-  apps disabled and no configured MCP servers. Both harnesses require
+  apps disabled, no configured MCP servers and the parent's explicit
+  per-role tool/web/filesystem controls. Both harnesses require
   functional live evidence; neither must prove
   complete tool absence or enforced role containment to use this policy.
 - Define explicit contract confirmation: selected Confirm or unambiguous

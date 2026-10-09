@@ -23,8 +23,10 @@ Local status reported `authMethod: "claude.ai"`, subscription type
 `team`, and no API-key source. The subprocess environment contained
 only HOME, PATH, USER, LOGNAME, LANG and TMPDIR; inherited API/provider
 variables were not passed. No API credential, credit, billing or account
-configuration was added or changed. `personal-profile` remains the default
-after this diagnostic-only exception.
+configuration was added or changed. `personal-profile` remains the owner's
+temporary local-development selection after this diagnostic-only exception.
+These names are not public product defaults; the
+[development boundary](harness-forge-local-development.md) governs later runs.
 The observation applies only to the tested `team-profile` Team profile,
 binary, model and flags. It does not carry over to `personal-profile` or
 another account: account/managed-policy equivalence was not tested.
