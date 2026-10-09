@@ -22,8 +22,9 @@ portable skill build and verification in both Claude Code and Codex.
 The same confirmed inputs, pinned Harness KB and confirmed overrides
 produce the same recommendation. A clean installation needs none of
 the author's personal plugins, aliases or account directories. Public
-adapters use standard vendor CLIs and an existing subscription login at
-vendor-default locations. The owner's setup is temporary local development
+adapters use standard vendor CLIs and the user's existing login at
+vendor-default locations. An API-key or unknown login type gets a
+cost warning and a continue/stop question before the first worker starts. The owner's setup is temporary local development
 only, as clarified on 2026-10-09 and recorded in the
 [development note](../plans/harness-forge-local-development.md).
 Do not manage logins, copy credentials or change saved configuration.

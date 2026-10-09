@@ -51,7 +51,7 @@ Success criteria:
 | --- | --- | --- |
 | Structure | A pipeline of focused skills plus a reviewer subagent | One large skill: body too long for the research's skill-size guidance, the builder would review its own work, and one description would have to trigger for too many tasks. A Claude Code workflow script: Codex has no equivalent, which breaks harness parity |
 | Harnesses | Claude Code and Codex equally | Claude Code first: gives up the parity the knowledge base itself keeps |
-| Model access | Subscription-authenticated harness CLIs only; user-confirmed on 2026-10-08 | Direct model API adapters, additional API tokens/keys, API credits and paid fallback: outside the user's subscription-only constraint, even if promotional credits could cover usage |
+| Model access | Harness CLIs with the user's existing login. The owner's development is subscription-only, user-confirmed on 2026-10-08. Forge asks before continuing with an API-key login, which may cost extra (2026-10-09) | Direct model API adapters, additional API tokens/keys, API credits and paid fallback: outside the user's subscription-only constraint, even if promotional credits could cover usage |
 | Worker isolation | Automated workers in each harness under the disclosed `best-effort-v1` policy, user-approved on 2026-10-09 | Blocking all implementation until complete tool absence and containment are proved; shared Claude backend or manual replacement of workers were not selected |
 | Knowledge-base home | Its own repo; the plugin bundles a pinned snapshot | Same repo as the tooling: couples research and tooling releases. Fetching pages at run time: non-deterministic, needs network, and brings outside content into context, which the security guide warns against |
 | Verification | Scripts first, then a fresh-context reviewer subagent on a fixed rule list | Model-only review: not deterministic |
@@ -68,10 +68,20 @@ Success criteria:
 
 Clarified by the user on 2026-10-09: public Forge uses standard `claude`
 and `codex` CLIs, vendor-default account locations and the user's existing
-subscription login. No personal alias, profile directory or plugin is a
-public prerequisite. Forge does not initiate login/logout, switch accounts,
-copy credentials or change saved configuration. An unavailable subscription
-login blocks the run rather than selecting an API or another account.
+login. No personal alias, profile directory or plugin is a public
+prerequisite. Forge does not initiate login/logout, switch accounts, copy
+credentials or change saved configuration. A missing login blocks the run;
+Forge never adds an API key or selects another account.
+
+**Login type.** A subscription login draws on the plan's usage limits; an
+API-key login bills each request, so a run can cost extra. The README
+tells users how to check their login type. Before the first worker launch
+of a run, the adapter reads the type read-only (`claude auth status`,
+`codex login status`). A subscription login continues. For an API-key
+login, or a type it cannot determine, Forge states that the run may cost
+extra and asks one question: continue or stop. The answer is recorded in
+the run's worker evidence. A run without a user stops at that point.
+The owner's own work stays subscription-only (see "Model access").
 
 The owner's configuration is a temporary local-development exception on
 this machine only, governed by the [development note](../plans/harness-forge-local-development.md).
@@ -98,8 +108,11 @@ Mandatory baseline controls: an initially empty temporary working
 directory outside the target repository, only staged role inputs, a small
 environment allowlist, closed extra file descriptors, no session
 resume/fork, and suppressed optional settings/hooks/plugin discovery.
-Pass only necessary OS environment for vendor-default subscription access;
-local development overrides stay outside product defaults. Do not inherit
+Pass only necessary OS environment for the existing login. When the user
+has set the vendors' account-location variables `CLAUDE_CONFIG_DIR` or
+`CODEX_HOME`, pass them through unchanged; Forge never sets or changes
+them. This is how a user, including the owner on this machine, selects a
+non-default profile without any personal setup in the product. Do not inherit
 API keys, provider overrides, unrelated credentials or arbitrary parent
 variables. Disable apps and configured
 MCP servers in both adapters. Codex must explicitly disable apps,

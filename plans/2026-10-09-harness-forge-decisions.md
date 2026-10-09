@@ -61,8 +61,10 @@ is made.
   outside-control flow. No general security rule is silently downgraded.
 - Subscription-only model access, with no direct model API, extra API keys,
   credits or paid fallback. As clarified by the user on 2026-10-09, public
-  adapters use standard vendor CLIs and an existing subscription login at
-  vendor-default account locations. No required custom profiles, login/logout,
+  adapters use standard vendor CLIs and the user's existing login at
+  vendor-default account locations. Users are told to check their login
+  type; for an API-key or unknown login, Forge warns of possible extra cost
+  and asks continue/stop before the first worker starts. No required custom profiles, login/logout,
   credential copying, account switching or saved-configuration changes.
   The owner's setup is temporary development-only configuration; see the
   [local development note](harness-forge-local-development.md). This applies
