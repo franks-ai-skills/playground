@@ -9,6 +9,10 @@ stop after M1 for feasibility review; the parent design governs conflicts.
 The user's 2026-10-08 subscription-only constraint also applies: no
 direct model API integration, additional API tokens/keys, API credits
 or paid fallback.
+On 2026-10-09 the user selected option 3: automated workers in both
+harnesses under the parent's disclosed `best-effort-v1` policy. The M1
+isolation decision is settled; complete containment is no longer a
+prerequisite for T3. Functional live acceptance remains required.
 
 ## Deliverable
 
@@ -37,11 +41,12 @@ their explicitly open implementation options.
   Initial parser/checker limits are 1 MiB per document, nesting depth 32,
   five seconds per checker and 64 KiB of checker output; these are
   implementation defaults, not values prescribed by the parent.
-- Try native workers and independent harness processes. The latter is
-  an implementation alternative to native delegation, requiring the same
-  fresh-context and access guarantees. An empty directory is not proof
-  of isolation. Test discovery, inherited context/environment and tools,
-  then document supported environments and actual launcher choices.
+- Use separate worker sessions/processes with explicit role inputs and
+  no intentional conversation inheritance. Configure available access
+  limits, test discovery/context/tools and record the remaining gaps
+  under `best-effort-v1`. An empty directory is not proof of isolation.
+  Both harnesses require functional live evidence; neither must prove
+  complete tool absence or enforced role containment to use this policy.
 - Define explicit contract confirmation: selected Confirm or unambiguous
   current-session text, relayed with the displayed digest, run and part
   ids. Scripts check consistency but cannot authenticate the human
@@ -77,7 +82,8 @@ launch methods does not establish that every possible approach fails.
 ## Scope
 
 - Establish public `agent-harness-kb` and `harness-forge` repositories.
-  Bootstrap locally, prove worker feasibility, then copy the knowledge
+  Bootstrap locally, record worker feasibility and the accepted policy,
+  then copy the knowledge
   base for rule extraction. Publish and remove the playground copy only
   at distribution, updating documentation pointers and checking the frozen
   source inventory for untransferred edits. Retain this spec and
@@ -158,7 +164,17 @@ remain final acceptance requirements even though the first vertical
 workflow excludes those conversations. Until implemented, unsupported
 inputs block rather than silently bypassing their contracts.
 
-If either harness cannot enforce the research or reviewer restrictions,
-that path reports unavailable and blocks the affected stage. A prompt,
-working-directory change or agent file does not substitute for a tested
-restriction.
+All three workers follow the parent's `best-effort-v1` policy. Tool-free
+source support, brief-only research and read-only/offline review remain
+role instructions and configured targets, not certified access guarantees.
+Record policy, controls, observations and unknowns in the run. Disclose
+the gap in Forge's README, generated-result READMEs and reports, including
+when the artifact is `verified`. Intake owns the generated README section
+`Worker isolation limitations` and preserves unrelated content.
+
+Unproven containment alone does not block this accepted mode. Missing
+functional capabilities, invalid/missing verdicts, observed out-of-scope
+actions and failed source checks still block affected work; a stated
+goal requiring enforced isolation remains unmet. Do not silently widen
+permissions or fabricate successful tests. The exception does not relax
+candidate runtime-test isolation or the security of deterministic checks.

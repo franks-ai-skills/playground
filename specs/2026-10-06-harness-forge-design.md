@@ -10,6 +10,10 @@ approved by the user on 2026-10-07. Execution starts natively and stops
 after M1 for review of worker-isolation feasibility.
 On 2026-10-08 the user confirmed subscription-only model access: no
 additional API tokens/keys, API credits or paid fallback.
+On 2026-10-09, after M1 and its bounded follow-ups, the user selected
+automated workers with weaker isolation (option 3), with the gap documented
+in the relevant READMEs. The policy below replaces the original requirement
+to prove worker containment before continuing implementation.
 
 ## Goal
 
@@ -48,6 +52,7 @@ Success criteria:
 | Structure | A pipeline of focused skills plus a reviewer subagent | One large skill: body too long for the research's skill-size guidance, the builder would review its own work, and one description would have to trigger for too many tasks. A Claude Code workflow script: Codex has no equivalent, which breaks harness parity |
 | Harnesses | Claude Code and Codex equally | Claude Code first: gives up the parity the knowledge base itself keeps |
 | Model access | Subscription-authenticated harness CLIs only; user-confirmed on 2026-10-08 | Direct model API adapters, additional API tokens/keys, API credits and paid fallback: outside the user's subscription-only constraint, even if promotional credits could cover usage |
+| Worker isolation | Automated workers in each harness under the disclosed `best-effort-v1` policy, user-approved on 2026-10-09 | Blocking all implementation until complete tool absence and containment are proved; shared Claude backend or manual replacement of workers were not selected |
 | Knowledge-base home | Its own repo; the plugin bundles a pinned snapshot | Same repo as the tooling: couples research and tooling releases. Fetching pages at run time: non-deterministic, needs network, and brings outside content into context, which the security guide warns against |
 | Verification | Scripts first, then a fresh-context reviewer subagent on a fixed rule list | Model-only review: not deterministic |
 | Granularity | Deciding questions per part of an idea | One round for the whole idea: fails when parts need different mechanisms |
@@ -58,6 +63,54 @@ Success criteria:
 | Outside controls | Recommended with prerequisites and listed in the result's README as "recommended, not verified"; never built, configured or checked on the platform | Building them through platform APIs: the forge would need admin tokens, which the identity research advises against. Checking them with a read-only token: not wanted; the README makes each recommendation visible instead |
 | Harness KB drift | The user decides: adopt the correction at once as a documented per-repository rule override, or keep the pinned rule; an issue or comment on `agent-harness-kb` is proposed for approval | Waiting for a reviewed Harness KB release: blocks the user's work on a correction they already accepted. Research changing rules without a user decision: fetched content could steer the build |
 | License | AGPL-3.0 for every repository in the organization, with an additional permission that excludes files harness-forge generates in a user's repository | Plain AGPL-3.0: leaves open whether generated configuration in a user's repository is covered |
+
+## Accepted worker isolation gap
+
+Claude Code and Codex retain the same automated workflow and functional
+acceptance requirements. Their tool and context restrictions may differ;
+equal features do not imply equal or certified containment. Each harness
+uses separate worker sessions/processes with explicit role inputs, no
+intentional builder/researcher conversation inheritance, and the strongest
+available restrictions selected and recorded by its adapter.
+
+Research is instructed to use web access for its brief only. Source
+support is instructed to judge only the supplied claim, quotation and
+context without tools. Review is instructed to read only the frozen
+candidate and supplied rules, without network access or writes. Configure
+those limits wherever supported. Remaining tools, automatic discovery,
+inherited settings, credential access and outbound channels may exceed
+them: complete absence or denial is not guaranteed. An empty directory,
+tool list or cooperative refusal does not prove containment.
+
+Use this mode only for trusted projects and operator-approved inputs.
+Do not rely on it to keep secrets, unrelated files or credentials hidden
+from workers or to contain hostile content. Fetched pages and candidate
+text remain untrusted data even in a trusted project. Human acceptance of
+findings does not prevent access or transmission that already occurred.
+
+Record `worker_policy: best-effort-v1` and `isolation_status: not-certified`
+with the harness/version/model, configured controls, observed tools and
+behavior, unknowns and evidence references. Bind that record to the run
+and show it in the current contract. Missing isolation proof alone does
+not block this policy; missing functional capabilities, invalid output,
+source-support failure or an observed out-of-scope action still fails the
+affected worker run and prevents its output advancing. Do not broaden
+tools or switch accounts silently to recover.
+
+All source checks, requirement acceptance, rule checks, current-session
+confirmation and result precedence remain mandatory. `verified` describes
+the built artifact against its confirmed rules and goals; it never certifies
+Forge's worker containment. Reports and the Forge and generated-result
+READMEs must display the gap alongside successful results. If a user's
+goal requires enforced isolation, this policy cannot establish that goal;
+use the existing conflict/outside-control flow without downgrading errors.
+This exception concerns Forge's three workers only; disposable runtime
+tests, catalog-only checkers and outside-control boundaries are unchanged.
+
+The recorded [decision](../plans/2026-10-09-harness-forge-decisions.md)
+and [last diagnostic](../plans/2026-10-09-harness-forge-catalog-spike-results.md)
+distinguish the accepted policy from the observed evidence. No worker is
+declared functionally supported until live checks pass in that harness.
 
 ## Repositories
 
@@ -404,13 +457,15 @@ snapshot.
 **Safety.** Fetched pages are untrusted content.
 
 - The research subagent receives only an approved research brief: the
-  goal, the user's picture, the parts and their accepted answers. It
-  gets no access to the repository's other files, because search
+  goal, the user's picture, the parts and their accepted answers. The
+  adapter limits access to other files where possible, because search
   arguments and fetched URLs can carry data out (OpenAI's deep-research
   security guidance, cited in `docs/guide/security.md`).
-- It has web access and no tool that writes outside
-  `.harness/research/`.
-- Restrictions are set up per harness and tested in each. Codex
+- It uses web access for research and returns structured findings for
+  the parent to persist in `.harness/research/`. The worker is instructed
+  not to write files; configured limits and gaps follow `best-effort-v1`.
+- Restrictions are configured and their behavior tested per harness;
+  tests do not establish complete containment. Codex
   subagents inherit the parent's sandbox and live runtime overrides
   even when the agent file says otherwise
   (`docs/vendors/codex/subagents.md`), so an agent file alone does not
@@ -680,12 +735,14 @@ to harness-forge itself:
   explicit network allowlist.
 - Check scripts run with time and output limits and do not execute
   the files they check.
-- The reviewer subagent gets read-only tools and no network access,
-  set up and tested per harness as for research.
+- The reviewer is instructed to use read-only supplied data and no network
+  or writes. Apply available tool limits and report remaining exposure
+  under `best-effort-v1`, as for research. Observed violations fail the run.
 - Reviewer output is validated against a schema: every applicable rule
   id must appear exactly once, and unknown ids are rejected.
-- A fresh context removes the builder's conversation, not prompt
-  injection inside the reviewed files. The reviewer's instructions
+- A fresh session avoids intentionally forwarding the builder's
+  conversation; automatic context discovery remains an accepted gap.
+  It does not remove prompt injection inside reviewed files. Instructions
   treat file contents as data, and a judged verdict can never
   overrule a failed script check.
 
