@@ -858,8 +858,10 @@ Progress on 2026-10-10: the offline part is done in Forge `4f7e83b`..`89c61a4`
 (independent-process adapters with preflight and the login-type check,
 runtime producer, Forge's own source fetch, research and verification
 workflow, CLI commands `workers`, `research`, `accept`, `build` and
-`verify`, skills wired to them; 377 tests). The live runner and the live
-runs remain.
+`verify`, skills wired to them), then the automated live runner
+(`tools/live_runs.py` behind `live_checks.py --case vertical|routing-smoke`,
+Forge `c751517`; 382 tests). User decision: one real session plus automated
+runs without user input; the live runs wait for the user's go.
 
 - [x] Define one live no-override/no-conflict case and offline adapter/
   orchestration assertions. Require both research passes, independent
