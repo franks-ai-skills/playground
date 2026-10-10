@@ -349,9 +349,14 @@ page, plus the security guide, not only the checklists.
      which event must it run? Events and their capabilities are
      recorded per harness.
    - For a hook, when the event's capabilities decide it: must its
-     result block the action or stop the agent, reach the agent as
-     feedback, or only report? A step that must run every time does
-     not have to block.
+     result prevent the action the event is about, stop the agent's
+     further work, reach the agent as feedback, or only report? A step
+     that must run every time does not have to prevent or stop
+     anything.
+   - For a hook, when a capability holds only for one source of the
+     event: which source must it handle, for example a session start
+     after compaction or a configuration change outside managed
+     policy settings?
 7. **Recommendation.** An outcome per part with alternatives, pros
    and cons, each citing rule ids and pages, plus how the parts
    connect, for example "B starts A; C enforces A's result". An
