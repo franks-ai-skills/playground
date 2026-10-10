@@ -105,7 +105,7 @@ manifest. Local versions observed on 2026-10-07: codex-cli 0.160.1 and
 Claude Code 2.1.292. These are observations, not promised minimums;
 rule applicability retains each cited version range.
 
-Use `PLAY`, `KB` and `FORGE` below as repository-root labels, not literal
+Use `PLAY`, `KB` and `ec2ce92` below as repository-root labels, not literal
 directories. Default local checkouts are sibling directories:
 `playground/`, `agent-harness-kb/` and `harness-forge/`, under their common
 parent. Separate Git repositories remain separate deliverables. Detect
@@ -172,7 +172,7 @@ support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
 M2 checkpoint on 2026-10-10: T3-T10 are complete on the `feature/thin-slice`
-branches of KB (`5403f01`) and Forge (`07a6fe9`), both local only. A
+branches of KB (`5403f01`) and Forge (`ec2ce92`), both local only. A
 review found eight defects in rule kinds, confirmation binding, bound
 inputs, path containment, blocked parts, runtime records, report
 provenance and selection citations; each now has a regression test, and a
@@ -192,9 +192,11 @@ made worker approval immutable. A whole-branch review then found seven
 gaps outside hook selection: duplicate requirement ids, the revision
 format `prepare-contract` read, the unbound reused artifact, stale
 assessments of parts without a build, titled and reference-style links,
-the review worker's request schema and the CLI output bound.
+the review worker's request schema and the CLI output bound. Its
+follow-up bound the confirmed facts and answers into the contract and
+kept footnotes out of the link check.
 Runs bind worker configurations, not observations. The
-offline workflow passes 312 tests with stubbed research and review
+offline workflow passes 318 tests with stubbed research and review
 workers; Forge's four skills pass its own script rules. Rulings and
 verification details are in the execution ledger. No harness is
 supported yet: T11 adds the worker launchers and the first live runs,

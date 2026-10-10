@@ -747,13 +747,15 @@ session: a local approval cache would be writable by the agent, which
 runs as the user.
 
 So each intake and verification run starts with one confirmation
-question showing the current contract, per part: the goal, the chosen
-outcome and mechanism, for a reuse part the reused artifact (name,
-source, license, maintenance, form and local path), the outside controls, the accepted Idea KB
-requirements as readable text together with the revision's sha256,
-and every rule override with its content and sha256. The hash binds
-the confirmation to exact content; the text lets the user understand
-what they confirm. Differences from the last confirmation recorded in the
+question showing the current contract: the idea's reach, hosting and
+confirmed facts, and per part: its name, the goal, the confirmed
+answers, the chosen outcome and mechanism, for a reuse part the reused
+artifact (name, source, license, maintenance, form and local path), the
+outside controls, the accepted Idea KB requirements as readable text
+together with the revision's sha256, and every rule override with its
+content and sha256. The hash binds the confirmation to exact content;
+the text lets the user understand what they confirm. A record whose
+facts contradict its targets or reach is refused instead of shown. Differences from the last confirmation recorded in the
 repository are highlighted as a hint, labelled as coming from an
 untrusted record. Only a contract the user confirms in the session is
 used. A part whose contract is not confirmed is `blocked`, and its
