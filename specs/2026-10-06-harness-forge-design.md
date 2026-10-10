@@ -721,8 +721,9 @@ Harness result, for what was built:
 Goal result, for the part's accepted goal, decided in this order:
 
 1. `not assessed`: the contract is unconfirmed, the part is
-   `blocked`, or the harness result is `not checked`, so nothing was
-   assessed against a trusted goal.
+   `blocked`, the harness result is `not checked`, or a bound input of
+   a part without a build changed after the run was prepared, so
+   nothing was assessed against a trusted goal.
 2. `not met`: the harness result is `not verified`, whether or not the
    goal also needs outside controls, or the confirmed outcome is
    "nothing fits". A failed build is reported as a failure, never as a
@@ -747,7 +748,8 @@ runs as the user.
 
 So each intake and verification run starts with one confirmation
 question showing the current contract, per part: the goal, the chosen
-outcome and mechanism, the outside controls, the accepted Idea KB
+outcome and mechanism, for a reuse part the reused artifact (name,
+source, license, maintenance, form and local path), the outside controls, the accepted Idea KB
 requirements as readable text together with the revision's sha256,
 and every rule override with its content and sha256. The hash binds
 the confirmation to exact content; the text lets the user understand
