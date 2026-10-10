@@ -172,7 +172,7 @@ support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
 M2 checkpoint on 2026-10-10: T3-T10 are complete on the `feature/thin-slice`
-branches of KB (`f782705`) and Forge (`ea635c0`), both local only. A
+branches of KB (`f6491c9`) and Forge (`c67dd8b`), both local only. A
 review found eight defects in rule kinds, confirmation binding, bound
 inputs, path containment, blocked parts, runtime records, report
 provenance and selection citations; each now has a regression test, and a
@@ -182,8 +182,10 @@ mechanisms (user decision, 2026-10-09). A third review showed that
 alternatives and reuse could still violate confirmed requirements: every
 requirement now rules out each mechanism that cannot meet it alone, reuse
 is held to the same eligibility, and a test checks every answer
-combination. Runs bind worker configurations, not observations. The
-offline workflow passes 269 tests with stubbed research and review
+combination. A fourth review added the hook's model and event as
+deciding facts and kept worker approval frozen across finalizations.
+Runs bind worker configurations, not observations. The
+offline workflow passes 275 tests with stubbed research and review
 workers; Forge's four skills pass its own script rules. Rulings and
 verification details are in the execution ledger. No harness is
 supported yet: T11 adds the worker launchers and the first live runs,
@@ -876,6 +878,13 @@ milestone proves the primary workflow, not the completed slice.
   discards the worker output and blocks its stage, without silent retries
   that broaden access. Validate independent support/reviewer identities
   and role input digests; do not reuse the builder's conversation.
+  Approve planned worker configurations before launch: the contract the
+  user confirms shows each planned worker's configuration, the review
+  worker's included, and no worker launches before that confirmation (a
+  launch-order test). Evidence a launched worker returns enriches the
+  report without a new confirmation; a launched configuration other than
+  the approved one leaves every part not verified, also when the run is
+  finalized again.
   Test runtime orchestration with a fake launcher: only frozen candidate
   files enter a disposable test workspace, supplied fixtures bind to the current
   run, and unavailable/timeout/error outcomes are recorded explicitly.

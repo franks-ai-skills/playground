@@ -340,8 +340,13 @@ page, plus the security guide, not only the checklists.
      disclose data?
    - Is earlier feedback wanted than an outside gate gives?
    - Who starts it: the user, the model, or an event?
-   - Does it need its own context, other tools or another model?
+   - Does it need its own context, other tools or another model? When
+     a hook could be chosen: does it need a model of its own, or only
+     other tools?
    - Does it reach an external system, and does a CLI exist for it?
+   - Can a script decide it without judgment?
+   - For a hook, when it decides whether the handler can run there: at
+     which event must it run?
 7. **Recommendation.** An outcome per part with alternatives, pros
    and cons, each citing rule ids and pages, plus how the parts
    connect, for example "B starts A; C enforces A's result". An
