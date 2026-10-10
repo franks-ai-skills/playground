@@ -172,7 +172,7 @@ support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
 M2 checkpoint on 2026-10-10: T3-T10 are complete on the `feature/thin-slice`
-branches of KB (`9445d3f`) and Forge (`f4577d4`), both local only. A
+branches of KB (`d6519d1`) and Forge (`162e758`), both local only. A
 review found eight defects in rule kinds, confirmation binding, bound
 inputs, path containment, blocked parts, runtime records, report
 provenance and selection citations; each now has a regression test, and a
@@ -182,14 +182,15 @@ mechanisms (user decision, 2026-10-09). A third review showed that
 alternatives and reuse could still violate confirmed requirements: every
 requirement now rules out each mechanism that cannot meet it alone, reuse
 is held to the same eligibility, and a test checks every answer
-combination. Reviews four to seven made the hook's model, its handler,
+combination. Reviews four to eight made the hook's model, its handler,
 its event, the event's source and what its result must do (prevent,
 stop, feed back or report) deciding facts, with each event's
 capabilities recorded per harness from the vendor references; resolved
 and cited the handler on every route; reuse a hook only when its recorded
-handler fits; and made worker approval immutable.
+form, including settings such as `async` and `continueOnBlock`, fits; and
+made worker approval immutable.
 Runs bind worker configurations, not observations. The
-offline workflow passes 294 tests with stubbed research and review
+offline workflow passes 297 tests with stubbed research and review
 workers; Forge's four skills pass its own script rules. Rulings and
 verification details are in the execution ledger. No harness is
 supported yet: T11 adds the worker launchers and the first live runs,
