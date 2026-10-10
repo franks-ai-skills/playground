@@ -854,7 +854,14 @@ Consume T4-T10's stage contracts. Produce a live reference run in each
 harness with accepted idea rules, a portable skill and a report. This
 milestone proves the primary workflow, not the completed slice.
 
-- [ ] Define one live no-override/no-conflict case and offline adapter/
+Progress on 2026-10-10: the offline part is done in Forge `4f7e83b`..`89c61a4`
+(independent-process adapters with preflight and the login-type check,
+runtime producer, Forge's own source fetch, research and verification
+workflow, CLI commands `workers`, `research`, `accept`, `build` and
+`verify`, skills wired to them; 377 tests). The live runner and the live
+runs remain.
+
+- [x] Define one live no-override/no-conflict case and offline adapter/
   orchestration assertions. Require both research passes, independent
   source support, explicit requirement acceptance, a skill build and a
   fresh reviewer. Pin `report["idea_revision"] == decision["idea_revision"]`
@@ -899,7 +906,7 @@ milestone proves the primary workflow, not the completed slice.
   Test runtime orchestration with a fake launcher: only frozen candidate
   files enter a disposable test workspace, supplied fixtures bind to the current
   run, and unavailable/timeout/error outcomes are recorded explicitly.
-- [ ] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
+- [x] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
   with stub workers; expect the new integration assertions to fail.
 - [ ] Connect the active skills to independent CLI worker processes in each
   harness; never fall back to native subagents. Use
