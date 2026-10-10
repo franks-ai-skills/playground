@@ -105,7 +105,7 @@ manifest. Local versions observed on 2026-10-07: codex-cli 0.160.1 and
 Claude Code 2.1.292. These are observations, not promised minimums;
 rule applicability retains each cited version range.
 
-Use `PLAY`, `KB` and `ec2ce92` below as repository-root labels, not literal
+Use `PLAY`, `KB` and `FORGE` below as repository-root labels, not literal
 directories. Default local checkouts are sibling directories:
 `playground/`, `agent-harness-kb/` and `harness-forge/`, under their common
 parent. Separate Git repositories remain separate deliverables. Detect
@@ -1050,6 +1050,9 @@ record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
   owns outside-section repairs. Prompt for Review/Extensive review with
   the calculated scope; record the choice and re-run affected links and
   the selected parts' runtime cases through T11's producer.
+  Revisit `connects_to`, which M2 leaves outside the contract because
+  the user picks the displayed scope: an edit between confirmation and
+  the run can narrow which linked parts the Review option covers.
   Complete override adoption: validate rule identity, source support and
   catalog parameters; display old/new content and explicit warnings when
   loosening/retiring an error or security rule. Current contract confirmation
