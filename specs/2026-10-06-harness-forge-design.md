@@ -350,7 +350,8 @@ page, plus the security guide, not only the checklists.
      recorded per harness.
    - For a hook, when the event's capabilities decide it: must its
      result prevent the action the event is about, stop the agent's
-     further work, reach the agent as feedback, or only report? A step
+     further work, reach the agent as feedback before its next step, or
+     only report? A step
      that must run every time does not have to prevent or stop
      anything.
    - For a hook, when a capability holds only for one source of the
