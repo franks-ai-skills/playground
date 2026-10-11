@@ -1064,7 +1064,7 @@ never removes accepted-goal checks.
 `write_override(repository: Path, override: dict) -> Path` validates the
 record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
 
-- [ ] Test conflicts detected immediately after selection override and
+- [x] Test conflicts detected immediately after selection override and
   again during verification. Assert ordered choices and current goal,
   chosen/recommended mechanisms, failing ids/sources and pros/cons are
   shown. `keep` retains the error. A recommendation-only mismatch warns.
@@ -1079,9 +1079,9 @@ record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
   Assert the exact override path, repository scope and unchanged pinned
   snapshot. Reject rule ids or symlinks that escape the target repository;
   overrides from another repository never enter the effective rules.
-- [ ] Run `python -m unittest tests.test_goal_conflicts tests.test_pipeline tests.test_overrides tests.test_research -v`;
+- [x] Run `python -m unittest tests.test_goal_conflicts tests.test_pipeline tests.test_overrides tests.test_research -v`;
   expect incorrect warning downgrades or missing rerouting to fail.
-- [ ] Implement rerouting: recommended skill→builder; another harness
+- [x] Implement rerouting: recommended skill→builder; another harness
   concept→intake with builder unavailable; outside control→intake and
   README; adjusted goal→questions/selection and changed-domain research/
   acceptance; keep→failed report. Require fresh confirmation of changed
@@ -1103,7 +1103,7 @@ record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
   Store override records at `.harness/overrides/<rule-id>.yaml` as
   commit-ready repository artifacts; persisted records still require
   current-session confirmation to apply.
-- [ ] Exercise a full offline pipeline with stub research/review:
+- [x] Exercise a full offline pipeline with stub research/review:
   split, survey, choice, deep acceptance, build, error, fix and review.
   A changed override must alter selection/build/checking consistently.
   Re-run conflict and pipeline tests; no branch claims success after
@@ -1112,7 +1112,26 @@ record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
   fixture and break/fix cycle, exercising both review choices. Synthetic
   drift sources/issue responses are labelled as fixtures, never presented
   as genuine findings or published to the real KB.
-- [ ] Commit: `feat: route goal conflicts and scoped re-verification`.
+- [x] Commit: `feat: route goal conflicts and scoped re-verification`.
+
+Progress on 2026-10-11 (Forge `4f9c383`..`113fea3`, KB `a631de5`; 482
+tests): goal conflicts are detected from the eligibility rules right
+after a selection override and again in verification; `resolve-conflict`
+records the answer and routes it, and build refuses a stale or open
+selection and an unanswered conflict. Repository overrides are checked
+against the pinned rules, the catalog and this repository's supported
+findings, shown with explicit loosening warnings, adopted through the
+confirmed contract and applied in selection, build and verification;
+after a KB update they are proposed for removal or kept on the user's
+answer. Drift is recorded from kept findings, kept or adopted through
+the contract, and reported to the KB only with an approval of the exact
+text. The contract binds the links between parts, `links.parts` checks
+them, and `scope` and `verify --scope review|extensive` compute the
+re-verification scope from the earlier report. An offline CLI pipeline
+covers split through override consistency, and the live flows run
+(`live_checks.py --case flows`) passed clean on both subscriptions with
+a goal conflict, fixture drift and override, break, repair and both
+scopes. Rulings are in the ledger; it is now in review.
 
 ## Task 13: Package both harnesses and finish the KB migration
 
