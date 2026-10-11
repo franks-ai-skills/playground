@@ -1,0 +1,39 @@
+brief_digest: 30df48750d09c11eca55bf76716ef3cd41424897f4cabdd8bc14b289150f254d
+digest: 70dbad821d81ee1443861f063f3cd3c983c5538b201fc5117a7e4f8e71caaebe
+rules:
+- part_id: A
+  rule:
+    id: idea.bug-reproduction-checklist.a.results
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: When producing a reproduction checklist, precisely describe the expected result and the
+      actual result observed during local reproduction, and clearly distinguish assumptions or hypotheses
+      from confirmed observations.
+    applies_to:
+      harnesses:
+      - codex
+    evidence: Vendor
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    contested: false
+- part_id: A
+  rule:
+    id: idea.bug-reproduction-checklist.a.data-risk-check
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Use best-effort checks and precautions for personal information in logs and irreversible
+      effects on existing data during local reproduction. Before returning any reported result to the
+      calling agent, including a checklist, error, or blocker, check it for personal information and remove
+      or redact that information.
+    applies_to:
+      harnesses:
+      - codex
+    evidence: Inference
+    sources:
+    - https://firefox-source-docs.mozilla.org/networking/submitting_networking_bugs.html
+    - https://www.sqlite.org/howtocorrupt.html
+    contested: false

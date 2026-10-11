@@ -875,8 +875,23 @@ brief fields, project-only settings and a matching baseline for Claude
 runtime cases, the build's every-time wording, a `--confirm-not-applicable`
 path for unresolved error rules, research and review worker instructions,
 Codex resource listings, skill-read activation and the KB's event-bound
-must-hold rule. Open: the user's hands-on session in both harnesses, a
-justified reuse outcome, the PLAY examples and the milestone commit.
+must-hold rule.
+
+Hands-on sessions on 2026-10-11 (Forge `78a5678`, KB `31f7664`), stored
+in PLAY `examples/reproduction-checklist/`: Claude Code built the skill,
+not verified, because a reviewer read "no implementation edits" in the
+goal as a must-hold rule after the user answered "usually"; Codex
+verified, goal met. Fixed from them in Forge `68f31e4`..`db79bfd` and KB
+`a631de5`: the build conflict diff, numbered requirements stated once,
+must-not wording, `forge.py readme` for outside controls with their
+conditions, worker failure reasons with a Codex sandbox hint, the
+must-hold rule bound to the every-time answer, the bypass question,
+intake questions in the user's terms, and an explicit and a near-miss
+runtime case per part. The automated verticals then passed again on
+both subscriptions (Forge `db79bfd`, 407 tests): clean, verified, goal
+met; Claude Code's three runtime cases pass, Codex's explicit and
+implicit pass and its near miss is not-run. No survey in any run found a
+reusable candidate, so a justified reuse outcome stays open for T14.
 
 - [x] Define one live no-override/no-conflict case and offline adapter/
   orchestration assertions. Require both research passes, independent
@@ -1003,7 +1018,7 @@ justified reuse outcome, the PLAY examples and the milestone commit.
   skills available to substitute for it. Static checkers never launch
   candidate behavior. Record observed activation signals; absence of an
   observable signal is `not-run` with a reason, never an invented pass.
-- [ ] Run `python tools/live_checks.py --harness claude-code --case vertical`
+- [x] Run `python tools/live_checks.py --harness claude-code --case vertical`
   and the Codex equivalent from clean test installations using existing
   subscription authentication. A run counts as clean only when its
   observed inventory shows no user-level skills or plugins; otherwise
@@ -1022,12 +1037,12 @@ justified reuse outcome, the PLAY examples and the milestone commit.
   Run `--case routing-smoke`: one explicit invocation, one implicit
   positive and one near miss per skill/harness, once each (24 cases).
   Record unsupported modes; do not invent an implicit-load trace marker.
-- [ ] Inspect reports, generated files and acceptance records. Script
+- [x] Inspect reports, generated files and acceptance records. Script
   failures cannot be reversed by review. Missing live confirmation
   leaves goals unassessed. Record restrictions, versions and model ids;
   fix integration failures and re-run affected cases. Present this
   milestone's evidence and limits before the remaining conversations.
-- [ ] Commit: `test: prove the live skills vertical workflow`.
+- [x] Commit: `test: prove the live skills vertical workflow`.
 
 ## Task 12: Complete overrides, drift, conflicts and fix/review flows
 
