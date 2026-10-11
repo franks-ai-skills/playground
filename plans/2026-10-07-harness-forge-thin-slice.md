@@ -863,6 +863,21 @@ workflow, CLI commands `workers`, `research`, `accept`, `build` and
 Forge `c751517`; 382 tests). User decision: one real session plus automated
 runs without user input; the live runs wait for the user's go.
 
+Progress on 2026-10-11: the automated live runs pass on both subscriptions
+(Forge `3f7b2d3`..`78a5678`, KB `31f7664`; 398 tests). The vertical run is
+clean and verified with the goal met in Claude Code and Codex, and every
+runtime case that has an observable signal passes. Routing smoke: Claude
+Code 11 of 12 pass, one explicit case not-run; Codex 4 implicit and 1
+explicit pass, the others not-run because Codex leaves no signal for an
+explicit `$skill` or a near miss. Fixed on the way, with rulings in the
+ledger: enforced worker output schemas, Forge-stamped finding ids and
+brief fields, project-only settings and a matching baseline for Claude
+runtime cases, the build's every-time wording, a `--confirm-not-applicable`
+path for unresolved error rules, research and review worker instructions,
+Codex resource listings, skill-read activation and the KB's event-bound
+must-hold rule. Open: the user's hands-on session in both harnesses, a
+justified reuse outcome, the PLAY examples and the milestone commit.
+
 - [x] Define one live no-override/no-conflict case and offline adapter/
   orchestration assertions. Require both research passes, independent
   source support, explicit requirement acceptance, a skill build and a
@@ -910,7 +925,7 @@ runs without user input; the live runs wait for the user's go.
   run, and unavailable/timeout/error outcomes are recorded explicitly.
 - [x] Run `python -m unittest tests.test_adapters tests.test_pipeline tests.test_runtime -v`
   with stub workers; expect the new integration assertions to fail.
-- [ ] Connect the active skills to independent CLI worker processes in each
+- [x] Connect the active skills to independent CLI worker processes in each
   harness; never fall back to native subagents. Use
   standard `claude` and `codex` executables with the user's existing login,
   vendor account resolution (default location or a user-set
