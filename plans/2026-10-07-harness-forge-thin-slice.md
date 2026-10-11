@@ -1147,6 +1147,15 @@ are neither dependencies nor silently discovered as requirements.
   procedure in an isolated test installation; save the exact working
   commands and account-access limitations. Use the existing subscription
   for live calls without copying credentials or silently creating logins.
+- [ ] Let contributors with an API-key or unknown login run
+  `tools/live_checks.py`. Today the automated runner stops on such a
+  login, because nobody is there to answer the cost question. Add an
+  explicit `--login-answer continue` flag that the contributor gives on
+  each run. Pass it to `preflight` and to every command that launches a
+  worker, and record it in `summary.json`. Never read an earlier
+  acceptance from disk or from another session. Test that a run without
+  the flag still stops at the `workers` stage and that the flag never
+  changes the subscription path.
 - [ ] **Checkpoint before publication: remove personal configuration.**
   Re-check every file that will be published in FORGE and KB, including
   evidence reports, evidence indexes and contributor instructions, for the
