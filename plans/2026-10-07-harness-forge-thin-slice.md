@@ -1131,7 +1131,22 @@ re-verification scope from the earlier report. An offline CLI pipeline
 covers split through override consistency, and the live flows run
 (`live_checks.py --case flows`) passed clean on both subscriptions with
 a goal conflict, fixture drift and override, break, repair and both
-scopes. Rulings are in the ledger; it is now in review.
+scopes. Rulings are in the ledger.
+
+Review on 2026-10-12 (Forge to `a15c2f7`, KB unchanged; 531 tests): a
+T12 review by GPT-6.1 Sol closed after eight rounds, then a review of
+the whole branch and both Forge repositories ran three rounds. Every
+finding was adopted or settled by a ledgered ruling; the loop stopped
+after round 3 on the owner's request, with round 3's fixes not
+re-reviewed. Among them: the contract binds and shows each drift
+finding in full, research and acceptance accept only findings whose
+support verdict was given for their current content, activation counts
+only an executed read of the staged candidate, accept drops retired
+parts' requirements and replaces older revisions, and Codex runs, whose
+inventory is not reported, are best-effort with the gap stated. The
+owner dropped a KB rule for Claude-only discovery layout (the runtime
+test covers a missing link) and set the issue routing: research disputes
+go to the KB repository, Forge problems to Forge's.
 
 ## Task 13: Package both harnesses and finish the KB migration
 
