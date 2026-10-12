@@ -1133,18 +1133,25 @@ covers split through override consistency, and the live flows run
 a goal conflict, fixture drift and override, break, repair and both
 scopes. Rulings are in the ledger.
 
-Review on 2026-10-12 (Forge to `a15c2f7`, KB unchanged; 531 tests): a
+Review on 2026-10-12 (Forge to `4227218`, KB unchanged; 544 tests): a
 T12 review by GPT-6.1 Sol closed after eight rounds, then a review of
-the whole branch and both Forge repositories ran three rounds. Every
-finding was adopted or settled by a ledgered ruling; the loop stopped
-after round 3 on the owner's request, with round 3's fixes not
-re-reviewed. Among them: the contract binds and shows each drift
+the whole branch and both Forge repositories closed after eight rounds
+with no remaining finding. Every finding was adopted or settled by a
+ledgered ruling; the reviewer withdrew the one it disputed once the
+trust boundary was stated: digests prove a record consistent, not
+authentic, and Forge guards against untrusted content and stale
+records, not an owner forging their own repository. Among the fixes: the contract binds and shows each drift
 finding in full, research and acceptance accept only findings whose
 support verdict was given for their current content, activation counts
 only an executed read of the staged candidate, accept drops retired
 parts' requirements and replaces older revisions, and Codex runs, whose
-inventory is not reported, are best-effort with the gap stated. The
-owner dropped a KB rule for Claude-only discovery layout (the runtime
+inventory is not reported, are best-effort with the gap stated. Later
+rounds made activation need the candidate's whole SKILL.md in order or
+the prompt's one invoked command, exempt only bundled Claude skills
+(origins from a second launch with bundled skills off), keep a Review's
+earlier results only with runtime evidence that holds for the verified
+harness and cases, supersede drift whose finding research replaced, and
+verify only in a target harness. The owner dropped a KB rule for Claude-only discovery layout (the runtime
 test covers a missing link) and set the issue routing: research disputes
 go to the KB repository, Forge problems to Forge's.
 
