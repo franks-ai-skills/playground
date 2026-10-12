@@ -1155,6 +1155,17 @@ verify only in a target harness. The owner dropped a KB rule for Claude-only dis
 test covers a missing link) and set the issue routing: research disputes
 go to the KB repository, Forge problems to Forge's.
 
+Live reruns on 2026-10-12 (Forge `bced4da`; 546 tests): Claude Code
+2.1.296 keeps its built-in `design`, `doctor` and `plugin-authoring`
+skills with bundled skills off, so they made every Claude runtime case
+not-run. Each runtime and routing case now turns the skills that launch
+lists off with `skillOverrides`; a skill still listed competes. Claude
+flows and vertical then passed clean, and Codex flows passed with its
+stated inventory gap. Codex 0.162.1 starts its `codex-code-mode-host`
+helper, which macOS held at a first-launch prompt once and later passed
+without one; `--disable code_mode_host` would turn off shell commands, so
+Forge keeps the vendor default.
+
 ## Task 13: Package both harnesses and finish the KB migration
 
 **Files:** FORGE manifests, `README.md`, `tests/test_packaging.py`,
