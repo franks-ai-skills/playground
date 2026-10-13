@@ -5,8 +5,11 @@ A scratch repository for trying things out in the
 
 ## Content
 
-- [`docs/`](docs/README.md): a knowledge base on configuring coding-agent
-  harnesses (Claude Code, Codex, OpenCode). Start with the
+- [`docs/`](docs/README.md): a frozen copy, as of 2026-10-09, of the
+  knowledge base on configuring coding-agent harnesses (Claude Code,
+  Codex, OpenCode). The current knowledge base is the `agent-harness-kb`
+  repository; this copy stays unchanged until that repository is
+  published and then moves out. Start with the
   [overview](docs/overview.md); behind it are a condensed guide per
   concept, the full concept and best-practice pages, and a reference
   per harness.
