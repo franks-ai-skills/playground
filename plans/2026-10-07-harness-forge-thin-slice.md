@@ -1165,6 +1165,10 @@ stated inventory gap. Codex 0.162.1 starts its `codex-code-mode-host`
 helper, which macOS held at a first-launch prompt once and later passed
 without one; `--disable code_mode_host` would turn off shell commands, so
 Forge keeps the vendor default.
+On 2026-10-13 the routing smoke ran on both harnesses and the Codex
+vertical run again, without failures. Explicit Claude slash invocations
+stay not-run: in print mode they leave no observable signal, the cost of
+the round-2 activation ruling and an open point for T14.
 
 ## Task 13: Package both harnesses and finish the KB migration
 
