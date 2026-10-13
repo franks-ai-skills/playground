@@ -1182,7 +1182,7 @@ PLAY `README.md`, `AGENTS.md`, `.agents/skills/agent-harness/SKILL.md`,
 snapshot identity is identical after installation. Author-only skills
 are neither dependencies nor silently discovered as requirements.
 
-- [ ] Test manifest versions, four skill names, package-resource paths,
+- [x] Test manifest versions, four skill names, package-resource paths,
   identical snapshot hashes and all required runtime files. Include a
   clean installation whose personal skill/plugin directories are empty or
   fully suppressed, as shown by the observed inventory.
@@ -1203,9 +1203,9 @@ are neither dependencies nor silently discovered as requirements.
   choice, not the exception's wording. Record the approved text/digest;
   changes to that wording require review again. Until approval, continue
   local packaging checks but leave publication pending.
-- [ ] Run `python -m unittest tests.test_packaging -v`; expect missing
+- [x] Run `python -m unittest tests.test_packaging -v`; expect missing
   manifests/resources to fail.
-- [ ] Package root `plugin.json`, Claude `.claude-plugin/plugin.json`
+- [x] Package root `plugin.json`, Claude `.claude-plugin/plugin.json`
   and `.claude-plugin/marketplace.json`, using tested current schemas.
   Both manifests point to the same `skills/`. Recheck marketplace
   compatibility in both CLIs; add a generated Codex marketplace file
@@ -1233,7 +1233,7 @@ are neither dependencies nor silently discovered as requirements.
   procedure in an isolated test installation; save the exact working
   commands and account-access limitations. Use the existing subscription
   for live calls without copying credentials or silently creating logins.
-- [ ] Let contributors with an API-key or unknown login run
+- [x] Let contributors with an API-key or unknown login run
   `tools/live_checks.py`. Today the automated runner stops on such a
   login, because nobody is there to answer the cost question. Add an
   explicit `--login-answer continue` flag that the contributor gives on
@@ -1293,6 +1293,22 @@ are neither dependencies nor silently discovered as requirements.
   describe those locations as local code paths, not public Markdown links.
 - [ ] Commit per repository: `feat: package forge for Claude Code and Codex`
   / `docs: move harness knowledge base to its own repository`.
+
+Progress on 2026-10-13 (Forge `b0971d3`..`15b51b9`, KB `7fb4b95`,
+`38b615e`): a clean install showed that a global ignore pattern had kept
+the coverage schema out of Forge, the KB and the snapshot; both
+repositories now track it and the snapshot is pinned again. Both
+harnesses install the repository root as one plugin, version 0.1.0,
+from a shared `.claude-plugin/marketplace.json`. `forge.py` switches to
+Forge's own Python environment, which `scripts/setup.py` creates once,
+with the user's consent, from the hashed lock in a Forge data directory.
+Installs from a clean clone into throwaway homes held only committed
+files and an identical snapshot, and a Claude session loaded only
+Forge's skills next to the bundled ones. The live runner takes
+`--login-answer continue`. The generated-output permission is drafted
+and awaits approval; publication, the playground migration and the
+evidence files that name personal profiles wait for the owner. Rulings
+are in the ledger.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
