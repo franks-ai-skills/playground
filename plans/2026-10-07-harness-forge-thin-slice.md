@@ -1310,6 +1310,20 @@ and awaits approval; publication, the playground migration and the
 evidence files that name personal profiles wait for the owner. Rulings
 are in the ledger.
 
+Review on 2026-10-13 (Forge to `91fb533`, KB `2b6fbce`; 589 tests): a
+T13 review by GPT-6.1 Sol closed after five rounds, then a review of the
+whole branch closed after eight. Among the fixes: setup runs pip isolated
+in a locked, in-place environment; Claude runtime cases and all workers
+fail on an observed access outside their workspace, and a Codex
+worker's shell lines must fit a strict grammar of reading commands; a
+Claude read activates only when it returned the whole SKILL.md in order;
+the reviewer gets only confirmed parts, their links, and goal requests
+it must answer exactly; the survey runs on an idea-level record before
+the split; verify rereads the runtime cases. Live flows passed on both
+harnesses and the routing smoke ran on both. Publication waits for the
+owner: the license wording, the evidence files that name personal
+profiles, and the filter-branch backup refs. Rulings are in the ledger.
+
 ## Task 14: Record real reference runs and verify the forge itself
 
 **Files:** PLAY `examples/reproduction-checklist/{claude-code,codex}/`,
