@@ -1196,7 +1196,7 @@ are neither dependencies nor silently discovered as requirements.
   Unexpected additions, edits or deletions block removal. Reconcile them
   into KB under its source policy, record any explicit pin update and
   re-run affected evidence before updating the migration inventory.
-- [ ] Draft the exact generated-output permission in
+- [x] Draft the exact generated-output permission in
   `legal/generated-output-permission.md` and its placement in `LICENSE`.
   Show both to the user for explicit approval before publishing either
   destination repository or the plugin. The parent settles the license
@@ -1323,6 +1323,15 @@ the split; verify rereads the runtime cases. Live flows passed on both
 harnesses and the routing smoke ran on both. Publication waits for the
 owner: the license wording, the evidence files that name personal
 profiles, and the filter-branch backup refs. Rulings are in the ledger.
+
+License on 2026-10-14 (Forge `178db78`, KB `8fff6ca`): after five reviews
+the owner approved the Harness Forge Generated Output Exception (draft 7,
+written in its own words on the Autoconf exception's concepts and
+covering AGPLv3 section 13). It is `LICENSE-OUTPUT-EXCEPTION` in both
+repositories, with `LICENSE` unchanged; the files whose text Forge
+copies into its output carry its notice, and `CONTRIBUTING.md` holds
+the contribution grant. It takes effect at publication, after the
+owner confirms that no existing material needs separate permission.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
