@@ -1242,7 +1242,7 @@ are neither dependencies nor silently discovered as requirements.
   acceptance from disk or from another session. Test that a run without
   the flag still stops at the `workers` stage and that the flag never
   changes the subscription path.
-- [ ] **Checkpoint before publication: remove personal configuration.**
+- [x] **Checkpoint before publication: remove personal configuration.**
   Re-check every file that will be published in FORGE and KB, including
   evidence reports, evidence indexes and contributor instructions, for the
   owner's personal configuration: profile and wrapper names, account
@@ -1332,6 +1332,13 @@ repositories, with `LICENSE` unchanged; the files whose text Forge
 copies into its output carry its notice, and `CONTRIBUTING.md` holds
 the contribution grant. It takes effect at publication, after the
 owner confirms that no existing material needs separate permission.
+
+Checkpoint on 2026-10-15 (Forge `df4d721`, KB `3125f2b`): the owner
+finished the check for personal configuration. Forge and the KB name no
+owner profile, wrapper, account path or local-development note; every
+author and committer address in Forge, the KB and playground is
+`frank.w.reichenbach@web.de`, which the owner chose for commits, so no
+history rewrite is needed. No filter-branch backup refs remain.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
