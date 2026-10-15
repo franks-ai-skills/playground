@@ -1407,6 +1407,30 @@ or raw private harness profiles.
   disclosed under the accepted policy; this does not waive required
   functional cases. Record any further capability needing a design change
   and return it for a concrete decision rather than weakening parity.
+- [ ] **Research is about the idea, not the harness** (owner, 2026-10-15).
+  Research looks into the user's idea and its domain: for a review skill,
+  how good reviews are done, which review tools exist and where reviews go
+  wrong. How Claude Code and Codex load skills, run commands or read
+  settings is already in Forge's pinned KB snapshot; research must not
+  find it again, and the agent must not work out Forge's own checks from
+  its code. Both happened in the owner's codex-review test
+  (`~/harness-work/codex-review`, session `cd590fb5`): a kept A1 finding
+  (F32) cites Claude Code's skills page for what happens when an injected
+  command fails, a harness fact the KB holds, and the agent imported
+  Forge's modules to compute brief digests, because harness-research says
+  research counts only under the current brief digest, although
+  `forge.py accept` already refuses research for another brief. Change the
+  researcher brief and both research steps so that the pinned KB answers
+  harness questions and research covers the idea only. A finding that
+  contradicts the KB still goes through drift. The harness-research skill
+  should tell the agent to rely on `accept`'s check.
+- [ ] Smaller points from the same test: the re-verification scope
+  question must say what is re-verified (the owner asked "for our current
+  work or within the skill we are creating?"); the reviewer judged the
+  same `outside.*` README text differently across two runs; parts A2 and
+  A3 lacked the untrusted-input line (`security.untrusted-input.as-data`,
+  warning) although the repository was marked untrusted, so the builder
+  guidance should carry it into every part when that fact is set.
 - [ ] Commit: `test: record portable skills pipeline reference runs`.
 
 ## Completion boundary
