@@ -52,3 +52,13 @@ These folders keep the sessions' original output, from before the
 fixes. Claude Code discovers `.claude/skills/` folders below the
 working directory, so a session that works on files in `claude-code/`
 can list `repro-checklist` as a skill.
+
+## Checked reference runs
+
+`tools/check_references.py` checks a stored run against the current
+Forge: records, revision and file bindings, accepted-only requirements,
+the Outside controls section, each part's exact rule set, the result
+labels its `expected.yaml` states and the runtime cases. These two
+folders predate Forge's current report format and have no
+`expected.yaml`, so the checker fails on them until the plan's task 14
+records new reference runs here.
