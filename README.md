@@ -5,17 +5,15 @@ A scratch repository for trying things out in the
 
 ## Content
 
-- [`docs/`](docs/README.md): a frozen copy, as of 2026-10-09, of the
-  knowledge base on configuring coding-agent harnesses (Claude Code,
-  Codex, OpenCode). The current knowledge base is the `agent-harness-kb`
-  repository; this copy stays unchanged until that repository is
-  published and then moves out. Start with the
-  [overview](docs/overview.md); behind it are a condensed guide per
-  concept, the full concept and best-practice pages, and a reference
-  per harness.
-- [`AGENTS.md`](AGENTS.md) and the `agent-harness` skill in
-  [`.agents/skills/`](.agents/skills/agent-harness/SKILL.md) make the
-  knowledge base available to agents working in this repository.
+- [`specs/`](specs/) and [`plans/`](plans/): the Harness Forge design,
+  its implementation plans and their results.
+- The knowledge base on configuring coding-agent harnesses (Claude Code,
+  Codex, OpenCode) moved to
+  [agent-harness-kb](https://github.com/franks-ai-skills/agent-harness-kb)
+  when it was published on 2026-10-16. [`AGENTS.md`](AGENTS.md) and the
+  `agent-harness` skill in
+  [`.agents/skills/`](.agents/skills/agent-harness/SKILL.md) route agents
+  working here to a local checkout of it, or to the public repository.
   `.claude/skills/` holds a symlink to the same skill for Claude Code.
 
 ## Harness Forge worker isolation gap
@@ -24,18 +22,19 @@ The [Harness Forge design](specs/2026-10-06-harness-forge-design.md) and
 [implementation plan](plans/2026-10-07-harness-forge-thin-slice.md) live here.
 On 2026-10-09 the owner accepted automated workers in Claude Code and
 Codex with weaker isolation (`best-effort-v1`). Available restrictions
-will be used, but complete tool absence and prevention of unauthorized
-file/context/network access are not guaranteed. Functional live support
-is still being implemented; the diagnostics did not certify containment.
+are used, but complete tool absence and prevention of unauthorized
+file/context/network access are not guaranteed; the diagnostics did not
+certify containment.
 
 Use this mode for trusted projects, and do not rely on it to hide secrets
 or contain hostile content. Forge's README and per-run reports must
 disclose the gap even when the built artifact is `verified`. See the
 [accepted policy](plans/2026-10-09-harness-forge-decisions.md) and
 [M1 report](plans/2026-10-07-harness-forge-m1-results.md) for the evidence.
-Forge is currently an unpublished sibling checkout; its local README is
-at `../harness-forge/README.md`. Public cross-repository links will be
-added at distribution. Generic Forge-build provenance is not mandatory
+Forge is published as
+[harness-forge](https://github.com/franks-ai-skills/harness-forge); its
+README states the [worker isolation limitations](https://github.com/franks-ai-skills/harness-forge#worker-isolation-limitations).
+Generic Forge-build provenance is not mandatory
 in every generated README; artifact-specific outside controls still are.
 
 ## Forge account setup

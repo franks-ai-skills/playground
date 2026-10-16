@@ -1,20 +1,20 @@
 # playground
 
 Scratch repository in the franks-ai-skills organization. It holds the
-Harness Forge specs and plans, and a frozen copy of the researched
-knowledge base on configuring coding-agent harnesses (Claude Code, Codex
-and OpenCode).
+Harness Forge specs and plans. The researched knowledge base on
+configuring coding-agent harnesses (Claude Code, Codex and OpenCode)
+lives in its own repository, agent-harness-kb.
 
 ## Agent harness knowledge base
 
-- Since 2026-10-09 the authoritative knowledge base is the sibling
-  checkout `../agent-harness-kb` (it is published at distribution). Read
-  its pages and make every correction there, under its `AGENTS.md`:
-  its source policy `docs/sources.md` and its propagation rules.
-- Playground's `docs/` is frozen migration evidence until the KB is
-  published: do not edit it. `harness-forge`'s migration guard fails on
-  any change. Without the sibling checkout, read it, but say that it is
-  the frozen copy of 2026-10-09.
+- The knowledge base is the sibling checkout `../agent-harness-kb`,
+  published at <https://github.com/franks-ai-skills/agent-harness-kb>.
+  Read its pages and make every correction there, under its
+  `AGENTS.md`: its source policy `docs/sources.md` and its propagation
+  rules. Without the sibling checkout, read the public repository and
+  say so.
+- Playground's copy of the research was removed after the KB was
+  published on 2026-10-16.
 - Paths below such as `docs/overview.md` refer to the KB checkout.
 - For any question or change about an agent harness (instruction
   files, settings, permissions, sandbox, MCP, skills, slash commands,

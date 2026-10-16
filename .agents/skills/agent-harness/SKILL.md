@@ -1,6 +1,6 @@
 ---
 name: agent-harness
-description: Answers questions about, and sets up or reviews, the configuration of coding-agent harnesses (Claude Code, Codex, OpenCode) using this repository's researched knowledge base. Covers instruction files (AGENTS.md, CLAUDE.md), settings, permissions and sandbox, MCP servers, skills, slash commands, subagents, hooks, plugins and marketplaces, and headless or CI automation. Use when configuring, reviewing, comparing or porting any of these, or when asked how a harness feature works or what the best practice is.
+description: Answers questions about, and sets up or reviews, the configuration of coding-agent harnesses (Claude Code, Codex, OpenCode) using the researched Agent Harness KB. Covers instruction files (AGENTS.md, CLAUDE.md), settings, permissions and sandbox, MCP servers, skills, slash commands, subagents, hooks, plugins and marketplaces, and headless or CI automation. Use when configuring, reviewing, comparing or porting any of these, or when asked how a harness feature works or what the best practice is.
 ---
 
 # Agent harness
@@ -18,10 +18,11 @@ questions about models themselves (pricing, model choice).
 
 ## The knowledge base
 
-The authoritative knowledge base is the sibling checkout
-`../agent-harness-kb`; the `docs/` paths below are relative to it.
-Playground's own `docs/` is a frozen copy of 2026-10-09: read it only
-when the sibling checkout is missing, say so, and never edit it.
+The knowledge base is the Agent Harness KB; the `docs/` paths below
+are relative to it. Read the sibling checkout `../agent-harness-kb`.
+Without one, read the public repository
+<https://github.com/franks-ai-skills/agent-harness-kb> for reference
+and say so; corrections still need a checkout.
 
 An overview page plus four layers, one page per concept in each. Page
 names are identical across layers, so `<concept>` below is one of: `instructions`,
@@ -66,8 +67,8 @@ one harness has. Check it before calling something portable.
    best-practices page and report each item that fails, with the page
    section that explains it.
 6. **Keep the knowledge base current.** When a fact turns out to be
-   outdated or wrong, fix it in `../agent-harness-kb`, never in the
-   frozen playground copy: fix the vendor page with the new source and
+   outdated or wrong, fix it in `../agent-harness-kb`: fix the vendor
+   page with the new source and
    date (the source rules in the KB's `AGENTS.md` apply),
    then every page that repeats it (`docs/concepts/`,
    `docs/best-practices/`, `docs/guide/`, `docs/overview.md`). Mention
