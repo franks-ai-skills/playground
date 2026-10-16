@@ -1291,6 +1291,23 @@ are neither dependencies nor silently discovered as requirements.
   on publication. Test README links as GitHub repository-relative paths:
   a link cannot traverse into a sibling checkout. Before publication,
   describe those locations as local code paths, not public Markdown links.
+- [ ] **First after publication: replace Forge's Markdown scanner with
+  markdown-it-py** (owner decision, 2026-10-16). Forge's own scanner
+  (`documents._scan`) follows CommonMark for fenced code, the seven HTML
+  block kinds and ATX headings, refuses a lone HTML tag line below text,
+  and accepts only Forge's own lines in its README sections. It does not
+  model list items, block quotes, indented code or setext headings, so a
+  fence or HTML block inside a list item or quote is misread: a broken
+  link in a skill file can pass the link checks, a heading inside such a
+  block can count as a KB anchor or a real one be missed, and the README
+  writer can replace such a block's text when it consists only of lines
+  in Forge's section form (Codex fix review round 8). Forge's README
+  states the gap and the workaround. The fix uses the CommonMark parser
+  markdown-it-py for headings, code and HTML ranges and links in every
+  consumer: README writer and coverage check, skill link and placeholder
+  checks, KB anchors, report reading, source policy. It adds a locked
+  dependency, so it needs the owner's approval of the install, and a
+  Codex review.
 - [ ] Commit per repository: `feat: package forge for Claude Code and Codex`
   / `docs: move harness knowledge base to its own repository`.
 
@@ -1339,6 +1356,22 @@ owner profile, wrapper, account path or local-development note; every
 author and committer address in Forge, the KB and playground is
 `frank.w.reichenbach@web.de`, which the owner chose for commits, so no
 history rewrite is needed. No filter-branch backup refs remain.
+
+Fixes from the owner's test on 2026-10-15/16 (Forge `16f54be`..`ab655a1`,
+KB `5e89e79`; 634 tests): a must-not requirement keeps the case of its
+first word; a part without accepted requirements gets no empty
+requirements section or reference, and a rebuild treats a file Forge
+wrote earlier but no longer plans as a conflict until the user agrees to
+remove it; runtime cases list tools only for the target harnesses, and
+verify refuses a case without them before any worker starts; the result
+README says where built skills load when the reach is wider than the
+repository. A Codex review (GPT-6.1 Sol, eight rounds) then hardened
+Forge's Markdown reading: one scanner for every consumer, Forge's README
+sections limited to the lines Forge writes, exact parsing of outside-
+control entries, report lines kept whole. Its last finding, fences and
+HTML blocks inside lists and quotes, is deferred by the owner to the
+first change after publication (see the item above). Rulings are in the
+ledger.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
