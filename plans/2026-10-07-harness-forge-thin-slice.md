@@ -172,7 +172,7 @@ support. Earlier failed/unproven evidence and the grader are unchanged.
 There is no automatic extension of the diagnostic or mandatory container.
 
 M2 checkpoint on 2026-10-10: T3-T10 are complete on the `feature/thin-slice`
-branches of KB (`5403f01`) and Forge (`ec2ce92`), both local only. A
+branches of KB (`5403f01`) and Forge (`ae2e030`), both local only. A
 review found eight defects in rule kinds, confirmation binding, bound
 inputs, path containment, blocked parts, runtime records, report
 provenance and selection citations; each now has a regression test, and a
@@ -854,17 +854,17 @@ Consume T4-T10's stage contracts. Produce a live reference run in each
 harness with accepted idea rules, a portable skill and a report. This
 milestone proves the primary workflow, not the completed slice.
 
-Progress on 2026-10-10: the offline part is done in Forge `4f7e83b`..`89c61a4`
+Progress on 2026-10-10: the offline part is done in Forge `cd3d8bc`..`4eec766`
 (independent-process adapters with preflight and the login-type check,
 runtime producer, Forge's own source fetch, research and verification
 workflow, CLI commands `workers`, `research`, `accept`, `build` and
 `verify`, skills wired to them), then the automated live runner
 (`tools/live_runs.py` behind `live_checks.py --case vertical|routing-smoke`,
-Forge `c751517`; 382 tests). User decision: one real session plus automated
+Forge `44407f1`; 382 tests). User decision: one real session plus automated
 runs without user input; the live runs wait for the user's go.
 
 Progress on 2026-10-11: the automated live runs pass on both subscriptions
-(Forge `3f7b2d3`..`78a5678`, KB `31f7664`; 398 tests). The vertical run is
+(Forge `22cb559`..`1009c05`, KB `31f7664`; 398 tests). The vertical run is
 clean and verified with the goal met in Claude Code and Codex, and every
 runtime case that has an observable signal passes. Routing smoke: Claude
 Code 11 of 12 pass, one explicit case not-run; Codex 4 implicit and 1
@@ -877,18 +877,18 @@ path for unresolved error rules, research and review worker instructions,
 Codex resource listings, skill-read activation and the KB's event-bound
 must-hold rule.
 
-Hands-on sessions on 2026-10-11 (Forge `78a5678`, KB `31f7664`), stored
+Hands-on sessions on 2026-10-11 (Forge `1009c05`, KB `31f7664`), stored
 in PLAY `examples/reproduction-checklist/`: Claude Code built the skill,
 not verified, because a reviewer read "no implementation edits" in the
 goal as a must-hold rule after the user answered "usually"; Codex
-verified, goal met. Fixed from them in Forge `68f31e4`..`db79bfd` and KB
+verified, goal met. Fixed from them in Forge `03a5ae6`..`306c4e2` and KB
 `a631de5`: the build conflict diff, numbered requirements stated once,
 must-not wording, `forge.py readme` for outside controls with their
 conditions, worker failure reasons with a Codex sandbox hint, the
 must-hold rule bound to the every-time answer, the bypass question,
 intake questions in the user's terms, and an explicit and a near-miss
 runtime case per part. The automated verticals then passed again on
-both subscriptions (Forge `db79bfd`, 407 tests): clean, verified, goal
+both subscriptions (Forge `306c4e2`, 407 tests): clean, verified, goal
 met; Claude Code's three runtime cases pass, Codex's explicit and
 implicit pass and its near miss is not-run. No survey in any run found a
 reusable candidate, so a justified reuse outcome stays open for T14.
@@ -1114,7 +1114,7 @@ record and writes `.harness/overrides/<rule-id>.yaml` in that repository.
   as genuine findings or published to the real KB.
 - [x] Commit: `feat: route goal conflicts and scoped re-verification`.
 
-Progress on 2026-10-11 (Forge `4f9c383`..`113fea3`, KB `a631de5`; 482
+Progress on 2026-10-11 (Forge `f54d3e5`..`7141102`, KB `a631de5`; 482
 tests): goal conflicts are detected from the eligibility rules right
 after a selection override and again in verification; `resolve-conflict`
 records the answer and routes it, and build refuses a stale or open
@@ -1133,7 +1133,7 @@ covers split through override consistency, and the live flows run
 a goal conflict, fixture drift and override, break, repair and both
 scopes. Rulings are in the ledger.
 
-Review on 2026-10-12 (Forge to `4227218`, KB unchanged; 544 tests): a
+Review on 2026-10-12 (Forge to `d9f4ef0`, KB unchanged; 544 tests): a
 T12 review by GPT-6.1 Sol closed after eight rounds, then a review of
 the whole branch and both Forge repositories closed after eight rounds
 with no remaining finding. Every finding was adopted or settled by a
@@ -1155,7 +1155,7 @@ verify only in a target harness. The owner dropped a KB rule for Claude-only dis
 test covers a missing link) and set the issue routing: research disputes
 go to the KB repository, Forge problems to Forge's.
 
-Live reruns on 2026-10-12 (Forge `bced4da`; 546 tests): Claude Code
+Live reruns on 2026-10-12 (Forge `f32a928`; 546 tests): Claude Code
 2.1.296 keeps its built-in `design`, `doctor` and `plugin-authoring`
 skills with bundled skills off, so they made every Claude runtime case
 not-run. Each runtime and routing case now turns the skills that launch
@@ -1311,7 +1311,7 @@ are neither dependencies nor silently discovered as requirements.
 - [ ] Commit per repository: `feat: package forge for Claude Code and Codex`
   / `docs: move harness knowledge base to its own repository`.
 
-Progress on 2026-10-13 (Forge `b0971d3`..`15b51b9`, KB `7fb4b95`,
+Progress on 2026-10-13 (Forge `f35e02c`..`182a8b1`, KB `7fb4b95`,
 `38b615e`): a clean install showed that a global ignore pattern had kept
 the coverage schema out of Forge, the KB and the snapshot; both
 repositories now track it and the snapshot is pinned again. Both
@@ -1327,7 +1327,7 @@ and awaits approval; publication, the playground migration and the
 evidence files that name personal profiles wait for the owner. Rulings
 are in the ledger.
 
-Review on 2026-10-13 (Forge to `91fb533`, KB `2b6fbce`; 589 tests): a
+Review on 2026-10-13 (Forge to `22e299a`, KB `2b6fbce`; 589 tests): a
 T13 review by GPT-6.1 Sol closed after five rounds, then a review of the
 whole branch closed after eight. Among the fixes: setup runs pip isolated
 in a locked, in-place environment; Claude runtime cases and all workers
@@ -1341,7 +1341,7 @@ harnesses and the routing smoke ran on both. Publication waits for the
 owner: the license wording, the evidence files that name personal
 profiles, and the filter-branch backup refs. Rulings are in the ledger.
 
-License on 2026-10-14 (Forge `178db78`, KB `8fff6ca`): after five reviews
+License on 2026-10-14 (Forge `4ec98c8`, KB `8fff6ca`): after five reviews
 the owner approved the Harness Forge Generated Output Exception (draft 7,
 written in its own words on the Autoconf exception's concepts and
 covering AGPLv3 section 13). It is `LICENSE-OUTPUT-EXCEPTION` in both
@@ -1350,14 +1350,14 @@ copies into its output carry its notice, and `CONTRIBUTING.md` holds
 the contribution grant. It takes effect at publication, after the
 owner confirms that no existing material needs separate permission.
 
-Checkpoint on 2026-10-15 (Forge `df4d721`, KB `3125f2b`): the owner
+Checkpoint on 2026-10-15 (Forge `e400ddc`, KB `3125f2b`): the owner
 finished the check for personal configuration. Forge and the KB name no
 owner profile, wrapper, account path or local-development note; every
 author and committer address in Forge, the KB and playground is
 `frank.w.reichenbach@web.de`, which the owner chose for commits, so no
 history rewrite is needed. No filter-branch backup refs remain.
 
-Fixes from the owner's test on 2026-10-15/16 (Forge `16f54be`..`ab655a1`,
+Fixes from the owner's test on 2026-10-15/16 (Forge `2f8e511`..`5d7ac0d`,
 KB `5e89e79`; 634 tests): a must-not requirement keeps the case of its
 first word; a part without accepted requirements gets no empty
 requirements section or reference, and a rebuild treats a file Forge

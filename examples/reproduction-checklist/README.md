@@ -8,7 +8,7 @@ requirements under `.harness/`, the built skill, and the README with its
 `Outside controls` section. The trial repositories' `AGENTS.md`, which
 names local paths, and the agent's own scratch files are left out.
 
-Both sessions ran Forge `78a5678` with the KB pinned at `31f7664`, on
+Both sessions ran Forge `1009c05` with the KB pinned at `31f7664`, on
 subscription logins, with the account's default model.
 
 | | Claude Code | Codex |
@@ -30,7 +30,7 @@ reviewer in the same session passed the rule.
 
 ## Fixed after these sessions
 
-Forge `68f31e4`..`db79bfd` and KB `a631de5`:
+Forge `03a5ae6`..`306c4e2` and KB `a631de5`:
 
 - A build over a changed skill showed its diff instead of crashing.
 - Requirements are numbered and stated once, with one period. The
