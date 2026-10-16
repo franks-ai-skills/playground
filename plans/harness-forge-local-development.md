@@ -23,24 +23,27 @@ not a prerequisite or proof of credential isolation.
 
 ## This machine only
 
-Local Forge development uses the `personal-profile` account. Start every
-local Forge run, test or probe with `CLAUDE_CONFIG_DIR=$HOME/.personal-profile`
-set; Forge passes the variable through to its workers and its login-type
-check. Never use or change `~/.claude`: the owner switches that default
-login as needed, normally to the `team-profile` work subscription.
+Local Forge development uses the owner's personal subscription profile,
+a separate Claude Code configuration directory. Start every local Forge
+run, test or probe with `CLAUDE_CONFIG_DIR` set to that directory; Forge
+passes the variable through to its workers and its login-type check. The
+owner tells each session which directory it is; it is not recorded here.
+Never use or change `~/.claude`: the owner switches that default login as
+needed, normally to the work subscription.
 
 Before a local run, check read-only that the profile is logged in with
-the expected account: `CLAUDE_CONFIG_DIR=$HOME/.personal-profile claude auth
-status`. If it is not, stop and report it. Do not run the `.zshrc`
-function `personal-profile` from automation: it can log out or start a login
-when the account differs. Do not source `.zshrc`, copy the profile or put
-this setup into product defaults, examples or fixtures.
+the expected account: `CLAUDE_CONFIG_DIR=<profile directory> claude auth
+status`. If it is not, stop and report it. Do not run the owner's shell
+functions that switch profiles from automation: they can log out or start
+a login when the account differs. Do not source `.zshrc`, copy the profile
+or put this setup into product defaults, examples or fixtures.
 
-`team-profile` was authorized only for the completed diagnostic. That
-exception is not renewed. Keep the existing Codex subscription account;
-do not change its home directory or login to create test isolation.
-Local launch settings remain outside distributed code, examples and
-fixtures. Record only non-secret launch metadata in development evidence.
+The work-subscription profile was authorized only for the completed
+diagnostic. That exception is not renewed. Keep the existing Codex
+subscription account; do not change its home directory or login to create
+test isolation. Local launch settings remain outside distributed code,
+examples and fixtures. Record only non-secret launch metadata in
+development evidence.
 
 Earlier diagnostic reports name personal profiles to explain their
 observations. Those observations do not establish public installation
