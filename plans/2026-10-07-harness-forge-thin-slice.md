@@ -1279,7 +1279,7 @@ are neither dependencies nor silently discovered as requirements.
   the global `user.email` will not reintroduce it. For playground, whose
   history is already public, present the affected commits and let the
   owner decide whether to rewrite and force-push.
-- [ ] Publish destination repositories when execution authorizes it,
+- [x] Publish destination repositories when execution authorizes it,
   and the exact license permission has been approved; then remove only
   the copied knowledge-base files from playground. Keep `plans/` and
   `specs/` in playground. Replace playground's local routing with a pointer
@@ -1308,7 +1308,7 @@ are neither dependencies nor silently discovered as requirements.
   checks, KB anchors, report reading, source policy. It adds a locked
   dependency, so it needs the owner's approval of the install, and a
   Codex review.
-- [ ] Commit per repository: `feat: package forge for Claude Code and Codex`
+- [x] Commit per repository: `feat: package forge for Claude Code and Codex`
   / `docs: move harness knowledge base to its own repository`.
 
 Progress on 2026-10-13 (Forge `7d7acc9`..`dd7ddbe`, KB `2ece0a5`,
@@ -1372,6 +1372,23 @@ control entries, report lines kept whole. Its last finding, fences and
 HTML blocks inside lists and quotes, is deferred by the owner to the
 first change after publication (see the item above). Rulings are in the
 ledger.
+
+Publication on 2026-10-16/17 (owner's go-ahead): a Codex whole-branch
+review closed after seven rounds (Forge `5ca03a7`, 658 tests); its last
+findings hardened Forge's source fetch (hostnames as the network stack
+reaches them, one error boundary per source). The owner confirmed the
+license and that no existing material needs separate permission, so the
+output exception is in effect. The rewrite backups were deleted.
+[harness-forge](https://github.com/franks-ai-skills/harness-forge) and
+[agent-harness-kb](https://github.com/franks-ai-skills/agent-harness-kb)
+are public; `main` is protected (pull request required, also for admins,
+no force push or deletion) and pull requests merge with a merge commit
+titled and described by the pull request. Both branches were merged as
+PR #1 with the commit titles above (Forge `3c362df`, KB `178fa88`), after
+the KB and Forge replaced sibling paths with public links and Forge
+pinned the published KB (657 tests). Playground removed its copy of the
+research and routes to the KB; Forge's copy test now reads the research
+from playground's history at the recorded source commit.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
