@@ -61,9 +61,12 @@ makes before it runs, prepares the run from the repository as it is now
 and finishes it with Forge's own code, then requires the stored report to
 be exactly the report Forge renders. Only what the live run alone knows
 comes from the report: the reviewer's verdicts, the runtime observations,
-the worker evidence and the user's choices. A reference run must also
-pass every declared runtime case with its own skill activated, and match
-the labels in its `expected.yaml`, which names its runtime cases file.
+the worker evidence and the user's choices. For a verified part, a
+reference run must also pass every declared runtime case its harness
+can observe, each positive case through the part's own skill; a Codex
+near miss stays not-run, because Codex cannot prove a non-activation.
+Its labels must match its `expected.yaml`, which names its runtime
+cases file.
 `tools/test_check_references.py` records a run with Forge's scripted
 workers and checks that each kind of tampering is refused.
 

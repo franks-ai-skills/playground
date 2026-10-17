@@ -29,7 +29,10 @@ sys.path[:0] = [str(FORGE), str(FORGE / "src"), str(PLAYGROUND / "tools")]
 
 import check_references  # noqa: E402
 from harness_forge.contracts import load_decision, split_part, write_decision  # noqa: E402
+from harness_forge.adapters.base import Completed  # noqa: E402
 from tests.builders import ANSWERS, decision, part  # noqa: E402
+from tests.test_adapters import FakeRunner, codex_stream  # noqa: E402
+from tests.test_pipeline import staged_request  # noqa: E402
 from tests.test_build_skill import DESCRIPTION, NAME, PROCEDURE  # noqa: E402
 from tests.test_cli_live import Cli  # noqa: E402
 from tests.test_workflow import ResearchRunner, finding  # noqa: E402
@@ -98,6 +101,49 @@ def record_reference(root: Path) -> None:
     ok("verify", "--decision", path, "--root", root, "--revision", revision, "--evidence", workers,
        "--relay", cli.confirm(path, "verify-1", "--revision", revision), "--harness", "claude-code",
        "--cases", cases_path, "--slug", "repro", "--write")
+
+
+class CodexRunner(FakeRunner):
+    """Codex workers as scripted CLI processes: a passing review, and a read of the candidate's SKILL.md
+    whenever the prompt is not the near miss."""
+
+    def __call__(self, command, *, cwd, env, stdin, timeout):
+        previous = len(self.worker_calls)
+        answer = super().__call__(command, cwd=cwd, env=env, stdin=stdin, timeout=timeout)
+        if len(self.worker_calls) == previous:
+            return answer
+        if "```json" in stdin:
+            inputs = staged_request(stdin)["inputs"]
+            output = {"run_id": staged_request(stdin)["run_id"],
+                      "verdicts": [{"part_id": rule["part_id"], "rule_id": rule["rule_id"], "verdict": "pass",
+                                    "reason": "Meets it.", "citation": "SKILL.md"} for rule in inputs["rules"]],
+                      "goal_verdicts": [{"part_id": goal["part_id"], "verdict": "met",
+                                         "reason": "It writes the checklist."} for goal in inputs["goals"]]}
+            return Completed(0, codex_stream(output), "", False)
+        events = [{"type": "thread.started", "thread_id": "x"}]
+        if "do not need reproduction steps" not in stdin:
+            directory = f".agents/skills/{NAME}"
+            events.append({"type": "item.completed", "item": {
+                "id": "read", "type": "command_execution", "command": f"cat {directory}/SKILL.md", "exit_code": 0,
+                "status": "completed", "aggregated_output": (Path(cwd) / directory / "SKILL.md").read_text()}})
+        events.append({"type": "turn.completed"})
+        return Completed(0, "\n".join(json.dumps(event) for event in events), "", False)
+
+
+def verify_in_codex(root: Path) -> None:
+    """The recorded repository verified again from Codex, a target of its decision, as a first run there."""
+    (root / REPORT).unlink()
+    cli = Cli(CodexRunner(), root)
+    cli.parts = ["A1", "A2"]
+    code, workers, stderr = cli("workers", "--harness", "codex")
+    assert code == 0, stderr
+    workers = cli.write("workers.json", workers)
+    revision = root / ".harness/research/repro.rules.yaml"
+    code, output, stderr = cli("verify", "--decision", root / DECISION, "--root", root, "--slug", "repro",
+                               "--revision", revision, "--evidence", workers, "--harness", "codex", "--cases",
+                               root / CASES, "--relay", cli.confirm(root / DECISION, "codex-verify", "--revision",
+                                                                    revision), "--write")
+    assert code == 0, (output, stderr)
 
 
 class CheckReferencesTest(unittest.TestCase):
@@ -358,6 +404,22 @@ class CheckReferencesTest(unittest.TestCase):
     def test_a_result_the_runtime_cannot_produce_for_its_case(self):
         self.cases(lambda data: [case["permitted_tools"]["claude-code"].append("Bash") for case in data["cases"]])
         self.refused("so Claude Code does not run it")
+
+    def test_a_codex_reference_verifies_with_its_unobservable_near_miss(self):
+        """Codex cannot prove a non-activation: its near miss stays not-run, and the part is still verified."""
+        verify_in_codex(self.root)
+        data = check_references._report_data((self.root / REPORT).read_text(encoding="utf-8"), self.forge["documents"])
+        self.assertEqual([item["result"] for item in data["runtime_results"] if item["expected"] == "does-not-activate"],
+                         ["not-run"])
+        self.expected(lambda expected: expected.update(harness="codex", parts={
+            part["part_id"]: {key: part[key] for key in ("harness_result", "goal_result")} for part in data["parts"]}))
+        self.assertEqual(self.part(data)["harness_result"], "verified")
+        self.assertEqual(self.problems(), [])
+
+    def test_a_fixture_that_replaces_the_candidate(self):
+        self.cases(lambda data: data["cases"][0].setdefault("fixtures", {}).update(
+            {f".agents/skills/{NAME}/SKILL.md": "replaced"}))
+        self.refused("would replace the candidate")
 
     def test_a_local_reuse_part_may_own_runtime_cases(self):
         """A reused skill installed in the repository is tested like a build, under its own path."""

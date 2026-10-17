@@ -29,9 +29,10 @@ and the user's choices (the confirmed parts and the rules confirmed not to
 apply). On top of Forge's gate, a reference run must have run every
 declared case, for parts the decision builds or reuses in place, in
 the harness `expected.yaml` names, with every case passing for a
-verified part, the part's own skill as the activation through a tool
-the case permits, and only results Forge's runtime can produce
-(`runtime.outcome_problem`); every built skill states only accepted requirements, and the
+verified part (or not-run where the harness cannot observe the
+outcome, as for every near miss in Codex), the part's own skill as the
+activation of a positive case through a tool the case permits, and
+only results Forge's runtime can produce (`runtime.outcome_problem`); every built skill states only accepted requirements, and the
 labels must match `expected.yaml`. Metadata files are read as Forge
 reads its inputs: inside the example, through no link.
 
@@ -339,7 +340,9 @@ def check_example(root: Path, forge: dict) -> list[str]:
         if item.harness != harness:
             problems.append(f"case {item.case_id} ran in {item.harness}, not in the reference's {harness}")
         # Forge's own rule for which results its runtime can produce, which its producer applies too.
-        problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id]) \
+        directory = run.part_dirs.get(item.part_id)
+        candidate = {path: b"" for path in run.frozen_inputs["files"] if directory and path.startswith(directory + "/")}
+        problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id], candidate) \
             if item.case_id in declared_cases else None
         if problem:
             problems.append(problem)
@@ -363,9 +366,11 @@ def check_example(root: Path, forge: dict) -> list[str]:
             if case and tool and tool not in case["permitted_tools"].get(harness, []):
                 problems.append(f"part {part_id}: case {item.case_id} activated through a tool the case does not "
                                 f"permit ({tool})")
-            if by_part[part_id].harness_result == "verified" and item.result != "pass":
+            # A case the harness cannot observe, such as any near miss in Codex, says so and stays not-run.
+            unobservable = item.result == "not-run" and item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ())
+            if by_part[part_id].harness_result == "verified" and item.result != "pass" and not unobservable:
                 problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
-                                "passes every case")
+                                "passes every case its harness can observe")
 
     controls = [{"part_id": part["id"], "control": control["control"]}
                 for part in decision.record["parts"] for control in part["outside_controls"]]
