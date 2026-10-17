@@ -55,10 +55,15 @@ can list `repro-checklist` as a skill.
 
 ## Checked reference runs
 
-`tools/check_references.py` checks a stored run against the current
-Forge: records, revision and file bindings, accepted-only requirements,
-the Outside controls section, each part's exact rule set, the result
-labels its `expected.yaml` states and the runtime cases. These two
-folders predate Forge's current report format and have no
-`expected.yaml`, so the checker fails on them until the plan's task 14
-records new reference runs here.
+`tools/check_references.py` checks a stored run with Forge's own code:
+it collects the repository's files and links, checks its overrides as
+Forge adopts them, and requires the report's bound inputs to equal what
+Forge computes now; then, per part of the decision, the exact rule set,
+fresh script results, result labels by Forge's precedence and as
+`expected.yaml` states them, accepted-only requirements, the Outside
+controls section and runtime evidence Forge would keep (every declared
+case, the part's own skill activated, these files). An example names
+its runtime cases file in `expected.yaml`. These two folders predate
+Forge's current report format and have no `expected.yaml`, so the
+checker fails on them until the plan's task 14 records new reference
+runs here.
