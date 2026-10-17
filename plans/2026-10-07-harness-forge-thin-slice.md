@@ -1291,7 +1291,7 @@ are neither dependencies nor silently discovered as requirements.
   on publication. Test README links as GitHub repository-relative paths:
   a link cannot traverse into a sibling checkout. Before publication,
   describe those locations as local code paths, not public Markdown links.
-- [ ] **First after publication: replace Forge's Markdown scanner with
+- [x] **First after publication: replace Forge's Markdown scanner with
   markdown-it-py** (owner decision, 2026-10-16). Forge's own scanner
   (`documents._scan`) follows CommonMark for fenced code, the seven HTML
   block kinds and ATX headings, refuses a lone HTML tag line below text,
@@ -1389,6 +1389,17 @@ the KB and Forge replaced sibling paths with public links and Forge
 pinned the published KB (657 tests). Playground removed its copy of the
 research and routes to the KB; Forge's copy test now reads the research
 from playground's history at the recorded source commit.
+
+Markdown parser on 2026-10-17 (Forge PR #2, `522e6fa`; KB PR #2,
+`f1353e8`): Forge reads Markdown with markdown-it-py 4.2.0 (MIT, pure
+Python) instead of its own scanner. A Codex review over six rounds
+found where markdown-it-py reads other than CommonMark 0.31.2 (Unicode
+regex semantics in HTML blocks and inline HTML, reference definitions
+ending paragraphs and their label limits and normalization, link
+destination escapes and entities, nesting cutoffs, Unicode trimming);
+Forge replaces those rules rather than preprocessing the text. cmarkgfm
+was rejected for missing macOS x86_64 wheels. The checkers that read
+Markdown have new versions in the KB catalog.
 
 ## Task 14: Record real reference runs and verify the forge itself
 
