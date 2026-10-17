@@ -306,6 +306,51 @@ class CheckReferencesTest(unittest.TestCase):
                         encoding="utf-8")
         self.refused("text is not what Forge renders")
 
+    def test_metadata_linked_from_outside_the_example(self):
+        outside = Path(self.scratch.name) / "outside.yaml"
+        outside.write_text('secret: "SYNTHETIC_PRIVATE_CANARY\n', encoding="utf-8")
+        for name in ("expected.yaml", REPORT):
+            with self.subTest(name=name):
+                shutil.rmtree(self.root)
+                shutil.copytree(self.reference, self.root, symlinks=True)
+                (self.root / name).unlink()
+                (self.root / name).symlink_to(outside)
+                problems = self.problems()
+                self.assertTrue(any("symbolic link" in problem for problem in problems), problems)
+                self.assertFalse(any("CANARY" in problem for problem in problems), "the linked file was read")
+
+    def test_runtime_evidence_from_another_harness(self):
+        def codex(data):
+            for item in data["runtime_results"]:
+                item["harness"] = "codex"
+                if item["observed_activation"]:
+                    item["observed_activation"] = f"read .agents/skills/{NAME}/SKILL.md"
+        self.report(codex)
+        self.refused("ran in codex")
+
+    def test_a_passing_near_miss_that_activated(self):
+        def activated(data):
+            item = next(item for item in data["runtime_results"] if item["expected"] == "does-not-activate")
+            item["observed_activation"] = f"Skill tool called for {NAME}"
+        self.report(activated)
+        self.refused("passed although it observed an activation")
+
+    def test_a_case_for_a_part_the_decision_does_not_build(self):
+        def extra(data):
+            case = copy.deepcopy(data["cases"][0])
+            case.update(id="extra", part_id="A9", mode="implicit")
+            data["cases"].append(case)
+        self.cases(extra)
+        self.refused("case extra names part A9")
+
+    def test_an_unaccepted_requirement_in_an_unconfirmed_build(self):
+        skill = self.root / f".agents/skills/{NAME}/SKILL.md"
+        text = skill.read_text(encoding="utf-8")
+        line = next(line for line in text.splitlines() if line.startswith("1. "))
+        skill.write_text(text.replace(line, line + "\n2. Must: Attach every log."), encoding="utf-8")
+        self.report(lambda data: data.update(confirmed_parts=["A2"]))
+        self.refused("SKILL.md requirements")
+
     def test_a_review_report_is_not_a_reference_run(self):
         self.report(lambda data: data.update(scope_parts=["A1"]))
         self.refused("is a Review")

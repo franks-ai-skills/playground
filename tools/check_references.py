@@ -27,8 +27,12 @@ What only the live run can know is taken from the report: the reviewer's
 verdicts, the runtime observations, the worker evidence and violations,
 and the user's choices (the confirmed parts and the rules confirmed not to
 apply). On top of Forge's gate, a reference run must have run every
-declared case, with every case passing for a verified part and the part's
-own skill as the activation, and its labels must match `expected.yaml`.
+declared case, for parts the decision builds, in the harness
+`expected.yaml` names, with every case passing for a verified part, the
+part's own skill as the activation and no activation on a passing near
+miss; every built skill states only accepted requirements, and the
+labels must match `expected.yaml`. Metadata files are read as Forge
+reads its inputs: inside the example, through no link.
 
 A Review report, which keeps earlier results the repository no longer
 holds, is refused: record a reference run as a first run or an Extensive
@@ -49,6 +53,7 @@ from types import SimpleNamespace
 PLAYGROUND = Path(__file__).resolve().parents[1]
 HARNESSES = ("claude-code", "codex")
 LABELS = ("harness_result", "goal_result")
+MAX_BYTES = 1024 * 1024
 
 
 def _forge(path: Path) -> dict:
@@ -62,8 +67,16 @@ def _forge(path: Path) -> dict:
             "verify": verify, "coverage": check_readme_coverage}
 
 
-def _expected(root: Path, documents) -> dict:
-    expected = documents.parse_yaml((root / "expected.yaml").read_text(encoding="utf-8"))
+def _read(root: Path, relative: str, documents) -> str:
+    """A metadata file inside the example, as Forge reads its own inputs: no link on the way, at most 1 MiB."""
+    path = documents.safe_path(root, relative)
+    if not path.is_file() or path.stat().st_size > MAX_BYTES:
+        raise ValueError(f"{relative}: not a regular file of at most {MAX_BYTES} bytes")
+    return path.read_text(encoding="utf-8")
+
+
+def _expected(text: str, documents) -> dict:
+    expected = documents.parse_yaml(text)
     if not isinstance(expected, dict) or not {"harness", "slug", "parts"} <= set(expected) or \
             set(expected) - {"harness", "slug", "cases", "parts"}:
         raise ValueError("expected.yaml names harness, slug and parts, and optionally cases, and nothing else")
@@ -144,20 +157,31 @@ def _refused(call, *arguments):
         return str(error) or type(error).__name__, None
 
 
-def _activations(directory: str) -> set[str]:
-    """Every activation signal Forge's observers write for the skill in ``directory``."""
+def _activations(harness: str, directory: str) -> set[str]:
+    """Every activation signal the harness's observer writes for the skill in ``directory``."""
     name = directory.rsplit("/", 1)[-1]
-    return {f"Skill tool called for {name}", f"read SKILL.md from the {name} skill", f"/{name} was invoked",
-            f"read {directory}/SKILL.md"}
+    if harness == "codex":
+        return {f"read {directory}/SKILL.md"}
+    return {f"Skill tool called for {name}", f"read SKILL.md from the {name} skill", f"/{name} was invoked"}
 
 
 def check_example(root: Path, forge: dict) -> list[str]:
     """Every problem with one stored reference run; empty when it passes."""
     cli, documents, verify = forge["cli"], forge["documents"], forge["verify"]
     root = root.resolve()
-    expected = _expected(root, documents)
+    problem, text = _refused(_read, root, "expected.yaml", documents)
+    if problem:
+        return [f"expected.yaml: {problem}"]
+    expected = _expected(text, documents)
     slug, harness = expected["slug"], expected["harness"]
-    decisions = sorted((root / ".harness" / "decisions").glob("*.md"))
+    problem, directory = _refused(documents.safe_path, root, ".harness/decisions")
+    if problem:
+        return [f"decisions: {problem}"]
+    decisions = sorted(directory.glob("*.md"))
+    for path in decisions:
+        problem = _refused(_read, root, path.relative_to(root).as_posix(), documents)[0]
+        if problem:
+            return [f"decision: {problem}"]
     if len(decisions) != 1:
         return [f"expected one decision record, found {len(decisions)}"]
     problem, recorded = _refused(lambda: cli.load_decision(decisions[0], root=root))
@@ -200,16 +224,30 @@ def check_example(root: Path, forge: dict) -> list[str]:
     for case in cases:
         if harness not in case["permitted_tools"]:
             problems.append(f"case {case['id']} names no permitted tools for {harness}")
-    for part in decision.record["parts"]:
-        if verify.part_kind(part) != "build":
-            continue
-        kinds = {(case["mode"], case["expected"]) for case in cases if case["part_id"] == part["id"]}
+    built = {part["id"]: f".agents/skills/{part['slug']}" for part in decision.record["parts"]
+             if verify.part_kind(part) == "build"}
+    for case in cases:
+        if case["part_id"] not in built:
+            problems.append(f"case {case['id']} names part {case['part_id']}, which the decision does not build")
+    for part_id in sorted(set(built) | {case["part_id"] for case in cases}):
+        kinds = {(case["mode"], case["expected"]) for case in cases if case["part_id"] == part_id}
         if not {("explicit", "activates"), ("negative", "does-not-activate")} <= kinds:
-            problems.append(f"part {part['id']} needs an explicit invocation and a near miss among its cases")
+            problems.append(f"part {part_id} needs an explicit invocation and a near miss among its cases")
+    # Accepted requirements only, in every built skill, confirmed or not.
+    for part_id, directory in sorted(built.items()):
+        skill = files.get(f"{directory}/SKILL.md", b"").decode("utf-8")
+        bounds = documents.markdown_section(skill, "Requirements")
+        stated = [line for line in skill[slice(*bounds)].splitlines()[1:] if line.strip()] if bounds else []
+        requirements = [entry["rule"] for entry in (revision.rules if revision else []) if entry["part_id"] == part_id]
+        wanted = [f"{number}. {forge['build_skill']._rule_line(rule)}." for number, rule in enumerate(requirements, 1)]
+        if stated != wanted:
+            problems.append(f"part {part_id}: SKILL.md requirements {stated} are not the accepted {wanted}")
     if sorted(expected["parts"]) != sorted(every):
         problems.append(f"expected.yaml names parts {sorted(expected['parts'])}, the decision {sorted(every)}")
 
-    report_text = (root / ".harness" / "reports" / f"{slug}.md").read_text(encoding="utf-8")
+    problem, report_text = _refused(_read, root, f".harness/reports/{slug}.md", documents)
+    if problem:
+        return problems + [f"report: {problem}"]
     data = _report_data(report_text, documents)
     if data["scope_parts"] is not None:
         return problems + ["the report is a Review, whose kept results rest on an earlier report; record a reference "
@@ -279,6 +317,12 @@ def check_example(root: Path, forge: dict) -> list[str]:
             if labels and getattr(result, key) != labels[key]:
                 problems.append(f"part {result.part_id}: Forge gives {key} {getattr(result, key)!r}, expected.yaml "
                                 f"{labels[key]!r}")
+    for item in runtime:
+        if item.harness != harness:
+            problems.append(f"case {item.case_id} ran in {item.harness}, not in the reference's {harness}")
+        if item.expected == "does-not-activate" and item.result == "pass" and item.observed_activation:
+            problems.append(f"case {item.case_id} passed although it observed an activation "
+                            f"({item.observed_activation!r})")
     by_part = {result.part_id: result for result in results}
     for part in decision.record["parts"]:
         part_id = part["id"]
@@ -294,19 +338,12 @@ def check_example(root: Path, forge: dict) -> list[str]:
             if case and (item.prompt, item.expected) != (case["prompt"], case["expected"]):
                 problems.append(f"part {part_id}: case {item.case_id} ran another prompt or expectation than declared")
             if item.expected == "activates" and item.result == "pass" and \
-                    item.observed_activation not in _activations(run.part_dirs[part_id]):
+                    item.observed_activation not in _activations(harness, run.part_dirs[part_id]):
                 problems.append(f"part {part_id}: case {item.case_id} activated {item.observed_activation!r}, "
                                 f"not the skill in {run.part_dirs[part_id]}")
             if by_part[part_id].harness_result == "verified" and item.result != "pass":
                 problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
                                 "passes every case")
-        skill = files.get(f"{run.part_dirs[part_id]}/SKILL.md", b"").decode("utf-8")
-        bounds = documents.markdown_section(skill, "Requirements")
-        stated = [line for line in skill[slice(*bounds)].splitlines()[1:] if line.strip()] if bounds else []
-        requirements = [entry["rule"] for entry in (revision.rules if revision else []) if entry["part_id"] == part_id]
-        wanted = [f"{number}. {forge['build_skill']._rule_line(rule)}." for number, rule in enumerate(requirements, 1)]
-        if stated != wanted:
-            problems.append(f"part {part_id}: SKILL.md requirements {stated} are not the accepted {wanted}")
 
     controls = [{"part_id": part["id"], "control": control["control"]}
                 for part in decision.record["parts"] for control in part["outside_controls"]]
