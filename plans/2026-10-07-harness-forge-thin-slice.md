@@ -1413,7 +1413,7 @@ report records, generated skills and relative symlinks, result README,
 redacted trace metadata and version/model ids. Never commit credentials
 or raw private harness profiles.
 
-- [ ] Define behavior cases for the reference and alternate outcomes,
+- [x] Define behavior cases for the reference and alternate outcomes,
   and routing cases for all four skills, including adjacent non-forge
   tasks that must not trigger them. `tools/check_references.py` asserts
   schema validity, hashes, accepted-only content, outside README coverage,
@@ -1426,7 +1426,7 @@ or raw private harness profiles.
   For built-skill examples, require T11's generated-skill runtime cases,
   matching run/file bindings and separate runtime outcomes; forge-skill
   routing evidence cannot satisfy this requirement.
-- [ ] Run `python tools/check_references.py`; expect absent reference
+- [x] Run `python tools/check_references.py`; expect absent reference
   evidence to fail. Run the FORGE unit suite to check its offline
   foundation before live execution.
 - [ ] In clean test installations with existing subscription authentication, run
@@ -1468,7 +1468,7 @@ or raw private harness profiles.
   disclosed under the accepted policy; this does not waive required
   functional cases. Record any further capability needing a design change
   and return it for a concrete decision rather than weakening parity.
-- [ ] **Research is about the idea, not the harness** (owner, 2026-10-15).
+- [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go
   wrong. How Claude Code and Codex load skills, run commands or read
@@ -1485,7 +1485,7 @@ or raw private harness profiles.
   harness questions and research covers the idea only. A finding that
   contradicts the KB still goes through drift. The harness-research skill
   should tell the agent to rely on `accept`'s check.
-- [ ] Smaller points from the same test: the re-verification scope
+- [x] Smaller points from the same test: the re-verification scope
   question must say what is re-verified (the owner asked "for our current
   work or within the skill we are creating?"); the reviewer judged the
   same `outside.*` README text differently across two runs; parts A2 and
