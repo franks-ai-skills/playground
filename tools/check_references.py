@@ -27,10 +27,10 @@ What only the live run can know is taken from the report: the reviewer's
 verdicts, the runtime observations, the worker evidence and violations,
 and the user's choices (the confirmed parts and the rules confirmed not to
 apply). On top of Forge's gate, a reference run must have run every
-declared case, for parts the decision builds, in the harness
-`expected.yaml` names, with every case passing for a verified part, the
-part's own skill as the activation and no activation on a passing near
-miss; every built skill states only accepted requirements, and the
+declared case, for parts the decision builds or reuses in place, in
+the harness `expected.yaml` names, with every case passing for a
+verified part, the part's own skill as the activation through a tool
+the case permits and no activation on a passing near miss; every built skill states only accepted requirements, and the
 labels must match `expected.yaml`. Metadata files are read as Forge
 reads its inputs: inside the example, through no link.
 
@@ -157,12 +157,31 @@ def _refused(call, *arguments):
         return str(error) or type(error).__name__, None
 
 
-def _activations(harness: str, directory: str) -> set[str]:
-    """Every activation signal the harness's observer writes for the skill in ``directory``."""
+def _activations(harness: str, directory: str) -> dict[str, str | None]:
+    """Each activation signal the harness's observer writes for the skill in ``directory``, with the tool it
+    takes; an invocation in the prompt takes none."""
     name = directory.rsplit("/", 1)[-1]
     if harness == "codex":
-        return {f"read {directory}/SKILL.md"}
-    return {f"Skill tool called for {name}", f"read SKILL.md from the {name} skill", f"/{name} was invoked"}
+        return {f"read {directory}/SKILL.md": "command_execution"}
+    return {f"Skill tool called for {name}": "Skill", f"read SKILL.md from the {name} skill": "Read",
+            f"/{name} was invoked": None}
+
+
+def _case_owners(decision, verify) -> dict[str, str]:
+    """The parts a runtime case can test, with their skill's directory: builds and skills reused in place."""
+    return {part["id"]: verify._skill_dir(part) for part in decision.record["parts"]
+            if verify.part_kind(part) in ("build", "local-reuse")}
+
+
+def _case_problems(owners: dict[str, str], cases: list[dict]) -> list[str]:
+    """verify's refusals of a cases file: each case tests a part with a skill, which has both case kinds."""
+    problems = [f"case {case['id']} names part {case['part_id']}, which the decision neither builds nor reuses "
+                "locally" for case in cases if case["part_id"] not in owners]
+    for part_id in sorted({case["part_id"] for case in cases}):
+        kinds = {(case["mode"], case["expected"]) for case in cases if case["part_id"] == part_id}
+        if not {("explicit", "activates"), ("negative", "does-not-activate")} <= kinds:
+            problems.append(f"part {part_id} needs an explicit invocation and a near miss among its cases")
+    return problems
 
 
 def check_example(root: Path, forge: dict) -> list[str]:
@@ -226,13 +245,10 @@ def check_example(root: Path, forge: dict) -> list[str]:
             problems.append(f"case {case['id']} names no permitted tools for {harness}")
     built = {part["id"]: f".agents/skills/{part['slug']}" for part in decision.record["parts"]
              if verify.part_kind(part) == "build"}
-    for case in cases:
-        if case["part_id"] not in built:
-            problems.append(f"case {case['id']} names part {case['part_id']}, which the decision does not build")
-    for part_id in sorted(set(built) | {case["part_id"] for case in cases}):
-        kinds = {(case["mode"], case["expected"]) for case in cases if case["part_id"] == part_id}
-        if not {("explicit", "activates"), ("negative", "does-not-activate")} <= kinds:
-            problems.append(f"part {part_id} needs an explicit invocation and a near miss among its cases")
+    owners = _case_owners(decision, verify)
+    problems += _case_problems(owners, cases)
+    for part_id in sorted(set(built) - {case["part_id"] for case in cases}):
+        problems.append(f"part {part_id} is a built skill: its runtime cases are missing")
     # Accepted requirements only, in every built skill, confirmed or not.
     for part_id, directory in sorted(built.items()):
         skill = files.get(f"{directory}/SKILL.md", b"").decode("utf-8")
@@ -326,7 +342,7 @@ def check_example(root: Path, forge: dict) -> list[str]:
     by_part = {result.part_id: result for result in results}
     for part in decision.record["parts"]:
         part_id = part["id"]
-        if verify.part_kind(part) != "build" or part_id not in run.confirmed_parts:
+        if part_id not in owners or part_id not in run.confirmed_parts:
             continue
         declared = {case["id"]: case for case in cases if case["part_id"] == part_id}
         evidence = [item for item in runtime if item.part_id == part_id]
@@ -337,10 +353,14 @@ def check_example(root: Path, forge: dict) -> list[str]:
             case = declared.get(item.case_id)
             if case and (item.prompt, item.expected) != (case["prompt"], case["expected"]):
                 problems.append(f"part {part_id}: case {item.case_id} ran another prompt or expectation than declared")
-            if item.expected == "activates" and item.result == "pass" and \
-                    item.observed_activation not in _activations(harness, run.part_dirs[part_id]):
+            signals = _activations(harness, run.part_dirs[part_id])
+            if item.expected == "activates" and item.result == "pass" and item.observed_activation not in signals:
                 problems.append(f"part {part_id}: case {item.case_id} activated {item.observed_activation!r}, "
                                 f"not the skill in {run.part_dirs[part_id]}")
+            tool = signals.get(item.observed_activation)
+            if case and tool and tool not in case["permitted_tools"].get(harness, []):
+                problems.append(f"part {part_id}: case {item.case_id} activated through a tool the case does not "
+                                f"permit ({tool})")
             if by_part[part_id].harness_result == "verified" and item.result != "pass":
                 problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
                                 "passes every case")

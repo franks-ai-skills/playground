@@ -351,6 +351,25 @@ class CheckReferencesTest(unittest.TestCase):
         self.report(lambda data: data.update(confirmed_parts=["A2"]))
         self.refused("SKILL.md requirements")
 
+    def test_an_activation_through_a_tool_the_case_does_not_permit(self):
+        self.cases(lambda data: [case["permitted_tools"].update({"claude-code": ["Read"]}) for case in data["cases"]])
+        self.refused("through a tool the case does not permit")
+
+    def test_a_local_reuse_part_may_own_runtime_cases(self):
+        """A reused skill installed in the repository is tested like a build, under its own path."""
+        from tests.builders import decision as make_decision, part as make_part
+        reused = make_decision(make_part("A1", "Reuse a checklist skill", outcome="reuse", recommended="skills",
+                                         chosen="skills", reuse={"name": NAME, "path": f"vendor/skills/{NAME}"}))
+        cases = [{"id": "explicit", "part_id": "A1", "mode": "explicit", "expected": "activates",
+                  "permitted_tools": {"claude-code": ["Skill"]}},
+                 {"id": "near-miss", "part_id": "A1", "mode": "negative", "expected": "does-not-activate",
+                  "permitted_tools": {"claude-code": ["Skill"]}}]
+        owners = check_references._case_owners(reused, self.forge["verify"])
+        self.assertEqual(owners, {"A1": f"vendor/skills/{NAME}"})
+        self.assertEqual(check_references._case_problems(owners, cases), [])
+        self.assertEqual(check_references._case_problems({}, cases)[0],
+                         "case explicit names part A1, which the decision neither builds nor reuses locally")
+
     def test_a_review_report_is_not_a_reference_run(self):
         self.report(lambda data: data.update(scope_parts=["A1"]))
         self.refused("is a Review")
