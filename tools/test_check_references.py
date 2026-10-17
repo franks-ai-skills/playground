@@ -355,6 +355,10 @@ class CheckReferencesTest(unittest.TestCase):
         self.cases(lambda data: [case["permitted_tools"].update({"claude-code": ["Read"]}) for case in data["cases"]])
         self.refused("through a tool the case does not permit")
 
+    def test_a_result_the_runtime_cannot_produce_for_its_case(self):
+        self.cases(lambda data: [case["permitted_tools"]["claude-code"].append("Bash") for case in data["cases"]])
+        self.refused("so Claude Code does not run it")
+
     def test_a_local_reuse_part_may_own_runtime_cases(self):
         """A reused skill installed in the repository is tested like a build, under its own path."""
         from tests.builders import decision as make_decision, part as make_part

@@ -30,7 +30,8 @@ apply). On top of Forge's gate, a reference run must have run every
 declared case, for parts the decision builds or reuses in place, in
 the harness `expected.yaml` names, with every case passing for a
 verified part, the part's own skill as the activation through a tool
-the case permits and no activation on a passing near miss; every built skill states only accepted requirements, and the
+the case permits, and only results Forge's runtime can produce
+(`runtime.outcome_problem`); every built skill states only accepted requirements, and the
 labels must match `expected.yaml`. Metadata files are read as Forge
 reads its inputs: inside the example, through no link.
 
@@ -333,12 +334,15 @@ def check_example(root: Path, forge: dict) -> list[str]:
             if labels and getattr(result, key) != labels[key]:
                 problems.append(f"part {result.part_id}: Forge gives {key} {getattr(result, key)!r}, expected.yaml "
                                 f"{labels[key]!r}")
+    declared_cases = {case["id"]: case for case in cases}
     for item in runtime:
         if item.harness != harness:
             problems.append(f"case {item.case_id} ran in {item.harness}, not in the reference's {harness}")
-        if item.expected == "does-not-activate" and item.result == "pass" and item.observed_activation:
-            problems.append(f"case {item.case_id} passed although it observed an activation "
-                            f"({item.observed_activation!r})")
+        # Forge's own rule for which results its runtime can produce, which its producer applies too.
+        problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id]) \
+            if item.case_id in declared_cases else None
+        if problem:
+            problems.append(problem)
     by_part = {result.part_id: result for result in results}
     for part in decision.record["parts"]:
         part_id = part["id"]
@@ -351,8 +355,6 @@ def check_example(root: Path, forge: dict) -> list[str]:
                             f"declared cases {sorted(declared)}")
         for item in evidence:
             case = declared.get(item.case_id)
-            if case and (item.prompt, item.expected) != (case["prompt"], case["expected"]):
-                problems.append(f"part {part_id}: case {item.case_id} ran another prompt or expectation than declared")
             signals = _activations(harness, run.part_dirs[part_id])
             if item.expected == "activates" and item.result == "pass" and item.observed_activation not in signals:
                 problems.append(f"part {part_id}: case {item.case_id} activated {item.observed_activation!r}, "
