@@ -55,15 +55,20 @@ can list `repro-checklist` as a skill.
 
 ## Checked reference runs
 
-`tools/check_references.py` checks a stored run with Forge's own code:
-it collects the repository's files and links, checks its overrides as
-Forge adopts them, and requires the report's bound inputs to equal what
-Forge computes now; then, per part of the decision, the exact rule set,
-fresh script results, result labels by Forge's precedence and as
-`expected.yaml` states them, accepted-only requirements, the Outside
-controls section and runtime evidence Forge would keep (every declared
-case, the part's own skill activated, these files). An example names
-its runtime cases file in `expected.yaml`. These two folders predate
-Forge's current report format and have no `expected.yaml`, so the
-checker fails on them until the plan's task 14 records new reference
-runs here.
+`tools/check_references.py` replays Forge's verification of a stored run
+instead of trusting its report. It applies the refusals `forge.py verify`
+makes before it runs, prepares the run from the repository as it is now
+and finishes it with Forge's own code, then requires the stored report to
+be exactly the report Forge renders. Only what the live run alone knows
+comes from the report: the reviewer's verdicts, the runtime observations,
+the worker evidence and the user's choices. A reference run must also
+pass every declared runtime case with its own skill activated, and match
+the labels in its `expected.yaml`, which names its runtime cases file.
+`tools/test_check_references.py` records a run with Forge's scripted
+workers and checks that each kind of tampering is refused.
+
+A Review report is refused, because its kept results rest on an earlier
+report; record a reference run as a first run or an Extensive review.
+These two folders predate Forge's current report format and have no
+`expected.yaml`, so the checker fails on them until the plan's task 14
+records new reference runs here.

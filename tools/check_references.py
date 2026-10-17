@@ -10,22 +10,30 @@ examples/reproduction-checklist/codex/, with an `expected.yaml`:
 
     harness: codex
     slug: bug-reproduction-checklist
-    cases: runtime-cases.yaml   # the runtime cases verify ran, relative to the example
+    cases: runtime-cases.yaml   # the runtime cases verify ran, inside the example
     parts:
       A: {harness_result: verified, goal_result: met by the verified build}
 
-The checker uses Forge's own code, not the report's word, for what the
-run rests on: it collects the repository's files and links itself, checks
-the overrides as Forge adopts them, and requires the report's bound inputs
-(decision, files, links, rules, overrides, revision, checkers, worker
-configurations, runtime cases) to equal what Forge computes now. It then
-checks every part of the decision: exactly the rules Forge applies, fresh
-script results, result labels that follow Forge's precedence and match
-`expected.yaml`, only accepted requirements in each built skill, the
-Outside controls section, and runtime evidence that Forge itself would
-keep for each built part (every declared case, explicit activation of the
-part's own skill, these files). Exit 0 when every example passes, 1 with
-each problem listed, 2 without any example.
+The checker replays Forge's verification instead of trusting the report.
+It applies the refusals `forge.py verify` makes before it runs (answers,
+accepted requirements and their research, overrides, target harness,
+runtime case kinds), prepares the run from the repository as it is now,
+and finishes it with Forge's own `finish_run`: selection failures, open
+drift, the decision's status, the confirmation of the current contract and
+the result precedence all come from Forge. The stored report must be
+exactly the report Forge renders from that replay.
+
+What only the live run can know is taken from the report: the reviewer's
+verdicts, the runtime observations, the worker evidence and violations,
+and the user's choices (the confirmed parts and the rules confirmed not to
+apply). On top of Forge's gate, a reference run must have run every
+declared case, with every case passing for a verified part and the part's
+own skill as the activation, and its labels must match `expected.yaml`.
+
+A Review report, which keeps earlier results the repository no longer
+holds, is refused: record a reference run as a first run or an Extensive
+review. Exit 0 when every example passes, 1 with each problem listed, 2
+without any example.
 """
 
 from __future__ import annotations
@@ -36,8 +44,11 @@ import json
 import re
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 PLAYGROUND = Path(__file__).resolve().parents[1]
+HARNESSES = ("claude-code", "codex")
+LABELS = ("harness_result", "goal_result")
 
 
 def _forge(path: Path) -> dict:
@@ -45,12 +56,29 @@ def _forge(path: Path) -> dict:
     specification = importlib.util.spec_from_file_location("forge_cli", path / "scripts" / "forge.py")
     cli = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(cli)
-    from harness_forge import build_skill, documents, overrides, research, runtime, scope, verify  # noqa: E402
+    from harness_forge import build_skill, documents, report, runtime, verify  # noqa: E402
     from harness_forge.checks.outside import check_readme_coverage  # noqa: E402
-    from harness_forge.contracts import load_decision  # noqa: E402
-    return {"cli": cli, "build_skill": build_skill, "documents": documents, "overrides": overrides,
-            "research": research, "runtime": runtime, "scope": scope, "verify": verify,
-            "coverage": check_readme_coverage, "load_decision": load_decision}
+    return {"cli": cli, "build_skill": build_skill, "documents": documents, "report": report, "runtime": runtime,
+            "verify": verify, "coverage": check_readme_coverage}
+
+
+def _expected(root: Path, documents) -> dict:
+    expected = documents.parse_yaml((root / "expected.yaml").read_text(encoding="utf-8"))
+    if not isinstance(expected, dict) or not {"harness", "slug", "parts"} <= set(expected) or \
+            set(expected) - {"harness", "slug", "cases", "parts"}:
+        raise ValueError("expected.yaml names harness, slug and parts, and optionally cases, and nothing else")
+    if expected["harness"] not in HARNESSES:
+        raise ValueError(f"expected.yaml: harness is one of {', '.join(HARNESSES)}")
+    if not isinstance(expected["slug"], str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", expected["slug"]):
+        raise ValueError("expected.yaml: slug is a lowercase name such as bug-reproduction-checklist")
+    if "cases" in expected and not isinstance(expected["cases"], str):
+        raise ValueError("expected.yaml: cases is a path inside the example")
+    parts = expected["parts"]
+    if not isinstance(parts, dict) or not all(
+            isinstance(labels, dict) and set(labels) == set(LABELS) and all(isinstance(v, str) for v in labels.values())
+            for labels in parts.values()):
+        raise ValueError(f"expected.yaml: each part states both {' and '.join(LABELS)}")
+    return expected
 
 
 def _report_data(text: str, documents) -> dict:
@@ -63,118 +91,222 @@ def _report_data(text: str, documents) -> dict:
     return data
 
 
-def _differences(recorded: dict, current: dict) -> list[str]:
+def _differences(recorded: dict, replayed: dict) -> list[str]:
     names = []
-    for key in sorted(set(recorded) | set(current)):
-        if recorded.get(key) == current.get(key):
+    for key in sorted(set(recorded) | set(replayed)):
+        if recorded.get(key) == replayed.get(key):
             continue
-        if isinstance(recorded.get(key), dict) and isinstance(current.get(key), dict):
-            inner = sorted(name for name in set(recorded[key]) | set(current[key])
-                           if recorded[key].get(name) != current[key].get(name))
+        if key == "parts" and isinstance(recorded.get(key), list):
+            ours = {part["part_id"]: part for part in replayed.get(key, [])}
+            for part in recorded[key]:
+                theirs = ours.get(part.get("part_id"), {})
+                inner = sorted(name for name in set(part) | set(theirs) if part.get(name) != theirs.get(name))
+                if inner:
+                    names.append(f"part {part.get('part_id')} ({', '.join(inner)})")
+            if len(recorded[key]) != len(ours) or not names:
+                names.append("parts")
+        elif isinstance(recorded.get(key), dict) and isinstance(replayed.get(key), dict):
+            inner = sorted(name for name in set(recorded[key]) | set(replayed[key])
+                           if recorded[key].get(name) != replayed[key].get(name))
             names.append(f"{key} ({', '.join(inner[:5])})")
         else:
             names.append(key)
     return names
 
 
+def _review(data: dict, verify, run) -> dict:
+    """The reviewer's verdicts as the report records them, in the form the worker returned them.
+
+    A judged rule whose applicability conditions do not hold never reached
+    the reviewer: Forge records it as not applicable without a verdict.
+    """
+    verdicts, goals = [], []
+    for part in data["parts"]:
+        for item in part["rule_results"]:
+            if item["check"] != "judged" or item["result"] == "missing" or \
+                    item["rule_id"] in run.not_applicable.get(part["part_id"], {}):
+                continue
+            # Forge records a reviewer's "not applicable" as such, as unresolved or as an error.
+            verdict = item["result"] if item["result"] in ("pass", "fail") else "not-applicable"
+            verdicts.append({"part_id": part["part_id"], "rule_id": item["rule_id"], "verdict": verdict,
+                             "reason": item["reason"].removesuffix(verify.NEEDS_CONFIRMATION),
+                             "citation": item.get("citation", "")})
+        if part.get("goal_verdict"):
+            goals.append({"part_id": part["part_id"], **part["goal_verdict"]})
+    return {"run_id": data["run_id"], "verdicts": verdicts, "goal_verdicts": goals}
+
+
+def _refused(call, *arguments):
+    """Forge's own refusal of these inputs, whatever its type, or None."""
+    try:
+        return None, call(*arguments)
+    except Exception as error:  # noqa: BLE001 - forge.py raises its own input errors
+        return str(error) or type(error).__name__, None
+
+
+def _activations(directory: str) -> set[str]:
+    """Every activation signal Forge's observers write for the skill in ``directory``."""
+    name = directory.rsplit("/", 1)[-1]
+    return {f"Skill tool called for {name}", f"read SKILL.md from the {name} skill", f"/{name} was invoked",
+            f"read {directory}/SKILL.md"}
+
+
 def check_example(root: Path, forge: dict) -> list[str]:
     """Every problem with one stored reference run; empty when it passes."""
     cli, documents, verify = forge["cli"], forge["documents"], forge["verify"]
-    expected = documents.parse_yaml((root / "expected.yaml").read_text(encoding="utf-8"))
+    root = root.resolve()
+    expected = _expected(root, documents)
     slug, harness = expected["slug"], expected["harness"]
     decisions = sorted((root / ".harness" / "decisions").glob("*.md"))
     if len(decisions) != 1:
         return [f"expected one decision record, found {len(decisions)}"]
-    decision = forge["load_decision"](decisions[0], root=root)
-    research = root / ".harness" / "research" / f"{slug}.md"
-    if research.is_file():
-        forge["research"].load_research(research, root=root)
-    accepted = decision.record.get("accepted_revision")
-    revision = (forge["research"].load_revision(root / ".harness" / "research" / f"{slug}.rules.yaml", root=root)
-                if accepted else None)
-    report_text = (root / ".harness" / "reports" / f"{slug}.md").read_text(encoding="utf-8")
-    report = _report_data(report_text, documents)
-    earlier, parts = forge["scope"].earlier_run(report_text)
-    cases = forge["runtime"].load_cases(root / expected["cases"]) if expected.get("cases") else []
-    problems = []
-
-    if (accepted or {}).get("digest") != (revision.digest if revision else None) or \
-            report["revision_digest"] != (revision.digest if revision else None):
-        problems.append("the decision, the rules file and the report name different accepted revisions")
-    try:
-        overrides, _ = cli._checked_overrides(root)
-    except Exception as error:  # forge.py's own refusal, whatever its type
-        return problems + [f"overrides: {error}"]
-    adopted = [{"rule_id": override["rule_id"], "digest": documents.canonical_digest(override)}
-               for override in overrides]
-    if sorted(report["overrides"], key=str) != sorted(adopted, key=str):
-        problems.append("the report's adopted overrides are not the repository's")
-    rules = forge["overrides"].apply_overrides(cli._pinned_rules(), overrides)
-    files, symlinks = cli.collect_target(root, decision)
-    current = verify.bound_inputs(decision, files, rules, symlinks=symlinks, revision=revision, overrides=overrides,
-                                  kb_version=cli._kb_version(), worker_evidence=report["worker_evidence"], cases=cases)
-    changed = _differences(report.get("bound_inputs") or {}, current)
-    if changed:
-        problems.append(f"bound inputs differ from the repository now: {', '.join(changed)}")
-
+    problem, recorded = _refused(lambda: cli.load_decision(decisions[0], root=root))
+    if problem:
+        return [f"forge refuses the decision: {problem}"]
+    # The requirements file is passed exactly when the decision records accepted requirements, as verify requires.
+    revision_path = root / ".harness" / "research" / f"{slug}.rules.yaml"
+    arguments = SimpleNamespace(decision=str(decisions[0]),
+                                revision=str(revision_path) if recorded.record.get("accepted_revision") else None)
+    problem, loaded = _refused(cli._decision_and_revision, arguments, root)
+    if problem:
+        return [f"forge refuses the decision or its requirements: {problem}"]
+    decision, revision = loaded
     every = [part["id"] for part in decision.record["parts"]]
-    if len(report["parts"]) != len(parts) or sorted(parts) != sorted(every):
-        problems.append(f"the report's parts {sorted(parts)} are not the decision's {sorted(every)}")
+    covered = [part["id"] for part in decision.record["parts"]
+               if verify.part_kind(part) in ("build", "local-reuse")]
+    problems = []
+    stale = cli._stale_requirements(decision, revision, covered)
+    if stale:
+        problems.append(f"forge refuses the accepted requirements: {stale}")
+    for part_id in covered if revision and not stale else []:
+        own = SimpleNamespace(rules=[entry for entry in revision.rules if entry["part_id"] == part_id])
+        provenance = cli._provenance_problem(root, slug, part_id, revision.brief_digests[part_id], own)
+        if provenance:
+            problems.append(f"part {part_id}: {provenance}")
+    problem = _refused(cli._require_target, decision, harness)[0]
+    if problem:
+        problems.append(problem)
+    problem, checked = _refused(cli._checked_overrides, root)
+    if problem:
+        return problems + [f"overrides: {problem}"]
+    overrides = checked[0]
+    files, symlinks = cli.collect_target(root, decision)
+    cases = []
+    if "cases" in expected:
+        problem, path = _refused(documents.safe_path, root, expected["cases"])
+        problem, cases = (problem, None) if problem else _refused(forge["runtime"].load_cases, path)
+        if problem:
+            return problems + [f"runtime cases: {problem}"]
+    for case in cases:
+        if harness not in case["permitted_tools"]:
+            problems.append(f"case {case['id']} names no permitted tools for {harness}")
+    for part in decision.record["parts"]:
+        if verify.part_kind(part) != "build":
+            continue
+        kinds = {(case["mode"], case["expected"]) for case in cases if case["part_id"] == part["id"]}
+        if not {("explicit", "activates"), ("negative", "does-not-activate")} <= kinds:
+            problems.append(f"part {part['id']} needs an explicit invocation and a near miss among its cases")
     if sorted(expected["parts"]) != sorted(every):
         problems.append(f"expected.yaml names parts {sorted(expected['parts'])}, the decision {sorted(every)}")
-    run = verify.prepare_run(decision, files, rules, None, symlinks=symlinks, revision=revision,
-                             kb_version=cli._kb_version(), worker_evidence=report["worker_evidence"], cases=cases)
-    fresh = {(result.part_id, result.rule_id): result.status for result in run.static_results}
+
+    report_text = (root / ".harness" / "reports" / f"{slug}.md").read_text(encoding="utf-8")
+    data = _report_data(report_text, documents)
+    if data["scope_parts"] is not None:
+        return problems + ["the report is a Review, whose kept results rest on an earlier report; record a reference "
+                           "run as a first run or an Extensive review"]
+    labels = {f"First run: judged {', '.join(sorted(every))}",
+              f"Extensive review (rarely needed): judged {', '.join(sorted(every))}"}
+    if data["scope"] not in labels:
+        problems.append(f"the report's scope {data['scope']!r} is not a first run or an Extensive review of every part")
+    if not data["contract_digest"]:
+        problems.append("the report names no confirmed contract; a live verification always runs under one")
+
+    drift = cli._drift(root)
+    unresolved = [entry for entry in drift if cli.drift_state(entry, decision.record, overrides) == "open"]
+    # verify reports the approved worker evidence, then what the review worker it ran observed.
+    stored = data["worker_evidence"]
+    split = next((count for count in range(len(stored), -1, -1)
+                  if _refused(lambda: cli.render_contract(decision, revision, overrides, worker_evidence=stored[:count],
+                                                          drift=drift).digest)[1] == data["contract_digest"]), None)
+    if split is None:
+        problems.append("the report's contract digest is not the current contract's for any approved workers it lists")
+        split = len(stored)
+    approved, observed = stored[:split], stored[split:]
+    if len(observed) > 1 or any(evidence["role"] != "review" for evidence in observed):
+        problems.append("the report lists worker evidence after the approved workers that is not one review worker's")
+    confirmation = cli.Confirmation(run_id=data["run_id"], contract_digest=data["contract_digest"] or "",
+                                    part_ids=sorted(data["confirmed_parts"]))
+    rules = cli.effective_rules(cli._pinned_rules(), overrides, confirmation)
+    problem, run = _refused(lambda: verify.prepare_run(
+        decision, files, rules, confirmation, symlinks=symlinks, revision=revision, overrides=overrides,
+        kb_version=cli._kb_version(), worker_evidence=approved,
+        scope_label=data["scope"] if data["scope"] in labels else sorted(labels)[0], recorded_drift=drift,
+        cases=cases))
+    if problem:
+        return problems + [f"forge cannot prepare the run: {problem}"]
+    run.worker_violations = list(data["worker_violations"])
+    problem, review = _refused(verify.validate_review, run, _review(data, verify, run))
+    if problem:
+        return problems + [f"the report's verdicts are not ones the reviewer could return: {problem}"]
+    exclusions = {(part["part_id"], item["rule_id"], verify.exclusion_token(run, part["part_id"], item["rule_id"]))
+                  for part in data["parts"] for item in part["rule_results"]
+                  if item["check"] == "judged" and item["result"] == "not-applicable"
+                  and item["rule_id"] not in run.not_applicable.get(part["part_id"], {})}
+    selection_rules = cli.effective_rules(cli._selection_rules(), overrides, confirmation)
+    failures, _ = verify.selection_failures(decision, selection_rules, domains=cli._domains(cli._selection_document()))
+    required = {part["id"]: {case["id"] for case in cases if case["part_id"] == part["id"]
+                             and case["mode"] == "explicit" and case["expected"] == "activates"}
+                for part in run.parts if verify.part_kind(part) == "build" and part["id"] in run.confirmed_parts
+                and harness in run.targets}
+    runtime = [forge["runtime"].RuntimeResult(**item) for item in data["runtime_results"]]
+    problem, results = _refused(lambda: verify.finish_run(
+        run, review, runtime, dict(run.frozen_inputs), confirmed_exclusions=frozenset(exclusions),
+        worker_observations=observed,
+        required_activation=required, drift=unresolved, selection=failures,
+        cited=verify.selection_citations(decision, selection_rules)))
+    if problem:
+        return problems + [f"forge refuses the report's runtime results: {problem}"]
+    replayed = forge["report"].report_data(run, results)
+    changed = _differences(data, replayed)
+    if changed:
+        problems.append(f"the report differs from Forge's replay of this repository: {', '.join(changed)}")
+    elif forge["report"].render_report(run, results) != report_text:
+        problems.append("the report's text is not what Forge renders for its data")
+
+    for result in results:
+        labels = expected["parts"].get(result.part_id)
+        for key in LABELS:
+            if labels and getattr(result, key) != labels[key]:
+                problems.append(f"part {result.part_id}: Forge gives {key} {getattr(result, key)!r}, expected.yaml "
+                                f"{labels[key]!r}")
+    by_part = {result.part_id: result for result in results}
     for part in decision.record["parts"]:
-        part_id, kind = part["id"], verify.part_kind(part)
-        result = parts.get(part_id)
-        if result is None:
+        part_id = part["id"]
+        if verify.part_kind(part) != "build" or part_id not in run.confirmed_parts:
             continue
-        considered = set(run.applicable_rules.get(part_id, [])) | set(run.not_applicable.get(part_id, {}))
-        recorded = {item["rule_id"]: item for item in result["rule_results"]}
-        kb_rules = {rule_id for rule_id in recorded if rule_id in run.rule_index}
-        if kb_rules != considered:
-            problems.append(f"part {part_id}: rules differ from those Forge applies: missing "
-                            f"{sorted(considered - kb_rules)}, unexplained {sorted(kb_rules - considered)}")
-        for (owner, rule_id), status in fresh.items():
-            if owner == part_id and rule_id in recorded and recorded[rule_id]["result"] != status:
-                problems.append(f"part {part_id}: {rule_id} is {recorded[rule_id]['result']} in the report, "
-                                f"{status} now")
-        if result["harness_result"] == "verified":
-            blocking = [rule_id for rule_id, item in recorded.items() if item["result"] in ("error", "unresolved")
-                        or (item["result"] == "fail" and run.rule_index.get(rule_id, {}).get("severity", "error")
-                            == "error")]
-            goal = result.get("goal_verdict") or {}
-            if blocking or goal.get("verdict") != "met" or report["worker_violations"] or part_id not in \
-                    report["confirmed_parts"]:
-                problems.append(f"part {part_id}: verified despite {blocking or 'its goal verdict, confirmation or '
-                                'worker violations'}")
-        goal_result = verify._goal_result(kind, result["status"], result["harness_result"],
-                                          result["outside_dependencies"], False)
-        if result["goal_result"] != goal_result:
-            problems.append(f"part {part_id}: goal result {result['goal_result']!r}, Forge gives {goal_result!r}")
-        labels = expected["parts"].get(part_id, {})
-        for key in ("harness_result", "goal_result"):
-            if labels and result[key] != labels.get(key):
-                problems.append(f"part {part_id}: {key} is {result[key]!r}, expected {labels.get(key)!r}")
-        if kind != "build":
-            continue
-        skill = files.get(f".agents/skills/{part['slug']}/SKILL.md", b"").decode("utf-8")
+        declared = {case["id"]: case for case in cases if case["part_id"] == part_id}
+        evidence = [item for item in runtime if item.part_id == part_id]
+        if sorted(item.case_id for item in evidence) != sorted(declared):
+            problems.append(f"part {part_id}: runtime results for {sorted(item.case_id for item in evidence)}, "
+                            f"declared cases {sorted(declared)}")
+        for item in evidence:
+            case = declared.get(item.case_id)
+            if case and (item.prompt, item.expected) != (case["prompt"], case["expected"]):
+                problems.append(f"part {part_id}: case {item.case_id} ran another prompt or expectation than declared")
+            if item.expected == "activates" and item.result == "pass" and \
+                    item.observed_activation not in _activations(run.part_dirs[part_id]):
+                problems.append(f"part {part_id}: case {item.case_id} activated {item.observed_activation!r}, "
+                                f"not the skill in {run.part_dirs[part_id]}")
+            if by_part[part_id].harness_result == "verified" and item.result != "pass":
+                problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
+                                "passes every case")
+        skill = files.get(f"{run.part_dirs[part_id]}/SKILL.md", b"").decode("utf-8")
         bounds = documents.markdown_section(skill, "Requirements")
         stated = [line for line in skill[slice(*bounds)].splitlines()[1:] if line.strip()] if bounds else []
         requirements = [entry["rule"] for entry in (revision.rules if revision else []) if entry["part_id"] == part_id]
         wanted = [f"{number}. {forge['build_skill']._rule_line(rule)}." for number, rule in enumerate(requirements, 1)]
         if stated != wanted:
             problems.append(f"part {part_id}: SKILL.md requirements {stated} are not the accepted {wanted}")
-        if result["harness_result"] == "verified" and not cli._runtime_holds(earlier, part_id, current, run, harness,
-                                                                              cases):
-            problems.append(f"part {part_id}: verified without runtime evidence Forge would keep for these files "
-                            "and cases")
-        for evidence in earlier.runtime_results:
-            if evidence.part_id == part_id and evidence.expected == "activates" and evidence.result == "pass" and \
-                    part["slug"] not in (evidence.observed_activation or ""):
-                problems.append(f"part {part_id}: case {evidence.case_id} activated {evidence.observed_activation!r}, "
-                                f"not the skill {part['slug']}")
 
     controls = [{"part_id": part["id"], "control": control["control"]}
                 for part in decision.record["parts"] for control in part["outside_controls"]]
@@ -204,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
     for root in examples:
         try:
             problems = check_example(root.resolve(), forge)
-        except (OSError, ValueError, KeyError) as error:
+        except (OSError, ValueError, KeyError, TypeError) as error:
             problems = [f"unreadable: {error}"]
         label = root.resolve().relative_to(PLAYGROUND) if root.resolve().is_relative_to(PLAYGROUND) else root
         for problem in problems:
