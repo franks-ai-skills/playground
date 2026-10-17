@@ -73,5 +73,6 @@ workers and checks that each kind of tampering is refused.
 A Review report is refused, because its kept results rest on an earlier
 report; record a reference run as a first run or an Extensive review.
 These two folders predate Forge's current report format and have no
-`expected.yaml`, so the checker fails on them until the plan's task 14
-records new reference runs here.
+`expected.yaml`. They are kept as history under `examples/history/`,
+which the checker does not read; plan task 14 records the new reference
+runs under `examples/bug-intake/`.

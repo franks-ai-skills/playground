@@ -6,10 +6,10 @@ Run it with Forge's environment from the playground root:
     ../harness-forge/.venv/bin/python tools/check_references.py [--forge ../harness-forge] [example ...]
 
 An example is a result repository, such as
-examples/reproduction-checklist/codex/, with an `expected.yaml`:
+examples/bug-intake/codex/, with an `expected.yaml`:
 
     harness: codex
-    slug: bug-reproduction-checklist
+    slug: bug-intake
     cases: runtime-cases.yaml   # the runtime cases verify ran, inside the example
     parts:
       A: {harness_result: verified, goal_result: met by the verified build}

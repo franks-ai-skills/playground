@@ -14,7 +14,6 @@ plumbing only: the live run regenerates research, judgments and choices.
 from __future__ import annotations
 
 import json
-import shutil
 import sys
 import tempfile
 import unittest
@@ -26,7 +25,7 @@ PLAYGROUND = Path(__file__).resolve().parents[1]
 FORGE = PLAYGROUND.parent / "harness-forge"
 sys.path[:0] = [str(FORGE), str(FORGE / "src"), str(PLAYGROUND / "tools")]
 
-import check_references  # noqa: E402
+import reference_runs  # noqa: E402
 from harness_forge.adapters.base import Completed  # noqa: E402
 from harness_forge.contracts import load_decision, split_part, write_decision  # noqa: E402
 from harness_forge.runtime import BASELINE_PROMPT  # noqa: E402
@@ -41,8 +40,8 @@ DATE = "2026-10-17"
 DECISION = f".harness/decisions/{DATE}-{SLUG}.md"
 REPORT = f".harness/reports/{SLUG}.md"
 REVISION = f".harness/research/{SLUG}.rules.yaml"
-CASES = ".scratch/cases.yaml"
-EXISTING = "bug-report-format"
+CASES = ".harness/cases.yaml"  # inside .harness/, as the runbook asks, so collection must not copy it twice
+EXISTING = reference_runs.EXISTING
 NEAR_MISS = "no bug report is involved"
 
 # The confirmed answers of the pinned reference-reproduction-checklist selection fixture: a skill, harness only.
@@ -55,15 +54,16 @@ PARTS = {
     "A2": ("Check a fix against its reproduction checklist before it merges", "fix-check",
            {"must_survive_compromise": "required"}),
     "A3": ("Format incoming bug reports with the team's template", EXISTING, {}),
-    "A4": ("Summarize the stack traces in a bug report", "trace-summary", {}),
+    "A4": ("Fix the failing CI checks on the fix's pull request", "gh-fix-ci", {}),
     "A5": ("Close the tracker issue once the fix ships", "close-issue", {"irreversible": True}),
     "A6": ("Label every incoming bug report", "label-reports", {"every_time": "always"}),
 }
 CANDIDATES = {
     "A3": {"name": EXISTING, "source": "https://example.com/team/bug-report-format", "license": "MIT",
            "maintenance": "maintained", "fit": "confirmed", "concept": "skills"},
-    "A4": {"name": "trace-summary", "source": "https://example.com/skills/trace-summary", "license": "Apache-2.0",
-           "maintenance": "maintained", "fit": "confirmed", "concept": "skills"},
+    # A public skill a live survey can find: openai/skills, Apache-2.0 (checked 2026-10-17).
+    "A4": {"name": "gh-fix-ci", "source": "https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci",
+           "license": "Apache-2.0", "maintenance": "maintained", "fit": "confirmed", "concept": "skills"},
 }
 DESCRIPTIONS = {
     "A1": "Turns an approved bug report into a reproduction checklist with environment, steps, expected and "
@@ -79,28 +79,26 @@ PROCEDURES = {
 }
 
 
-def existing_skill() -> str:
-    return (f"---\nname: {EXISTING}\ndescription: Formats an incoming bug report with the team's template of "
-            "title, environment, steps, expected and observed behavior. Use when a new bug report arrives. "
-            "Not for triage.\n---\n# Bug report format\n\nRewrite the report under these headings: Title, "
-            "Environment, Steps, Expected, Observed.\n")
-
-
 def runtime_cases() -> dict:
     """An explicit, an implicit and a near-miss case for each built part."""
     fixture = {"bug-report.md": "# Bug 42 (approved)\nExporting an empty date range crashes the app on macOS 15.\n"
                                 "Expected: an empty export. Observed: the app quits.\n"}
     tools = {"claude-code": ["Skill", "Read"], "codex": ["command_execution"]}
+    fix = {"checklist.md": "1. Open the export dialog.\n2. Choose an empty date range.\n3. Export.\n",
+           "fix.diff": "--- a/export.py\n+++ b/export.py\n+    if not rows:\n+        return []\n"}
+    # Each built skill's own requests: a case another skill's prompt would answer hides a routing miss.
+    prompts = {"A1": ("Use the reproduction-checklist skill on the bug report in bug-report.md.",
+                      "The bug report in bug-report.md is approved; how do I reproduce it step by step?", fixture),
+               "A2": ("Use the fix-check skill on fix.diff and checklist.md.",
+                      "Does the fix in fix.diff cover every step of checklist.md before it merges?", fix)}
     cases = []
-    for part_id, skill in (("A1", "reproduction-checklist"), ("A2", "fix-check")):
+    for part_id, (explicit, implicit, fixtures) in prompts.items():
         prefix = part_id.lower()
         cases += [
             {"id": f"{prefix}-explicit", "part_id": part_id, "mode": "explicit", "expected": "activates",
-             "prompt": f"Use the {skill} skill on the bug report in bug-report.md.",
-             "permitted_tools": tools, "fixtures": fixture},
+             "prompt": explicit, "permitted_tools": tools, "fixtures": fixtures},
             {"id": f"{prefix}-implicit", "part_id": part_id, "mode": "implicit", "expected": "activates",
-             "prompt": "The bug report in bug-report.md is approved; what should happen next for it?",
-             "permitted_tools": tools, "fixtures": fixture},
+             "prompt": implicit, "permitted_tools": tools, "fixtures": fixtures},
             {"id": f"{prefix}-near-miss", "part_id": part_id, "mode": "negative", "expected": "does-not-activate",
              "prompt": f"Rename the variables in utils.py; {NEAR_MISS}.", "permitted_tools": tools,
              "fixtures": {"utils.py": "x = 1\n"}},
@@ -163,12 +161,7 @@ class Scenario:
 
     def start(self):
         root = self.root
-        (root / "README.md").write_text("# Bug intake\n", encoding="utf-8")
-        skill = root / ".agents" / "skills" / EXISTING
-        skill.mkdir(parents=True)
-        (skill / "SKILL.md").write_text(existing_skill(), encoding="utf-8")
-        (root / ".claude" / "skills").mkdir(parents=True)
-        (root / ".claude" / "skills" / EXISTING).symlink_to(f"../../.agents/skills/{EXISTING}")
+        reference_runs.start(root)
         record = decision(part("A", "Handle incoming bug reports from intake to closing", slug=SLUG))
         self.facts = record.record["facts"]
         record = split_part(record, "A", [goal for goal, _, _ in PARTS.values()])
@@ -238,7 +231,7 @@ class Scenario:
         revision = self.root / REVISION
         cases = self.root / CASES
         if not cases.exists():
-            self.cli.write("cases.yaml", yaml.safe_dump(runtime_cases()))
+            cases.write_text(yaml.safe_dump(runtime_cases()), encoding="utf-8")
         relay = self.cli.confirm(self.decision, run_id, "--revision", revision)
         return self.ok("verify", "--decision", self.decision, "--root", self.root, "--revision", revision,
                        "--evidence", self.workers, "--relay", relay, "--harness", "claude-code",
@@ -297,8 +290,20 @@ class ReferenceScenarioTest(unittest.TestCase):
         closing = scenario.verify("verify-4")
         self.assertEqual((results(closing), closing["kept_parts"]), (EXPECTED, []))
         example = Path(self.directory.name) / "example"
-        collect(self.root, example)
-        self.assertEqual(check_references.check_example(example, check_references._forge(FORGE)), [])
+        (self.root / ".env").write_text("TOKEN=not-for-the-example\n", encoding="utf-8")
+        self.assertEqual(reference_runs.collect(self.root, example, harness="claude-code", slug=SLUG, cases=CASES), [])
+        self.assertFalse((example / ".env").exists())
+        self.assertFalse((example / ".scratch" / "workers.json").exists(), "the agent's scratch files stay behind")
+
+    def test_collect_refuses_a_path_outside_the_repository_before_writing(self):
+        reference_runs.start(self.root)
+        outside = Path(self.directory.name) / "cases.yaml"
+        outside.write_text("cases: []\n", encoding="utf-8")
+        example = Path(self.directory.name) / "example"
+        for cases in ("../cases.yaml", "/etc/hosts", ".claude/skills/../../cases.yaml"):
+            with self.subTest(cases=cases), self.assertRaises(ValueError):
+                reference_runs.collect(self.root, example, harness="claude-code", slug=SLUG, cases=cases)
+            self.assertFalse(example.exists())
 
     def test_the_same_result_verified_from_codex_replays(self):
         """Codex as the second target: a first run there over the result, near misses unobservable."""
@@ -323,8 +328,7 @@ class ReferenceScenarioTest(unittest.TestCase):
         self.assertEqual({case["case_id"]: case["result"] for case in output["runtime"] if "near-miss" in case["case_id"]},
                          {"a1-near-miss": "not-run", "a2-near-miss": "not-run"})
         example = Path(self.directory.name) / "example"
-        collect(self.root, example, harness="codex")
-        self.assertEqual(check_references.check_example(example, check_references._forge(FORGE)), [])
+        self.assertEqual(reference_runs.collect(self.root, example, harness="codex", slug=SLUG, cases=CASES), [])
 
 
 EXPECTED = {"A1": ("verified", "met by the verified build"), "A2": ("verified", "depends on outside controls"),
@@ -335,16 +339,6 @@ EXPECTED = {"A1": ("verified", "met by the verified build"), "A2": ("verified", 
 def results(output: dict) -> dict:
     return {part["part_id"]: (part["harness_result"], part["goal_result"]) for part in output["parts"]}
 
-
-def collect(root: Path, example: Path, harness: str = "claude-code") -> None:
-    """The result repository as a reference example: its files as they are, with the labels it expects."""
-    shutil.copytree(root, example, symlinks=True)
-    data = check_references._report_data((root / REPORT).read_text(encoding="utf-8"),
-                                         check_references._forge(FORGE)["documents"])
-    labels = {part["part_id"]: {"harness_result": part["harness_result"], "goal_result": part["goal_result"]}
-              for part in data["parts"]}
-    (example / "expected.yaml").write_text(yaml.safe_dump(
-        {"harness": harness, "slug": SLUG, "cases": CASES, "parts": labels}), encoding="utf-8")
 
 if __name__ == "__main__":
     unittest.main()

@@ -1430,8 +1430,11 @@ or raw private harness profiles.
   evidence to fail. Run the FORGE unit suite to check its offline
   foundation before live execution.
 - [ ] In clean test installations with existing subscription authentication, run
-  `python tools/live_checks.py --harness claude-code --case reproduction-checklist`
-  and the Codex equivalent. Use the same confirmed reference answers;
+  the reference sessions by hand in Claude Code and Codex, as
+  [the owner-session runbook](2026-10-17-t14-owner-sessions.md) describes
+  (no automated `live_checks.py` case can confirm a contract for the
+  user). `tools/test_reference_scenario.py` runs the same six-outcome
+  scenario offline first. Use the same confirmed reference answers;
   record live survey differences rather than demanding identical
   fetched pages. If compatible reuse appears, exercise it honestly and
   use the confirmed no-reuse fixture separately for the build path.
