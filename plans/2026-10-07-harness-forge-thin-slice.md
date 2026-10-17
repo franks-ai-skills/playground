@@ -1446,14 +1446,23 @@ or raw private harness profiles.
   harness versions and runtime setup still match.
   Reuse T11/T12 evidence only when its bound inputs remain unchanged;
   otherwise re-run the affected cases against the installed package.
-- [ ] Run each skill's explicit invocation, implicit routing where
+- [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:
   20 × 3 × 4 skills × 2 harnesses = about 480 runs before baseline arms.
   The initial smoke suite already ran in T11; this broader evaluation is
   not required to reach the first live workflow. Record activation signals
   and baseline behavior. Do not invent a Codex trace marker.
-  Run harness-verify against forge's own skills, using its accepted
+  Ran once on 2026-10-17 (486 sessions); FORGE
+  `evals/canaries/results/routing-2026-10-17.md` (PR #4, `ea7956b`) records the results,
+  re-judged offline after the Codex multi-file `cat` fix, the misses and
+  the observability limits: explicit `/name` and `$name` leave no stream
+  signal, and Codex near misses stay unobservable. Owner, 2026-10-17:
+  such live runs are costly and not regular; a further one needs a very
+  important reason, after every offline change it would check. Observer
+  fixes are checked by re-judging the recorded streams
+  (`tools/rescore_routing.py`), not by a new run.
+- [ ] Run harness-verify against forge's own skills, using its accepted
   contract and pinned rules. Include Forge's own research-isolation
   recommendation: untrusted fetched content plus login material and egress
   triggers it even for a trusted project. Do not automatically mark the
