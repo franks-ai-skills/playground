@@ -403,7 +403,7 @@ class CheckReferencesTest(unittest.TestCase):
 
     def test_a_result_the_runtime_cannot_produce_for_its_case(self):
         self.cases(lambda data: [case["permitted_tools"]["claude-code"].append("Bash") for case in data["cases"]])
-        self.refused("so Claude Code does not run it")
+        self.refused("stops before it runs (not-run: unavailable: Claude runs the case without a sandbox")
 
     def test_a_codex_reference_verifies_with_its_unobservable_near_miss(self):
         """Codex cannot prove a non-activation: its near miss stays not-run, and the part is still verified."""
@@ -420,6 +420,20 @@ class CheckReferencesTest(unittest.TestCase):
         self.cases(lambda data: data["cases"][0].setdefault("fixtures", {}).update(
             {f".agents/skills/{NAME}/SKILL.md": "replaced"}))
         self.refused("would replace the candidate")
+
+    def test_fixture_paths_that_cannot_all_be_files(self):
+        self.cases(lambda data: data["cases"][0].setdefault("fixtures", {}).update({"bug-report.md/nested.txt": "x"}))
+        self.refused("cannot both be files")
+
+    def test_an_unobservable_near_miss_that_observed_an_activation(self):
+        verify_in_codex(self.root)
+        self.expected(lambda expected: expected.update(harness="codex"))
+
+        def hidden(data):
+            item = next(item for item in data["runtime_results"] if item["expected"] == "does-not-activate")
+            item["observed_activation"] = f"read .agents/skills/{NAME}/SKILL.md"
+        self.report(hidden)
+        self.refused("contradicts its expectation or observation")
 
     def test_a_local_reuse_part_may_own_runtime_cases(self):
         """A reused skill installed in the repository is tested like a build, under its own path."""

@@ -342,8 +342,10 @@ def check_example(root: Path, forge: dict) -> list[str]:
         # Forge's own rule for which results its runtime can produce, which its producer applies too.
         directory = run.part_dirs.get(item.part_id)
         candidate = {path: b"" for path in run.frozen_inputs["files"] if directory and path.startswith(directory + "/")}
-        problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id], candidate) \
-            if item.case_id in declared_cases else None
+        links = {link: run.frozen_inputs["symlinks"][link] for link in run.part_links.get(item.part_id, [])
+                 if link in run.frozen_inputs["symlinks"]}
+        problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id], (directory, candidate, links)) \
+            if item.case_id in declared_cases and directory else None
         if problem:
             problems.append(problem)
     by_part = {result.part_id: result for result in results}
