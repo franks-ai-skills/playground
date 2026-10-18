@@ -5,8 +5,9 @@ the starting repository `tools/reference_runs.py start` creates and the
 idea "Handle incoming bug reports from intake to closing", with their own
 picture of the workflow instead of the runbook's six parts. `claude-code/`
 holds the result as `tools/reference_runs.py collect` copies it. The
-runtime cases were in the session's scratch directory; they are added as
-`.harness/cases.yaml`, which no report digest binds.
+runtime cases were in the session's scratch directory and are added,
+unchanged, as `.harness/cases.yaml`. The report binds their content
+(`bound_inputs.cases`), not the file's path or formatting.
 
 The session ran Forge `7c7272d`, installed as the plugin from GitHub,
 with the KB pinned at `ec829ae`, on Claude Code 2.1.302 with a
@@ -42,10 +43,11 @@ nothing-fits part, no break/fix with a Review and no verified part.
 
 - Forge runs a user-invoked skill's explicit case as `/<name>` in
   Claude Code and `$<name>` in Codex.
-- `prepare-contract` refuses a part whose recorded selection `build`
+- `prepare-contract` names each part whose recorded selection `build`
   would refuse, such as a control the goal needs recorded as a
-  precaution. In this session that refusal came only at C's build and
-  cost a third contract confirmation.
+  precaution, so it is fixed before confirmation. In this session that
+  refusal came only at C's build and cost a third contract
+  confirmation.
 - harness-intake states controls the goal needs instead of asking, asks
   before recording a link between parts, and warns before the trigger
   question that a model-started skill with side effects fails
