@@ -341,7 +341,10 @@ def check_example(root: Path, forge: dict) -> list[str]:
             problems.append(f"case {item.case_id} ran in {item.harness}, not in the reference's {harness}")
         # Forge's own rule for which results its runtime can produce, which its producer applies too.
         directory = run.part_dirs.get(item.part_id)
-        candidate = {path: b"" for path in run.frozen_inputs["files"] if directory and path.startswith(directory + "/")}
+        # The candidate's own files, read as Forge reads them: whether the skill is user-invoked decides which
+        # results its explicit case can have.
+        candidate = {path: forge["documents"].safe_path(root, path).read_bytes() for path in run.frozen_inputs["files"]
+                     if directory and path.startswith(directory + "/")}
         links = {link: run.frozen_inputs["symlinks"][link] for link in run.part_links.get(item.part_id, [])
                  if link in run.frozen_inputs["symlinks"]}
         problem = forge["runtime"].outcome_problem(item, declared_cases[item.case_id], (directory, candidate, links)) \

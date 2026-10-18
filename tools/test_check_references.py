@@ -13,6 +13,7 @@ changes one thing in a copy and expects the checker to refuse it.
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import re
 import shutil
@@ -434,6 +435,26 @@ class CheckReferencesTest(unittest.TestCase):
             item["observed_activation"] = f"read .agents/skills/{NAME}/SKILL.md"
         self.report(hidden)
         self.refused("contradicts its expectation or observation")
+
+    def test_an_unobserved_invocation_is_judged_on_the_candidates_own_files(self):
+        """Only a user-invoked skill's explicit case may stay unobserved; the replay reads the skill to tell."""
+        from harness_forge.runtime import SLASH_UNSEEN
+        explicit = next(case["id"] for case in yaml.safe_load((self.root / CASES).read_text(encoding="utf-8"))["cases"]
+                        if case["mode"] == "explicit")
+
+        def unobserved(data):
+            next(item for item in data["runtime_results"] if item["case_id"] == explicit).update(
+                result="not-run", reason=SLASH_UNSEEN, observed_activation=None)
+        self.report(unobserved)
+        self.refused("only a user-invoked skill's explicit case")
+        path = f".agents/skills/{NAME}/SKILL.md"
+        skill = (self.root / path).read_text(encoding="utf-8").replace("---\n", "---\ndisable-model-invocation: true\n", 1)
+        (self.root / path).write_text(skill, encoding="utf-8")
+        digest = hashlib.sha256(skill.encode()).hexdigest()
+        self.report(lambda data: [item["file_hashes"].update({path: digest}) for item in data["runtime_results"]])
+        problems = self.problems()
+        self.assertTrue(problems, "the edited skill no longer matches its review")
+        self.assertFalse([problem for problem in problems if "user-invoked" in problem or "frozen" in problem], problems)
 
     def test_a_local_reuse_part_may_own_runtime_cases(self):
         """A reused skill installed in the repository is tested like a build, under its own path."""
