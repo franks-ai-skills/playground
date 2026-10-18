@@ -6,9 +6,10 @@
         link, which the reference idea can reuse.
 
     python tools/reference_runs.py collect <result repository> <example directory> --harness <harness>
-            --slug <slug> --cases <cases file inside the repository>
+            --slug <slug> [--cases <cases file inside the repository>]
         Copy the reference artifacts as the session left them into the
-        example directory: .harness/, README.md, the cases file, each
+        example directory: .harness/, README.md, the cases file (left out
+        for a run without runtime cases, such as one that built nothing), each
         built or reused skill's directory with its .claude/skills link,
         and a plugin skill's manifests. Nothing else, so a .env file or
         the agent's scratch files stay behind. Then write expected.yaml
@@ -65,7 +66,7 @@ def located(root: Path, relative: str) -> Path:
     return safe_path(root, relative)
 
 
-def artifacts(repository: Path, cases: str) -> list[str]:
+def artifacts(repository: Path, cases: str | None) -> list[str]:
     """The paths a reference example keeps, relative to the repository: what Forge reads and binds. A path
     inside another one it keeps is left out, since copying that one copies it."""
     from harness_forge.contracts import load_decision
@@ -74,7 +75,7 @@ def artifacts(repository: Path, cases: str) -> list[str]:
     decisions = sorted((repository / ".harness" / "decisions").glob("*.md"))
     if len(decisions) != 1:
         raise ValueError(f"{repository} needs exactly one decision record, found {len(decisions)}")
-    paths = [".harness", "README.md", cases]
+    paths = [".harness", "README.md", *([cases] if cases else [])]
     for part in load_decision(decisions[0]).record["parts"]:
         kind = part_kind(part)
         if kind not in ("build", "local-reuse"):
@@ -91,11 +92,14 @@ def artifacts(repository: Path, cases: str) -> list[str]:
     return [path for path in kept if not any(path.startswith(other + "/") for other in kept if other != path)]
 
 
-def collect(repository: Path, example: Path, *, harness: str, slug: str, cases: str) -> list[str]:
-    """Copy the result into ``example`` with its expected labels; return the checker's problems."""
+def collect(repository: Path, example: Path, *, harness: str, slug: str, cases: str | None) -> list[str]:
+    """Copy the result into ``example`` with its expected labels; return the checker's problems.
+
+    ``cases`` is None for a run without runtime cases, such as one that built nothing.
+    """
     if example.exists():
         raise ValueError(f"{example} exists; collect into a new directory")
-    if not located(repository, cases).is_file():
+    if cases is not None and not located(repository, cases).is_file():
         raise ValueError(f"{cases} is not a file in {repository}")
     selected = artifacts(repository, cases)  # every path is checked before anything is written
     example.mkdir(parents=True)
@@ -113,7 +117,7 @@ def collect(repository: Path, example: Path, *, harness: str, slug: str, cases: 
     labels = {part["part_id"]: {"harness_result": part["harness_result"], "goal_result": part["goal_result"]}
               for part in check_references._report_data(report, forge["documents"])["parts"]}
     (example / "expected.yaml").write_text(yaml.safe_dump(
-        {"harness": harness, "slug": slug, "cases": cases, "parts": labels}), encoding="utf-8")
+        {"harness": harness, "slug": slug, **({"cases": cases} if cases else {}), "parts": labels}), encoding="utf-8")
     return check_references.check_example(example, forge)
 
 
@@ -126,7 +130,8 @@ def main(argv: list[str] | None = None) -> int:
     collecting.add_argument("example", type=Path)
     collecting.add_argument("--harness", choices=("claude-code", "codex"), required=True)
     collecting.add_argument("--slug", required=True)
-    collecting.add_argument("--cases", required=True, help="the cases file's path inside the repository")
+    collecting.add_argument("--cases", help="the cases file's path inside the repository; left out when the run "
+                                           "had no runtime cases")
     arguments = parser.parse_args(argv)
     try:
         if arguments.command == "start":

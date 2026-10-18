@@ -295,6 +295,18 @@ class ReferenceScenarioTest(unittest.TestCase):
         self.assertFalse((example / ".env").exists())
         self.assertFalse((example / ".scratch" / "workers.json").exists(), "the agent's scratch files stay behind")
 
+    def test_a_result_without_runtime_cases_is_collected_without_them(self):
+        """A run that built nothing has no cases file; collected without one, a built part's missing cases show."""
+        scenario = self.scenario
+        scenario.start()
+        scenario.choose()
+        scenario.build()
+        scenario.verify("verify-1")
+        example = Path(self.directory.name) / "example"
+        problems = reference_runs.collect(self.root, example, harness="claude-code", slug=SLUG, cases=None)
+        self.assertNotIn("cases", yaml.safe_load((example / "expected.yaml").read_text(encoding="utf-8")))
+        self.assertIn("part A1 is a built skill: its runtime cases are missing", problems)
+
     def test_collect_refuses_a_path_outside_the_repository_before_writing(self):
         reference_runs.start(self.root)
         outside = Path(self.directory.name) / "cases.yaml"
