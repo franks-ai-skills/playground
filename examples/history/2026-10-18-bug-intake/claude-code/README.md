@@ -1,0 +1,157 @@
+# Bug intake
+
+## Outside controls
+
+- `codeowners-agent-config` (part A): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part A): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `merge-rules` (part A): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part A): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part B): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `merge-rules` (part B): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part B): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part C): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part C): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `merge-rules` (part C): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part C): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part D): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part D): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `event-gate` (part D): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - A CI check counts as a gate only when the repository requires it to pass on the protected ref (`outside.ci.required-on-ref`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `merge-rules` (part D): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part D): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part E): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `event-gate` (part E): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - A CI check counts as a gate only when the repository requires it to pass on the protected ref (`outside.ci.required-on-ref`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `merge-rules` (part E): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part E): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part F): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `merge-rules` (part F): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part F): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part G): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part G): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `merge-rules` (part G): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+  - Approval comes from an identity other than the author, the last pusher and the launching user, and resets on new pushes (`outside.merge.requester-cannot-approve`)
+- `outer-isolation` (part G): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+
+## Where the skills load
+
+Forge builds `reproduce`, `fix-and-pr`, `close-and-label` into this repository (`.agents/skills/<name>/`), and a skill there loads only in this repository, although the idea's reach is public. This release packages no plugin: publish this repository, and each user copies each skill's folder to their user skills location: `~/.claude/skills/<name>/` for Claude Code and `~/.agents/skills/<name>/` for Codex. Forge verifies the skills in this repository, not a copy.

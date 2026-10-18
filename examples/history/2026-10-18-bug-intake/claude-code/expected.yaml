@@ -1,0 +1,25 @@
+cases: .harness/cases.yaml
+harness: claude-code
+parts:
+  A:
+    goal_result: not assessed
+    harness_result: not applicable
+  B:
+    goal_result: not met
+    harness_result: not verified
+  C:
+    goal_result: not met
+    harness_result: not verified
+  D:
+    goal_result: not assessed
+    harness_result: not applicable
+  E:
+    goal_result: depends on outside controls
+    harness_result: not applicable
+  F:
+    goal_result: not met
+    harness_result: not verified
+  G:
+    goal_result: not assessed
+    harness_result: not applicable
+slug: bug-intake

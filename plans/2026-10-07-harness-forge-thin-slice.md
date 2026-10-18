@@ -1449,6 +1449,14 @@ or raw private harness profiles.
   harness versions and runtime setup still match.
   Reuse T11/T12 evidence only when its bound inputs remain unchanged;
   otherwise re-run the affected cases against the installed package.
+  First session, Claude Code, 2026-10-18, on the owner's own bug-intake
+  idea instead of the runbook's parts:
+  `examples/history/2026-10-18-bug-intake/`. It is partial (no reuse,
+  nothing-fits, break/fix or verified part); FORGE PR #6 fixes its
+  findings. A user-invoked skill stays unverifiable in Claude Code while
+  `/name` leaves no stream signal; a two-run probe of
+  `--replay-user-messages` decides whether Forge can observe it, and
+  otherwise the gap goes to the owner for a decision.
 - [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:

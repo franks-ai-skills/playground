@@ -1,0 +1,263 @@
+briefs:
+  B: 7cfcb2e232d2ee9bfad04a01fa4ac168783446588af6b7be28abd1826c7ea555
+  C: 4d510095e2fc1707b4b1b9d3e46bf1c905b06649478cefca566feabedfdf3617
+  F: f79df32d27a379acf9e4b6893f84220433c56d96c205493c04b23f3bb6969306
+digest: e1805692c07794fb076d85404a8ce1d99581b7ad56af5cabea3935af53c2acde
+rules:
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.exact-steps
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The skill has the agent add numbered, exact steps to reproduce to the issue, precise enough
+      that someone else can follow them and later tell whether the bug is fixed.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.repeated-runs
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The skill has the agent run the reproduction several times, each run in a fresh process
+      or environment, and record in the issue how many runs were made and how many reproduced the bug.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://firefox-source-docs.mozilla.org/testing/test-verification/index.html
+    - https://firefox-source-docs.mozilla.org/testing/debugging-intermittents/index.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.consistency-statement
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The issue states whether the bug reproduced in every run (consistent), in some runs (intermittent,
+      with the observed count such as 3 of 10), or in none.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    - https://firefox-source-docs.mozilla.org/testing/test-verification/index.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.observed-expected
+    concept: idea
+    kind: must
+    severity: warning
+    check: judged
+    statement: After the steps, the issue describes the observed result and the expected result precisely.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.facts-vs-speculation
+    concept: idea
+    kind: should
+    severity: warning
+    check: judged
+    statement: The skill keeps observations separate from guesses about the cause in what it writes to
+      the issue.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-intake.b.order-dependency
+    concept: idea
+    kind: should
+    severity: warning
+    check: judged
+    statement: For an intermittent bug, the skill has the agent check whether it depends on what runs
+      before or alongside it, by running the reproduction both alone and together with related tests.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Research
+    sources:
+    - https://firefox-source-docs.mozilla.org/testing/debugging-intermittents/index.html
+    - https://arxiv.org/abs/2101.09077
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.closing-keyword
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: 'The skill opens the pull request against the default branch with a closing keyword for
+      the issue (such as "Fixes #123") in the description; if the pull request must target another branch,
+      it links the issue explicitly and tells the user the issue will not close on merge.'
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.regression-test
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The fix comes with a new or updated test that covers the fixed behavior, based on the reproduction
+      steps.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://google.github.io/eng-practices/review/developer/small-cls.html
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.ci-workaround
+    concept: idea
+    kind: must-not
+    severity: error
+    check: judged
+    statement: The skill makes failing checks pass by skipping, deleting or weakening tests, or by changing
+      CI configuration, instead of fixing the cause.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.pwn-request
+    concept: idea
+    kind: must-not
+    severity: error
+    check: judged
+    statement: The skill changes a workflow so that it uses the pull_request_target trigger together with
+      a checkout of the pull request's code.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Advisory
+    sources:
+    - https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.self-merge
+    concept: idea
+    kind: must-not
+    severity: warning
+    check: judged
+    statement: The skill merges the pull request itself.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-intake.c.green-before-done
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The skill reports the pull request as ready only after every required check has passed,
+      and reports which checks are still failing otherwise.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+    contested: false
+- part_id: F
+  rule:
+    id: idea.bug-intake.f.closing-note
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: 'The closing note on the issue names the fix: a link to the merged pull request and its
+      merge commit.'
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+    contested: false
+- part_id: F
+  rule:
+    id: idea.bug-intake.f.merged-first
+    concept: idea
+    kind: must-not
+    severity: error
+    check: judged
+    statement: The skill closes an issue whose fix pull request is not merged.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+    contested: false
+- part_id: F
+  rule:
+    id: idea.bug-intake.f.auto-closed
+    concept: idea
+    kind: must
+    severity: warning
+    check: judged
+    statement: The skill checks whether GitHub already closed the issue on merge; if so it adds the note
+      and label without reopening it, and if not (for example, the pull request targeted another branch)
+      it closes the issue itself.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+    contested: false

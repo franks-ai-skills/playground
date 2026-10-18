@@ -1,0 +1,163 @@
+cases:
+- id: reproduce-explicit
+  part_id: B
+  mode: explicit
+  prompt: Use the reproduce skill on the bug in issue-42.md and tell me how you would reproduce it.
+  expected: activates
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range
+
+      Environment: macOS 15, app 2.3.1
+
+      Steps: open Reports, clear both date fields, click Export.
+
+      Expected: an empty CSV. Observed: the app quits.
+
+      '
+- id: reproduce-implicit
+  part_id: B
+  mode: implicit
+  prompt: Can you repro the bug described in issue-42.md and check whether it is flaky?
+  expected: activates
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range
+
+      Environment: macOS 15, app 2.3.1
+
+      Steps: open Reports, clear both date fields, click Export.
+
+      Expected: an empty CSV. Observed: the app quits.
+
+      '
+- id: reproduce-near-miss
+  part_id: B
+  mode: negative
+  prompt: Summarize in two sentences what issue-42.md is about; I do not need it reproduced.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range
+
+      Environment: macOS 15, app 2.3.1
+
+      Steps: open Reports, clear both date fields, click Export.
+
+      Expected: an empty CSV. Observed: the app quits.
+
+      '
+- id: fix-and-pr-explicit
+  part_id: C
+  mode: explicit
+  prompt: Use the fix-and-pr skill for the bug in issue-42.md and tell me the first steps you would take.
+  expected: activates
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range
+
+      Environment: macOS 15, app 2.3.1
+
+      Steps: open Reports, clear both date fields, click Export.
+
+      Expected: an empty CSV. Observed: the app quits.
+
+      '
+- id: fix-and-pr-near-miss
+  part_id: C
+  mode: negative
+  prompt: What do you think causes the crash described in issue-42.md? Just give me your guess, no changes.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range
+
+      Environment: macOS 15, app 2.3.1
+
+      Steps: open Reports, clear both date fields, click Export.
+
+      Expected: an empty CSV. Observed: the app quits.
+
+      '
+- id: close-and-label-explicit
+  part_id: F
+  mode: explicit
+  prompt: Use the close-and-label skill for the bug in issue-42.md and tell me what you would do.
+  expected: activates
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range (open)
+
+      Fix PR #57 "Handle empty date range in export" was merged into main
+
+      as commit 3f2c9ab on 2026-10-17. It contained "Fixes #42".
+
+      '
+- id: close-and-label-implicit
+  part_id: F
+  mode: implicit
+  prompt: The fix for the bug in issue-42.md is merged now. Close it out.
+  expected: activates
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range (open)
+
+      Fix PR #57 "Handle empty date range in export" was merged into main
+
+      as commit 3f2c9ab on 2026-10-17. It contained "Fixes #42".
+
+      '
+- id: close-and-label-near-miss
+  part_id: F
+  mode: negative
+  prompt: List the dates mentioned in issue-42.md.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code:
+    - Skill
+    - Read
+    codex:
+    - command_execution
+  fixtures:
+    issue-42.md: '# Issue #42: Export crashes with empty date range (open)
+
+      Fix PR #57 "Handle empty date range in export" was merged into main
+
+      as commit 3f2c9ab on 2026-10-17. It contained "Fixes #42".
+
+      '
