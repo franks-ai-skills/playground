@@ -42,7 +42,9 @@ nothing-fits part, no break/fix with a Review and no verified part.
 ## Fixed after this session
 
 - Forge runs a user-invoked skill's explicit case as `/<name>` in
-  Claude Code and `$<name>` in Codex.
+  Claude Code and `$<name>` in Codex. In Claude Code the case sends its
+  prompt as a stream-json message that Claude Code replays, which shows
+  its expansion of the resolved command.
 - `prepare-contract` names each part whose recorded selection `build`
   would refuse, such as a control the goal needs recorded as a
   precaution, so it is fixed before confirmation. In this session that

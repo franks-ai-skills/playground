@@ -1453,10 +1453,12 @@ or raw private harness profiles.
   idea instead of the runbook's parts:
   `examples/history/2026-10-18-bug-intake/`. It is partial (no reuse,
   nothing-fits, break/fix or verified part); FORGE PR #6 fixes its
-  findings. A user-invoked skill stays unverifiable in Claude Code while
-  `/name` leaves no stream signal; a two-run probe of
-  `--replay-user-messages` decides whether Forge can observe it, and
-  otherwise the gap goes to the owner for a decision.
+  findings. A two-run probe (2026-10-18, Claude Code 2.1.302) showed
+  that with `--input-format stream-json --replay-user-messages` the
+  replayed user message carries Claude Code's expansion of a resolved
+  `/name`; FORGE PR #7 runs slash cases that way, so a user-invoked
+  skill can be verified in Claude Code. A KB issue on the selection gap
+  for external state changes is drafted and not yet filed.
 - [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:
