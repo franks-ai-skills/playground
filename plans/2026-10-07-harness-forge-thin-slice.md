@@ -1457,8 +1457,8 @@ or raw private harness profiles.
   that with `--input-format stream-json --replay-user-messages` the
   replayed user message carries Claude Code's expansion of a resolved
   `/name`; FORGE PR #7 runs slash cases that way, so a user-invoked
-  skill can be verified in Claude Code. A KB issue on the selection gap
-  for external state changes is drafted and not yet filed.
+  skill can be verified in Claude Code. The selection gap for external
+  state changes is KB issue #4.
 - [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:
