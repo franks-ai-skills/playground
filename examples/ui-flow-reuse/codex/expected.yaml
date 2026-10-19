@@ -1,0 +1,6 @@
+harness: codex
+parts:
+  A:
+    goal_result: not assessed
+    harness_result: not checked
+slug: local-ui-testing

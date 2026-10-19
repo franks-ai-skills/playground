@@ -1,0 +1,48 @@
+# Bug intake
+
+## Outside controls
+
+- `codeowners-agent-config` (part A1): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part A2): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part B): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part C): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part C): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)
+- `codeowners-agent-config` (part D): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `codeowners-agent-config` (part E): recommended, not verified. Precaution; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - A CODEOWNERS entry names an owner for every file that configures the agent, including `.agents/`, `.claude/`, `CLAUDE.md`, `.mcp.json`, `.codex/`, `AGENTS.md`, `AGENTS.override.md`, `.devcontainer/`, the CI workflow files and the CODEOWNERS file itself, and the branch rule requires code-owner review (`outside.codeowners.agent-config`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+- `compromise-resistant-gate` (part E): recommended, not verified. Required for the goal; availability available. It works as a gate only when:
+  - Workflow, scanner and policy files that define a gate are under code owners or come from outside the repository at a pinned ref, and CODEOWNERS owns itself (`outside.ci.workflow-protected`)
+  - No broader credential or channel the agent can reach, such as a personal token or a metadata endpoint, bypasses the control (`outside.gate.no-broader-bypass`)
+  - Its configuration is checked periodically, because gate configuration drifts silently (`outside.gate.periodic-verification`)
+  - The control is enforced on the user's plan and repository visibility, or the recommendation says it is not (`outside.gate.plan-enforced`)
+  - It targets the real refs and resources it protects, such as the default and release branches and tags or the production accounts (`outside.gate.real-refs`)
+  - The agent's identity, including the bot, app, token and the human whose token it uses, is on no bypass or override list of the control (`outside.merge.no-agent-bypass`)

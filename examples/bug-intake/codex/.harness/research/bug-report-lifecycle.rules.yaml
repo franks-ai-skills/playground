@@ -1,0 +1,108 @@
+briefs:
+  A1: e4e2c279c5d7191c4fa4f224f9c1dfcf276ded5710169bc400fc2d1811f706e9
+  B: cdb45811bd72c0a095d56fdeede664f36e6c7e32cddb1c20b86137892fadefe6
+  C: 2a501c063c1db1e9bc7281f8af04aa13d4827f96df6086de6e2e59e6d208c15b
+  D: 7f86a7fc18365a9da5e125430e880a868da2d9605693809da1a423f1d6e02b51
+digest: 03caeb0fd62b468d5be723224f6a732f33ca3d8dc78f77fb6a3453bf87dfce4e
+rules:
+- part_id: B
+  rule:
+    id: idea.bug-report-lifecycle.b.results
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: After the reproduction steps, describe the observed and expected results precisely and
+      distinguish observations from speculation.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html
+    contested: false
+- part_id: B
+  rule:
+    id: idea.bug-report-lifecycle.b.redaction
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Redact sensitive information from logs included in the checklist or its supporting evidence.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://github.com/UsefulSoftwareCo/executor/issues/1225
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-report-lifecycle.c.latest-commit
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Require the checklist check to pass on the latest commit SHA; a result for an older commit
+      does not satisfy the check.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks
+    contested: false
+- part_id: C
+  rule:
+    id: idea.bug-report-lifecycle.c.required-merge-gate
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Require an outside protected required-status-check gate before merging, and describe the
+      in-session checklist verdict as advisory rather than proof that the merge gate is configured.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+    contested: false
+- part_id: D
+  rule:
+    id: idea.bug-report-lifecycle.d.current-commit
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Diagnose checks for the latest commit SHA and distinguish stale check results from current-commit
+      results.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks
+    contested: false
+- part_id: D
+  rule:
+    id: idea.bug-report-lifecycle.d.explicit-pr
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Resolve the intended pull request from the developer context and select that pull request
+      explicitly when using gh pr checks.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://cli.github.com/manual/gh_pr_checks
+    contested: false

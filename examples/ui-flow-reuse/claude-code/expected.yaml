@@ -1,0 +1,6 @@
+harness: claude-code
+parts:
+  A:
+    goal_result: not assessed
+    harness_result: not checked
+slug: ui-flow-testing

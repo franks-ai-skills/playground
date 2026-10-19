@@ -1,0 +1,52 @@
+briefs:
+  A: b9bdda02a6c8f46abc583053f4a94ab8f15b8b575fc7ca1b8a90ed85e020470d
+digest: f6f1a9b7ba48dbbc780350f1f90a7ed03344e159728568be5fd596e38a9912d2
+rules:
+- part_id: A
+  rule:
+    id: idea.local-ui-testing.a.python-playwright
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Use native Python Playwright scripts to test the local web application.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md
+    contested: false
+- part_id: A
+  rule:
+    id: idea.local-ui-testing.a.console-events
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Capture browser console messages through page console events.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://playwright.dev/docs/api/class-consolemessage
+    contested: false
+- part_id: A
+  rule:
+    id: idea.local-ui-testing.a.screenshot-file
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: Use the screenshot API with a file path to save screenshot evidence.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Inference
+    sources:
+    - https://playwright.dev/docs/screenshots
+    contested: false

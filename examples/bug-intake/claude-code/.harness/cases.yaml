@@ -1,0 +1,164 @@
+# Runtime activation cases for the user-invoked skills built for parts B
+# and C. Both are user-invoked commands, so there is no implicit case: the
+# explicit prompts are the request alone, and Forge runs them as
+# /<name> <prompt> in Claude Code and $<name> <prompt> in Codex. The
+# fixtures stand in for GitHub content, since the cases have no network.
+cases:
+- id: repro-checklist-explicit
+  part_id: B
+  mode: explicit
+  prompt: >-
+    Write the reproduction checklist for the approved bug report in
+    issue-123.md. Do not post anything; just show me the checklist.
+  expected: activates
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    issue-123.md: |
+      # Issue 123: Export crashes on empty date range
+      Labels: bug, approved
+
+      ## Environment
+      macOS 15.1, app version 4.2.0
+
+      ## Steps
+      Open Reports, clear both date fields, click Export CSV.
+
+      ## Expected
+      An empty CSV file is saved.
+
+      ## Observed
+      The app quits immediately. Happens every time.
+- id: repro-checklist-near-miss
+  part_id: B
+  mode: negative
+  prompt: >-
+    Rewrite the bug report in issue-123.md under our template headings
+    Title, Environment, Steps, Expected and Observed. I do not need a
+    reproduction checklist.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    issue-123.md: |
+      # Issue 123: Export crashes on empty date range
+      Labels: bug, approved
+
+      I opened Reports on my Mac (macOS 15.1, version 4.2.0), cleared both
+      dates and hit Export CSV. Instead of saving an empty file the app
+      just quit. Happens every time.
+- id: check-fix-explicit
+  part_id: C
+  mode: explicit
+  prompt: >-
+    Check the fix in pr-456.md against the reproduction checklist on the
+    issue in issue-123.md. Do not post anything; just show me the verdict.
+  expected: activates
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    pr-456.md: |
+      # PR 456: Handle empty date range in CSV export
+      Base: main. Related issue: #123.
+
+      Diff summary: exporter.py now returns an empty CSV when both dates
+      are empty; adds test_export_empty_range in tests/test_exporter.py.
+    issue-123.md: |
+      # Issue 123: Export crashes on empty date range
+      Labels: bug, approved
+
+      ## Reproduction checklist
+      ### Steps
+      1. Open Reports.
+      2. Clear both date fields.
+      3. Click Export CSV.
+      ### Expected
+      An empty CSV file is saved.
+      ### Actual
+      The app quits.
+      ### Reproducibility
+      Always.
+      ### Verification
+      Run `pytest tests/test_exporter.py::test_export_empty_range`; it fails
+      on main and passes once the bug is fixed.
+- id: fix-ci-explicit
+  part_id: D
+  mode: explicit
+  prompt: >-
+    Use the fix-ci skill on the failing CI log in ci-log.txt for the pull
+    request in pr-456.md and tell me what is wrong. Do not change any files.
+  expected: activates
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    pr-456.md: |
+      # PR 456: Handle empty date range in CSV export
+      Base: main. Related issue: #123.
+      Diff summary: exporter.py now returns an empty CSV when both dates
+      are empty; adds test_export_empty_range in tests/test_exporter.py.
+    ci-log.txt: |
+      Run pytest
+      tests/test_exporter.py::test_export_empty_range PASSED
+      tests/test_report_dates.py::test_default_range FAILED
+      AssertionError: expected range ending 2026-10-17, got 2026-10-18
+      1 failed, 41 passed
+- id: fix-ci-implicit
+  part_id: D
+  mode: implicit
+  prompt: >-
+    CI went red on my fix in pr-456.md; the log is in ci-log.txt. Why is
+    it failing? Do not change any files.
+  expected: activates
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    pr-456.md: |
+      # PR 456: Handle empty date range in CSV export
+      Base: main. Related issue: #123.
+      Diff summary: exporter.py now returns an empty CSV when both dates
+      are empty; adds test_export_empty_range in tests/test_exporter.py.
+    ci-log.txt: |
+      Run pytest
+      tests/test_exporter.py::test_export_empty_range PASSED
+      tests/test_report_dates.py::test_default_range FAILED
+      AssertionError: expected range ending 2026-10-17, got 2026-10-18
+      1 failed, 41 passed
+- id: fix-ci-near-miss
+  part_id: D
+  mode: negative
+  prompt: >-
+    Write a short release note for the change described in pr-456.md. CI
+    is green.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    pr-456.md: |
+      # PR 456: Handle empty date range in CSV export
+      Base: main. Related issue: #123.
+      Diff summary: exporter.py now returns an empty CSV when both dates
+      are empty; adds test_export_empty_range in tests/test_exporter.py.
+- id: check-fix-near-miss
+  part_id: C
+  mode: negative
+  prompt: >-
+    CI is failing on the pull request described in pr-456.md. Look at
+    what it changes and tell me what might be breaking the build.
+  expected: does-not-activate
+  permitted_tools:
+    claude-code: [Skill, Read, Grep, Glob]
+    codex: [command_execution]
+  fixtures:
+    pr-456.md: |
+      # PR 456: Handle empty date range in CSV export
+      Base: main. Related issue: #123.
+
+      Diff summary: exporter.py now returns an empty CSV when both dates
+      are empty; adds test_export_empty_range in tests/test_exporter.py.
+      CI: lint job failed.

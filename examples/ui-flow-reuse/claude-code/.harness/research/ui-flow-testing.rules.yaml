@@ -1,0 +1,79 @@
+briefs:
+  A: d52dec931ad6e5683c7b272d6c151896bf5293b1b0d228a833cd11d5ece90edc
+digest: c724ac91b59e022d5ed2ecffaeedbab8332d05b79462704ef64206d1b4d21f2d
+rules:
+- part_id: A
+  rule:
+    id: idea.ui-flow-testing.a.wait-before-inspect
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The skill has the agent wait for the page's network to go idle (networkidle) before it
+      inspects the rendered page of a dynamic app.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md
+    contested: false
+    severity_rationale: Inspecting a dynamic app before its scripts have run yields screenshots and DOM
+      state that do not show what the developer will see.
+- part_id: A
+  rule:
+    id: idea.ui-flow-testing.a.close-browser
+    concept: idea
+    kind: must
+    severity: warning
+    check: judged
+    statement: The skill has the agent close the browser when a run is done.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Practitioner
+    sources:
+    - https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md
+    contested: false
+    severity_rationale: A browser left open wastes resources on the developer's machine but does not falsify
+      the evidence.
+- part_id: A
+  rule:
+    id: idea.ui-flow-testing.a.license-file
+    concept: idea
+    kind: must
+    severity: error
+    check: judged
+    statement: The reused skill keeps its LICENSE.txt next to SKILL.md, because its frontmatter points
+      there for the complete license terms.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Specification
+    sources:
+    - https://raw.githubusercontent.com/anthropics/skills/main/skills/webapp-testing/SKILL.md
+    contested: false
+    severity_rationale: The skill's frontmatter points to LICENSE.txt for its terms, and Apache-2.0 requires
+      giving recipients a copy of the license.
+- part_id: A
+  rule:
+    id: idea.ui-flow-testing.a.only-controlled-origins
+    concept: idea
+    kind: must-not
+    severity: warning
+    check: judged
+    statement: The skill directs the agent to test external sites or third-party servers the team does
+      not control.
+    applies_to:
+      harnesses:
+      - claude-code
+      - codex
+    evidence: Vendor
+    sources:
+    - https://playwright.dev/docs/best-practices
+    contested: false
+    severity_rationale: Driving sites the team does not control adds flaky evidence and unintended traffic,
+      but the part only reads and screenshots.
