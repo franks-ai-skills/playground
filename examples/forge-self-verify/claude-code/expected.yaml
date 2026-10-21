@@ -1,0 +1,16 @@
+harness: claude-code
+parts:
+  A:
+    goal_result: met by the verified build
+    harness_result: verified
+  B:
+    goal_result: met by the verified build
+    harness_result: verified
+  C:
+    goal_result: not met
+    harness_result: not verified
+  D:
+    goal_result: met by the verified build
+    harness_result: verified
+repository: harness-forge
+slug: forge-self-verify

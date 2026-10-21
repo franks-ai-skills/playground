@@ -1475,7 +1475,7 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
 - [x] Run `python tools/check_references.py`; expect absent reference
   evidence to fail. Run the FORGE unit suite to check its offline
   foundation before live execution.
-- [ ] In clean test installations with existing subscription authentication, run
+- [x] In clean test installations with existing subscription authentication, run
   the reference sessions by hand in Claude Code and Codex, as
   [the owner-session runbook](2026-10-17-t14-owner-sessions.md) describes
   (no automated `live_checks.py` case can confirm a contract for the
@@ -1505,6 +1505,17 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   `/name`; FORGE PR #7 runs slash cases that way, so a user-invoked
   skill can be verified in Claude Code. The selection gap for external
   state changes is KB issue #4.
+  Reference runs, 2026-10-18, agent-played (`examples/bug-intake/`): all
+  six outcomes in both harnesses, with break/fix and a closing Extensive
+  review; the remote reuse is `examples/ui-flow-reuse/`. Codex was re-run
+  on 2026-10-21 under the re-focus, Forge `d7abb41`, codex-cli 0.163.0,
+  with the temporary observer, and every built part is verified. The
+  observer credited C's explicit `$name` case in the first review and
+  B's in the closing one. The first review also showed the reviewer
+  failing C's goal over an unverified outside control the report shows
+  separately; FORGE PR #10 tells the reviewer which controls a goal
+  needs. The
+  2026-10-18 Codex result is in `examples/history/2026-10-18-bug-intake-codex/`.
 - [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:
@@ -1521,7 +1532,7 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   important reason, after every offline change it would check. Observer
   fixes are checked by re-judging the recorded streams
   (`tools/rescore_routing.py`), not by a new run.
-- [ ] Run harness-verify against forge's own skills, using its accepted
+- [x] Run harness-verify against forge's own skills, using its accepted
   contract and pinned rules. Include Forge's own research-isolation
   recommendation: untrusted fetched content plus login material and egress
   triggers it even for a trusted project. Do not automatically mark the
@@ -1536,6 +1547,13 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   disclosed under the accepted policy; this does not waive required
   functional cases. Record any further capability needing a design change
   and return it for a concrete decision rather than weakening parity.
+  Ran 2026-10-21 in Claude Code at Forge `d7abb41`, agent-played, with
+  Forge's shared code declared as reviewed dependencies (FORGE PR #11,
+  `examples/forge-self-verify/`): build-skill, harness-intake and
+  harness-verify are verified. harness-research is not verified: it never
+  marks fetched quotes as untrusted where it shows them
+  (`idea.forge-self-verify.c.untrusted-marked`). That error is deferred
+  as a failure, as the re-focus allows, and proposed as an issue.
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go
@@ -1560,7 +1578,7 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   A3 lacked the untrusted-input line (`security.untrusted-input.as-data`,
   warning) although the repository was marked untrusted, so the builder
   guidance should carry it into every part when that fact is set.
-- [ ] Commit: `test: record portable skills pipeline reference runs`.
+- [x] Commit: `test: record portable skills pipeline reference runs`.
 
 ## Completion boundary
 

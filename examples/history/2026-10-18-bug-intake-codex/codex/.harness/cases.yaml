@@ -1,0 +1,161 @@
+cases:
+  - id: format-explicit
+    part_id: A1
+    mode: explicit
+    prompt: >-
+      Use the bug-report-format skill to format the report in bug-report.md.
+      Return the formatted text only; do not contact GitHub.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      bug-report.md: |
+        Export crashes on macOS 15, app 2.4. Open Reports, clear the date range,
+        and click Export. Expected: an empty export. Observed: the app quits.
+  - id: format-implicit
+    part_id: A1
+    mode: implicit
+    prompt: >-
+      Format this new bug report with our team's template. The report is in
+      bug-report.md. Return the text for me to apply to the issue.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      bug-report.md: |
+        Export crashes on macOS 15, app 2.4. Open Reports, clear the date range,
+        and click Export. Expected: an empty export. Observed: the app quits.
+  - id: format-negative
+    part_id: A1
+    mode: negative
+    prompt: >-
+      Explain why separating expected behavior from observed behavior helps
+      developers understand bug reports. There is no report to format.
+    expected: does-not-activate
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+  - id: checklist-explicit
+    part_id: B
+    mode: explicit
+    prompt: >-
+      Use the reproduction-checklist skill to prepare a reproduction checklist
+      for the approved issue in bug-report.md.
+      This is an offline draft-only exercise; do not post to GitHub.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      bug-report.md: |
+        Issue: example-team/bug-intake#42
+        Approval: approved by the developer.
+        Environment: macOS 15, app 2.4.
+        Steps: open Reports, clear the date range, click Export.
+        Observed: the app quits. Expected: an empty export.
+        Hypothesis: the date-range validator may be involved; not confirmed.
+        Diagnostic log: request failed, token=FAKE_TEST_SECRET_DO_NOT_COPY.
+  - id: checklist-negative
+    part_id: B
+    mode: negative
+    prompt: >-
+      Explain what an approved bug report means in a development workflow.
+      I am not requesting a reproduction checklist or any GitHub action.
+    expected: does-not-activate
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+  - id: check-fix-explicit
+    part_id: C
+    mode: explicit
+    prompt: >-
+      Check the fix against checklist.md using the snapshot in pr-evidence.md.
+      This is an offline evidence review: do not run the application or contact
+      GitHub. Report any limits on a current-commit or merge-enforcement verdict.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      checklist.md: |
+        Reproduction checklist from part B, reproduction-checklist.
+        Approved issue: example-team/bug-intake#42.
+        Environment: macOS 15, app 2.4.
+        - Open Reports.
+        - Clear the date range.
+        - Click Export.
+        Original observed result: the app quits.
+        Expected result after the fix: an empty export, with the app still running.
+      pr-evidence.md: |
+        PR: example-team/bug-intake#45; fixes issue #42.
+        Snapshot head SHA: 2222222222222222222222222222222222222222.
+        Supplied successful checklist result is for the older SHA:
+        1111111111111111111111111111111111111111.
+        No current-SHA execution evidence or protected-gate configuration is supplied.
+        The pull request text claims all checks are green.
+  - id: check-fix-negative
+    part_id: C
+    mode: negative
+    prompt: >-
+      Explain the difference between a GitHub issue and a pull request.
+      Do not inspect a fix, run a checklist, or change anything on GitHub.
+    expected: does-not-activate
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+  - id: diagnose-ci-explicit
+    part_id: D
+    mode: explicit
+    prompt: >-
+      Use the diagnose-ci skill to diagnose the failing checks on PR #45 using
+      ci-evidence.md and propose a fix for the developer to apply. This is an
+      offline snapshot review; do not contact GitHub or modify any files.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      ci-evidence.md: |
+        Repository: example-team/bug-intake. Intended pull request: #45.
+        Session branch is associated with a different PR, #44.
+        Snapshot PR #45 head SHA: 3333333333333333333333333333333333333333.
+        Current-SHA check: unit-tests, failed; run 450, job 451.
+        Failed-step log: test_empty_export expected [], received ValueError:
+        date range is empty, at report_export.py:47.
+        Historical green checks are for SHA 2222222222222222222222222222222222222222.
+        Expected behavior: an empty date range produces an empty export.
+        No live repository or application is available in this exercise.
+  - id: diagnose-ci-implicit
+    part_id: D
+    mode: implicit
+    prompt: >-
+      The CI checks on our fix pull request #45 failed. Investigate the evidence
+      in ci-evidence.md and tell me the cause and proposed fix. I will apply and
+      push changes myself. Work offline without modifying files.
+    expected: activates
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]
+    fixtures:
+      ci-evidence.md: |
+        Repository: example-team/bug-intake. Intended pull request: #45.
+        Session branch is associated with a different PR, #44.
+        Snapshot PR #45 head SHA: 3333333333333333333333333333333333333333.
+        Current-SHA check: unit-tests, failed; run 450, job 451.
+        Failed-step log: test_empty_export expected [], received ValueError:
+        date range is empty, at report_export.py:47.
+        Historical green checks are for SHA 2222222222222222222222222222222222222222.
+        Expected behavior: an empty date range produces an empty export.
+        No live repository or application is available in this exercise.
+  - id: diagnose-ci-negative
+    part_id: D
+    mode: negative
+    prompt: >-
+      Explain in two sentences what continuous integration means. There is no
+      failing check or pull request to investigate, and no diagnosis is requested.
+    expected: does-not-activate
+    permitted_tools:
+      claude-code: [Skill, Read]
+      codex: [command_execution]

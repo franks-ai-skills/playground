@@ -1,0 +1,14 @@
+{
+  "candidate": {
+    "name": "gh-fix-ci",
+    "source": "https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci",
+    "license": "Apache-2.0",
+    "maintenance": "unmaintained"
+  },
+  "fit": "confirmed",
+  "reason": "The upstream repository declares itself deprecated; user corrected its maintenance status to not maintained.",
+  "source": "https://github.com/openai/skills",
+  "quote": "This repository is deprecated.",
+  "successor": "https://github.com/openai/plugins",
+  "successor_has_no_gh_fix_ci": "Reported by the user; no replacement was assumed."
+}

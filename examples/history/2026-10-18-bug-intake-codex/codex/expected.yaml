@@ -1,0 +1,22 @@
+cases: .harness/cases.yaml
+harness: codex
+parts:
+  A1:
+    goal_result: met by the verified build
+    harness_result: verified
+  A2:
+    goal_result: not met
+    harness_result: not applicable
+  B:
+    goal_result: not met
+    harness_result: not verified
+  C:
+    goal_result: not met
+    harness_result: not verified
+  D:
+    goal_result: met by the verified build
+    harness_result: verified
+  E:
+    goal_result: depends on outside controls
+    harness_result: not applicable
+slug: bug-report-lifecycle
