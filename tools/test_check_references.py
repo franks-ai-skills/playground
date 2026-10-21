@@ -262,6 +262,30 @@ class CheckReferencesTest(unittest.TestCase):
         self.report(excluded)
         self.refused("part A1")
 
+    def test_expectations_can_name_a_sibling_repository(self):
+        """Forge's verification of its own skills: the results stay in Forge, the expectations in playground."""
+        stored = Path(self.scratch.name) / "playground" / "examples" / "forge-self-verify" / "claude-code"
+        stored.mkdir(parents=True)
+        data = yaml.safe_load((self.root / "expected.yaml").read_text(encoding="utf-8"))
+        playground = check_references.PLAYGROUND
+        check_references.PLAYGROUND = Path(self.scratch.name) / "playground"
+        try:
+            for repository, problem in (("example", None), ("missing", "no checkout"),
+                                        ("../example", "sibling checkout")):
+                with self.subTest(repository=repository):
+                    (stored / "expected.yaml").write_text(yaml.safe_dump({**data, "repository": repository}),
+                                                          encoding="utf-8")
+                    try:
+                        problems = check_references.check_example(stored, self.forge)
+                    except ValueError as error:
+                        problems = [str(error)]
+                    if problem is None:
+                        self.assertEqual(problems, [])
+                    else:
+                        self.assertTrue(any(problem in text for text in problems), problems)
+        finally:
+            check_references.PLAYGROUND = playground
+
     def test_parts_left_out_of_the_report_or_expected_labels(self):
         self.report(lambda data: data.update(parts=[part for part in data["parts"] if part["part_id"] != "A1"]))
         self.refused("parts")

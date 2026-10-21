@@ -36,6 +36,11 @@ only results Forge's runtime can produce (`runtime.outcome_problem`); every buil
 labels must match `expected.yaml`. Metadata files are read as Forge
 reads its inputs: inside the example, through no link.
 
+An `expected.yaml` may name `repository: <name>`, a sibling checkout of
+playground such as `harness-forge`: the checker then checks that
+repository's own `.harness/` results, as for Forge's verification of its
+own skills, with the expectations stored in playground.
+
 A Review report, which keeps earlier results the repository no longer
 holds, is refused: record a reference run as a first run or an Extensive
 review. Exit 0 when every example passes, 1 with each problem listed, 2
@@ -80,8 +85,12 @@ def _read(root: Path, relative: str, documents) -> str:
 def _expected(text: str, documents) -> dict:
     expected = documents.parse_yaml(text)
     if not isinstance(expected, dict) or not {"harness", "slug", "parts"} <= set(expected) or \
-            set(expected) - {"harness", "slug", "cases", "parts"}:
-        raise ValueError("expected.yaml names harness, slug and parts, and optionally cases, and nothing else")
+            set(expected) - {"harness", "slug", "cases", "parts", "repository"}:
+        raise ValueError("expected.yaml names harness, slug and parts, and optionally cases and repository, and "
+                         "nothing else")
+    if "repository" in expected and not (isinstance(expected["repository"], str)
+                                         and re.fullmatch(r"[a-z0-9][a-z0-9-]*", expected["repository"])):
+        raise ValueError("expected.yaml: repository is the name of a sibling checkout, such as harness-forge")
     if expected["harness"] not in HARNESSES:
         raise ValueError(f"expected.yaml: harness is one of {', '.join(HARNESSES)}")
     if not isinstance(expected["slug"], str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", expected["slug"]):
@@ -164,7 +173,10 @@ def _activations(harness: str, directory: str) -> dict[str, str | None]:
     takes; an invocation in the prompt takes none."""
     name = directory.rsplit("/", 1)[-1]
     if harness == "codex":
-        return {f"read {directory}/SKILL.md": "command_execution"}
+        # The second is Forge's temporary rollout observer (HARNESS_FORGE_TEMPORARY_CODEX_ROLLOUT): the injected
+        # instructions of a $name invocation, which needs no tool.
+        return {f"read {directory}/SKILL.md": "command_execution",
+                f"instructions injected for {directory}/SKILL.md (session rollout)": None}
     return {f"Skill tool called for {name}": "Skill", f"read SKILL.md from the {name} skill": "Read",
             f"/{name} was invoked": None}
 
@@ -195,6 +207,10 @@ def check_example(root: Path, forge: dict) -> list[str]:
         return [f"expected.yaml: {problem}"]
     expected = _expected(text, documents)
     slug, harness = expected["slug"], expected["harness"]
+    if "repository" in expected:
+        root = (PLAYGROUND.parent / expected["repository"]).resolve()
+        if not (root / ".harness").is_dir():
+            return [f"repository {expected['repository']}: no checkout with .harness/ beside playground"]
     problem, directory = _refused(documents.safe_path, root, ".harness/decisions")
     if problem:
         return [f"decisions: {problem}"]
