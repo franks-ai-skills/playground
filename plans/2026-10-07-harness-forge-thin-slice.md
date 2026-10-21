@@ -1413,6 +1413,52 @@ report records, generated skills and relative symlinks, result README,
 redacted trace metadata and version/model ids. Never commit credentials
 or raw private harness profiles.
 
+**Re-focus (owner, 2026-10-21).** The owner gave these instructions for
+the rest of T14:
+
+1. No manual testing by the owner: the agent runs the sessions itself as
+   far as it can. Forge may read Codex's session files in
+   `~/.codex/sessions` to observe a `$name` invocation, as a temporary
+   measure only, never a default test case.
+2. Re-focus on the goal, good harness mechanisms: a skill used by an
+   agent with a user, or without one, is non-deterministic, and not every
+   edge case can be handled.
+3. The agent may diverge from this plan when it and Codex (gpt-6.1-sol)
+   both agree that the change re-focuses on that goal.
+4. Record these instructions.
+5. Report when T14 is ready; only then the owner may run a test.
+
+Claude Opus 5.5 and Codex agreed on these divergences (Codex session
+`01a15d61`, 2026-10-21):
+
+- **Codex `$name`, temporary:** with `HARNESS_FORGE_TEMPORARY_CODEX_ROLLOUT=1`
+  set, a Codex explicit case of a user-invoked skill runs without
+  `--ephemeral`, and Forge reads that run's own rollout file, credits
+  "instructions injected" when it records the staged skill, and deletes
+  the file. Off by default; no default test or reference case needs it.
+  Only the Codex bug-intake verification is re-run with it.
+- **Self-verification in Claude Code only**, static and judged, both
+  targets in the contract. Each reuse source is pinned to the reviewed
+  Forge commit.
+- **Plugin dependencies are reviewed:** a local reuse may declare
+  `reuse.dependencies`, which are hash-bound and reviewed with the skill.
+  Forge declares its helpers, schemas, worker instructions, templates,
+  `requirements.lock` and the snapshot files they read.
+- **harness-research hands publishing to the user**, so the skill meets
+  `skills.invocation.side-effects-user-invoked`.
+- **Three run findings fixed:** input-shape examples in the skills'
+  references, batched intake answers, and a reuse candidate the user
+  names reaching research. Others become proposed issues.
+- **Forge's README** prose section is renamed so `forge.py readme` writes
+  the generated `## Outside controls`.
+- **Done means:** every outcome shown in both harnesses, every built part
+  verified where the harness can observe it, Forge's own skills verified
+  or each remaining error confirmed not applicable, corrected, or
+  deferred as a failure, and all offline suites green. Not required:
+  further routing runs or edge cases.
+- Agent-played confirmations are development evidence; they never become
+  a product default.
+
 - [x] Define behavior cases for the reference and alternate outcomes,
   and routing cases for all four skills, including adjacent non-forge
   tasks that must not trigger them. `tools/check_references.py` asserts

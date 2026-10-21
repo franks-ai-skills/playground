@@ -1,5 +1,11 @@
 # Task 14: the owner sessions
 
+> **2026-10-21:** the owner asked the agent to run these sessions itself
+> and re-focused T14. Part 2 runs in Claude Code only, with each reuse
+> source pinned to the reviewed commit and Forge's helpers declared as
+> `reuse.dependencies`. See the re-focus note in task 14 of the
+> [plan](2026-10-07-harness-forge-thin-slice.md).
+
 What remains of plan task 14 needs the owner: the reference runs, where a
 person confirms the contract and accepts requirements, and harness-verify
 on Forge's own skills. Two sessions cover both, one in Claude Code and one
