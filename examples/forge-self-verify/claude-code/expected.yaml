@@ -7,8 +7,8 @@ parts:
     goal_result: met by the verified build
     harness_result: verified
   C:
-    goal_result: not met
-    harness_result: not verified
+    goal_result: met by the verified build
+    harness_result: verified
   D:
     goal_result: met by the verified build
     harness_result: verified
