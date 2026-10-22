@@ -2,55 +2,50 @@
 
 harness-verify run on Harness Forge's four skills, as task 14 asks. The
 result lives in Forge's repository, where the skills are:
-`.harness/` and the generated `## Outside controls` section of its
-README, last written by FORGE PR #28. `claude-code/expected.yaml`
+`.harness/`, last written by FORGE PR #35, and the generated
+`## Outside controls` section of its README, unchanged since FORGE
+PR #28. `claude-code/expected.yaml`
 names that sibling checkout (`repository: harness-forge`), and
 `tools/check_references.py` replays the result from it.
 
-> **Stale on purpose (2026-10-22).** The result binds the hashes of the
-> Forge code each part declares as a dependency. The fixes for the
-> remaining Forge issues (#24, #30, #16, #18) change that code, so from
-> FORGE PR #31 on `tools/check_references.py` fails this example
-> against Forge `main`. It replays at Forge `f39e671` and earlier. One
-> Claude Code re-verification after the last of those issues records it
-> again, as agreed with Codex (session 01a16529).
+The result binds the hashes of the Forge code each part declares as a
+dependency, so any later change to that code makes this example fail
+against Forge `main` until the verification is recorded again.
 
 ## How it was run
 
-The agent ran the session on 2026-10-22 under the owner's re-focus of
-task 14 (see the plan), playing the user in a headless Claude Code
-session, one message per turn: eight turns, about 48 minutes of session
-time. It confirmed every contract and accepted every proposed
-requirement there.
+The agent ran the session on 2026-10-22 under the owner's working mode
+(see playground's `AGENTS.md`), playing the user in a headless Claude
+Code session, one message per turn: six turns. It confirmed every
+contract and answered every proposed requirement there.
 
-- A fresh clone of Forge at `93f5285`, loaded as the plugin with
-  `--plugin-dir`, with the KB pinned at `5236d06`. It started from the
-  decision, research and report of the run before (FORGE PR #23).
+- A fresh clone of Forge, loaded as the plugin with `--plugin-dir`, with
+  the KB pinned at `5236d06`. It started from the decision, research and
+  report of the run before (FORGE PR #28). Turns 1 and 2 ran at Forge
+  `7d45551`, turns 3 to 6 at `4db8962` (see below).
 - Claude Code 2.1.308, subscription login, the account's default model.
 - Four parts, each a local reuse of its skill under `skills/<name>` with
   skill home `plugin`. Each declares Forge's shared code as
   `reuse.dependencies`: `scripts/`, `src/harness_forge/`, `workers/`,
   `templates/`, `schemas/`, `requirements.lock` and the snapshot files
   the code reads. The reviewer judged them with the skill.
-- harness-intake (B) and harness-verify (D) changed since their pins, so
-  B and D moved their pins to `93f5285`. build-skill (A) keeps `5ff7fc0`
-  and harness-research (C) `5294508`.
-- The snapshot asks the new part fact `side_effects` (KB #4), which every
-  part answers false. That changed every part's research brief, so all
-  four had a new deep pass. D's first pass kept no finding from
-  harness-verify's `SKILL.md`, so its two requirements on runtime results
-  could not be proposed (FORGE #24); a rerun of D's pass found them
-  again.
+- Only harness-research (C) changed since its pin, so C moved its pin to
+  `7d45551` and had a new deep pass. build-skill (A) keeps `5ff7fc0`,
+  harness-intake (B) and harness-verify (D) keep `93f5285`.
+- C's deep pass did not find the sources of four of its six earlier
+  requirements again. The new `research --recheck` (FORGE #24) dropped
+  every finding at first: the output schema the worker CLI enforces had
+  no `requirement_id`, which offline tests had not caught. FORGE PR #34
+  fixed that without touching `skills/`, so C kept its pin and deep
+  pass, and the second re-check kept three findings that restored the
+  lost sources. The session accepted C1 to C7; C4 and C5 now cite only
+  the source bound to them, and C7 is new.
 - Targets both harnesses, reach public, lethal trifecta set, so Forge's
   `outer-isolation` recommendation applies as a precaution, not as a goal
   dependency. No runtime cases: those for a plugin skill report not-run.
-- 22 accepted requirements: 5 for A, 5 for B, 6 for C and 6 for D.
-- The first review left `skills.invocation.side-effects-user-invoked`
-  unresolved on every part, judged not applicable; the session confirmed
-  that for all four. Of the four verify runs after it, two review replies
-  were rejected by Forge's review validation (a misspelled rule id, a
-  duplicate verdict) and one review worker stopped at the subscription's
-  usage limit. The last run is the one recorded.
+- 23 accepted requirements: 5 for A, 5 for B, 7 for C and 6 for D.
+- The first verify run was the recorded one: no review reply was
+  rejected and no rule was left unresolved.
 
 ## Results
 
@@ -61,10 +56,12 @@ requirement there.
 | C | harness-research | verified | met by the verified build |
 | D | harness-verify | verified | met by the verified build |
 
-No rule fails at any severity. The warning
-`skills.references.load-conditions` on D, failed in the run before,
-passes after FORGE PR #25.
+No error rule fails. One warning fails on C:
+`skills.references.load-conditions`, because harness-research's
+`SKILL.md` points to `references/contract.md` without saying when to
+read it.
 
 Earlier results are in Forge's history: the 2026-10-21 result, C not
 verified, at `80244fd`; the first 2026-10-22 result, at Forge `5294508`
-with all four verified and D's warning failed, at `ca99fae`.
+with all four verified and D's warning failed, at `ca99fae`; the second,
+at `93f5285` with no failed rule, at `2c1aa23`.

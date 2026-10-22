@@ -1564,11 +1564,15 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   #17 and KB #4: at Forge `5294508` all four parts are verified (FORGE
   PR #23), D with one warning; at `93f5285`, with the KB pinned at
   `5236d06`, all four are verified with no failed rule (FORGE PR #28).
-  Follow-ups that the slice does not need, agreed with Codex: FORGE #16
-  (revision-digest churn in a one-file repair), #18 (remove the
-  temporary Codex rollout observer once Codex shows an injected skill)
-  and #24 (check the sources of earlier requirements again after a new
-  deep pass).
+  Under the owner's working mode of 2026-10-22, the follow-ups were
+  fixed too: FORGE #24 (re-check the sources of earlier requirements,
+  PR #31, with the worker output schema fixed in PR #34 after the live
+  run showed the gap), #30 (retry a review reply that validation
+  rejects, PR #32) and #16 (a part-level requirements digest, PR #33).
+  Recorded again at `4db8962` (FORGE PR #35): all four verified, no
+  failed error rule, one warning on C. #18 (remove the temporary Codex
+  rollout observer) stays open until Codex shows an injected skill in
+  `exec --json`; codex-cli 0.163.0 does not.
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go

@@ -114,19 +114,18 @@ and disagreements.
   to change the revision.
 - #18: check offline whether codex-cli shows an injected skill; without
   evidence, keep #18 open with an upstream-dependency note.
-- The stored self-verification (`examples/forge-self-verify/`) goes
-  stale from Forge PR #31 on, because it binds Forge's own code. It
-  stays stale during the work order; one targeted Claude Code
-  re-verification after the last issue records it again (estimate:
-  about 8 turns, 50 minutes and $10 notional for the main session plus
-  workers, inside one Claude five-hour window; session 01a16529).
+- The stored self-verification (`examples/forge-self-verify/`) binds
+  Forge's own code, so any change to it makes the example fail against
+  `main` until it is recorded again (session 01a16529).
+- Done on 2026-10-22: #24 (PRs #31, #34), #30 (PR #32), #16 (PR #33)
+  merged; #18 kept open with an upstream note (codex-cli 0.163.0 shows
+  no injected skill); self-verification recorded again at `4db8962`
+  (PR #35): all four verified, one warning on C
+  (`skills.references.load-conditions`).
 
 ## Current work order
 
 Agreed with Codex (session 01a1651d); change it only by agreement.
 
-1. FORGE #24: targeted re-check of earlier requirements' sources.
-2. FORGE #30: retry a validation-rejected review reply once.
-3. FORGE #16: revision-digest churn in a one-file repair.
-4. FORGE #18: offline check, then remove or keep open with a note.
-5. Re-record Forge's self-verification (one targeted live run).
+1. Merge FORGE PR #35 after review.
+2. Nothing else remains in the thin slice; #18 waits on Codex.
