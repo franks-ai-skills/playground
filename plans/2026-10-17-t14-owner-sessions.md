@@ -35,8 +35,8 @@ plugin from `main`. Before starting, follow
    | A2 | Check a fix against its reproduction checklist before it merges | must survive a compromised agent: required | outside-alongside, skill plus a gate |
    | A3 | Format incoming bug reports with the team's template | reuse `.agents/skills/bug-report-format` (home: repository) | reuse, local |
    | A4 | Fix the failing CI checks on the fix's pull request | reuse `gh-fix-ci` from openai/skills (Apache-2.0) if research confirms it | reuse, remote |
-   | A5 | Close the tracker issue once the fix ships | irreversible | outside-instead |
-   | A6 | Label every incoming bug report | must happen every time | nothing-fits |
+   | A5 | Post the fix's release note on the tracker issue once it ships | irreversible (it publishes) | outside-instead |
+   | A6 | Label every incoming bug report | must happen every time; changes external state | nothing-fits |
 
    A4 depends on live research confirming a public skill's fit, license
    and maintenance; `gh-fix-ci` in openai/skills

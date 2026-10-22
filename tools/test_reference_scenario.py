@@ -55,8 +55,9 @@ PARTS = {
            {"must_survive_compromise": "required"}),
     "A3": ("Format incoming bug reports with the team's template", EXISTING, {}),
     "A4": ("Fix the failing CI checks on the fix's pull request", "gh-fix-ci", {}),
-    "A5": ("Close the tracker issue once the fix ships", "close-issue", {"irreversible": True}),
-    "A6": ("Label every incoming bug report", "label-reports", {"every_time": "always"}),
+    "A5": ("Post the fix's release note on the tracker issue once it ships", "post-release-note",
+           {"irreversible": True}),
+    "A6": ("Label every incoming bug report", "label-reports", {"every_time": "always", "side_effects": True}),
 }
 CANDIDATES = {
     "A3": {"name": EXISTING, "source": "https://example.com/team/bug-report-format", "license": "MIT",
