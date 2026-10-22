@@ -1516,6 +1516,11 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   separately; FORGE PR #10 tells the reviewer which controls a goal
   needs. The
   2026-10-18 Codex result is in `examples/history/2026-10-18-bug-intake-codex/`.
+  On 2026-10-22 both reference runs moved to
+  `examples/history/2026-10-21-bug-intake/` and
+  `examples/history/2026-10-18-ui-flow-reuse/`: FORGE PR #20 (issue #13)
+  changes the gate conditions, so they replay only against Forge
+  `80244fd`. Forge's self-verification is recorded again after it.
 - [x] Run each skill's explicit invocation, implicit routing where
   supported and near misses in fresh sessions at this distribution
   milestone. Use about 20 routing prompts per skill and three repeats:

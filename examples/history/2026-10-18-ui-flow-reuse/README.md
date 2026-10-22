@@ -1,7 +1,7 @@
 # UI flow testing: a remote reuse
 
 Task 14's remote reuse, one session per harness, run the way
-[`../bug-intake/`](../bug-intake/README.md) describes: Claude Opus 5.5
+[`../2026-10-21-bug-intake/`](../2026-10-21-bug-intake/README.md) describes: Claude Opus 5.5
 played the user at the owner's request, Forge `7cd81c6`, KB `ec829ae`.
 
 The idea is "Test our web app's UI flows locally in a browser" in a
@@ -16,3 +16,7 @@ console logs, with the developer judging the result.
 The skill is not installed, so its home stays open and the part is
 `not checked` / `not assessed` in both harnesses. Nothing is built, so
 no runtime cases exist and `expected.yaml` names none.
+
+Moved here from `examples/ui-flow-reuse/` on 2026-10-22, with the bug
+intake runs; their README says why and how both replay against Forge
+`80244fd`.

@@ -5,12 +5,34 @@ from intake to closing", from the starting repository
 `tools/reference_runs.py start` creates. `claude-code/` and `codex/` hold
 each result as `tools/reference_runs.py collect` copies it.
 
+## Why they are history
+
+Until 2026-10-22 these were task 14's checked reference runs under
+`examples/bug-intake/`. Forge PR #20 then gave each outside control
+every gate condition its kind needs (agent-harness-kb PR #5) and judged each condition
+against the controls that list it. The rules these reports bind and the
+conditions their reviewers judged no longer match Forge's replay, so
+`tools/check_references.py` fails them against current Forge. The
+results stay as recorded, and so does
+[`../2026-10-18-ui-flow-reuse/`](../2026-10-18-ui-flow-reuse/). Both
+still replay against Forge `80244fd`, the last commit that checked them,
+from the playground root:
+
+```sh
+git -C ../harness-forge worktree add <dir> 80244fd
+../harness-forge/.venv/bin/python tools/check_references.py --forge <dir> \
+  examples/history/2026-10-21-bug-intake/claude-code \
+  examples/history/2026-10-21-bug-intake/codex \
+  examples/history/2026-10-18-ui-flow-reuse/claude-code \
+  examples/history/2026-10-18-ui-flow-reuse/codex
+```
+
 ## How they were run
 
 The owner asked an agent to run the sessions in their place
 (2026-10-18). Claude Opus 5.5 played the user in headless sessions, one
 message per turn, and gave the runbook's answers
-([`plans/2026-10-17-t14-owner-sessions.md`](../../plans/2026-10-17-t14-owner-sessions.md)).
+([`plans/2026-10-17-t14-owner-sessions.md`](../../../plans/2026-10-17-t14-owner-sessions.md)).
 It confirmed every contract and accepted or rejected every requirement
 there; no confirmation was scripted.
 
@@ -52,7 +74,7 @@ the report is new.
   the closing review judged C's goal met, so C depends on outside
   controls.
 - The 2026-10-18 result is in
-  [`../history/2026-10-18-bug-intake-codex/`](../history/2026-10-18-bug-intake-codex/).
+  [`../2026-10-18-bug-intake-codex/`](../2026-10-18-bug-intake-codex/).
 
 ## Results
 
@@ -77,4 +99,4 @@ the report is new.
 - D was first a remote reuse of `gh-fix-ci` from `openai/skills`. That
   repository is deprecated ("This repository is deprecated."), found by
   Claude Code's deep research, so D was reselected and built in both
-  sessions. The remote reuse is in [`../ui-flow-reuse/`](../ui-flow-reuse/).
+  sessions. The remote reuse is in [`../2026-10-18-ui-flow-reuse/`](../2026-10-18-ui-flow-reuse/).
