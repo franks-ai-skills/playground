@@ -7,6 +7,14 @@ README, last written by FORGE PR #28. `claude-code/expected.yaml`
 names that sibling checkout (`repository: harness-forge`), and
 `tools/check_references.py` replays the result from it.
 
+> **Stale on purpose (2026-10-22).** The result binds the hashes of the
+> Forge code each part declares as a dependency. The fixes for the
+> remaining Forge issues (#24, #30, #16, #18) change that code, so from
+> FORGE PR #31 on `tools/check_references.py` fails this example
+> against Forge `main`. It replays at Forge `f39e671` and earlier. One
+> Claude Code re-verification after the last of those issues records it
+> again, as agreed with Codex (session 01a16529).
+
 ## How it was run
 
 The agent ran the session on 2026-10-22 under the owner's re-focus of
