@@ -34,6 +34,78 @@ lives in its own repository, agent-harness-kb.
   its new source, then every page that repeats it: `docs/concepts/`,
   `docs/best-practices/`, `docs/guide/` and `docs/overview.md`.
 
+## Working mode: Claude and Codex (owner, 2026-10-22)
+
+These rules apply to playground, harness-forge and agent-harness-kb.
+They override every older rule that asks the owner to approve a push,
+a merge or an issue text, including the defaults of the `git-flow`
+skill and earlier plan notes. Where an older rule conflicts with them,
+these rules win.
+
+**Goal.** Finish the Harness Forge thin slice and resolve all open
+issues on your own. Prefer harness mechanisms that work well over
+handling every edge case. Skills, plugins, hooks and MCP servers make
+the environment non-deterministic: aim for determinism, but stop when
+further work yields little.
+
+**Roles.** Claude implements. Codex (`gpt-6.1-sol`, through
+`codex exec -s read-only`) plans with Claude and reviews; it changes no
+files. Every Codex call starts with
+[the Codex brief](plans/claude-codex-collaboration.md): Codex cannot
+read Claude's memory, so the brief carries these rules, the project
+constraints, the decisions taken so far and the current work order.
+
+1. **Planning.** Before each task, Claude proposes the next steps to
+   Codex. They debate scope, priorities and implementation until Codex
+   explicitly agrees. Only then does Claude start.
+2. **Implementation.** Claude implements the agreed work, tests it and
+   makes atomic commits.
+3. **Review.** Claude reviews its own work first, then asks Codex for an
+   independent review of the whole PR. Claude challenges each finding
+   and adopts only those it agrees with. Each follow-up request includes
+   a summary of the changes, each disagreement with its reasons, and a
+   request to reassess the whole affected scope. This repeats until both
+   explicitly agree that the PR is ready.
+4. **Issues.** When either agent proposes an issue, both agree on its
+   exact title and body before Claude creates it, together with an
+   updated work order for all remaining tasks and issues. The owner's
+   approval is not needed.
+5. **Consensus.** Neither agent declares consensus alone. When
+   discussion cannot settle a substantive disagreement, Claude takes
+   that one decision to the owner and continues with other work.
+
+Codex's explicit agreement is required before starting a task, before
+changing agreed scope or priorities, before creating an issue, before
+changing the work order, and before merging a PR after its final
+review.
+
+**Pushes, PRs and merges.** Claude pushes branches, creates and updates
+PRs and merges without asking the owner. A merge requires the
+repository's required checks to pass (Forge's test suite, the KB's
+`tools/validate.py`), a Codex review of the latest pushed PR head, and both
+agents' explicit agreement that the PR is ready. Any push after Codex's
+approval voids it and needs a new review. Respect branch protection and
+each repository's merge method: harness-forge and agent-harness-kb
+allow only merge commits. Keep each PR description in step with what
+the PR contains. Playground's `ai-stuff` branch is pushed directly,
+without a PR.
+
+**Unchanged.** The security, subscription, account, evidence and
+attribution rules in this file and in each repository's `AGENTS.md`
+stay in force; read
+[the local development note](plans/harness-forge-local-development.md)
+before local harness runs. Claude tests on its own and does not ask the
+owner to test by hand. Live model runs and probes spend the owner's
+subscription windows: run one only for an important reason, after the
+offline work it should check, with a usage estimate. A targeted run of
+a few sessions needs Codex's agreement on its purpose and estimate; a
+batch evaluation (dozens of sessions or more) needs the owner. Nothing
+is installed or updated without the owner, except a well-known, free,
+open-source tool or dependency both agents agree on, recorded with its
+reason in the PR. Each step, round and ruling goes into the progress ledger
+`.superpowers/sdd/2026-10-07-harness-forge-thin-slice/progress.md`
+(local, not tracked).
+
 ## Repository layout rules
 
 - This file is the only instruction file. Claude Code reads

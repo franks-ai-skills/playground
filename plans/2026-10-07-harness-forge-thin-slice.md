@@ -114,9 +114,10 @@ Use the worktree skill when execution requires branch isolation.
 
 Task 1 establishes local repositories; publish them only as part of an
 authorized execution handoff. Do not remove playground's KB before its
-destination is reviewable and published. Merging follows git-flow and
-requires an explicit request. Each task ends with a Conventional Commit
-in each changed repository and the actual writer's `Assisted-by` trailer.
+destination is reviewable and published. Since 2026-10-22, pushes, PRs,
+issues and merges follow the "Working mode" in playground's `AGENTS.md`:
+Claude performs them under that working mode without an owner request.
+Each task ends with a Conventional Commit in each changed repository and the actual writer's `Assisted-by` trailer.
 Stage explicit paths. Planning does not create repositories or publish.
 
 Keep `plans/` and `specs/` in playground when moving the KB. Repair the
