@@ -1559,6 +1559,15 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   marks fetched quotes as untrusted where it shows them
   (`idea.forge-self-verify.c.untrusted-marked`). That error is deferred
   as a failure, as the re-focus allows, and proposed as an issue.
+  Recorded again on 2026-10-22 after the fixes for FORGE #12 to #15,
+  #17 and KB #4: at Forge `5294508` all four parts are verified (FORGE
+  PR #23), D with one warning; at `93f5285`, with the KB pinned at
+  `5236d06`, all four are verified with no failed rule (FORGE PR #28).
+  Follow-ups that the slice does not need, agreed with Codex: FORGE #16
+  (revision-digest churn in a one-file repair), #18 (remove the
+  temporary Codex rollout observer once Codex shows an injected skill)
+  and #24 (check the sources of earlier requirements again after a new
+  deep pass).
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go
