@@ -100,14 +100,26 @@ and disagreements.
   task 14's "Re-focus" note lists the divergences agreed on 2026-10-21.
 - Thin-slice tasks 1 to 14 are complete (2026-10-22): Forge `2c1aa23`
   verifies its own four skills with no failed rule, pinned to KB
-  `5236d06`.
+  `5236d06`. KB `c5ce67d` differs from the pin only in `AGENTS.md`; no
+  re-pin is needed.
+- The working mode is recorded in all three repositories (playground
+  `ca90659`, Forge PR #29, KB PR #7).
+- #24 design (session 01a1651d): `forge.py research --pass deep --part X
+  --recheck` runs one research worker limited to the missing sources of
+  X's recorded requirements; each finding binds to a requested
+  requirement statement and source pair; out-of-target findings are
+  dropped before any fetch or support worker; findings are appended
+  under X's current brief; a requirement counts as re-supported only
+  when every cited source has provenance; `accept` stays the only way
+  to change the revision.
+- #18: check offline whether codex-cli shows an injected skill; without
+  evidence, keep #18 open with an upstream-dependency note.
 
 ## Current work order
 
-Agreed with Codex; change it only by agreement.
+Agreed with Codex (session 01a1651d); change it only by agreement.
 
-1. Record the 2026-10-22 working mode in the instruction files of all
-   three repositories.
-2. Push playground `ai-stuff`.
-3. Remaining Forge issues, in the order agreed at planning: #24, #16,
-   the review-reply retry issue (once agreed and created), #18.
+1. FORGE #24: targeted re-check of earlier requirements' sources.
+2. FORGE #30: retry a validation-rejected review reply once.
+3. FORGE #16: revision-digest churn in a one-file repair.
+4. FORGE #18: offline check, then remove or keep open with a note.
