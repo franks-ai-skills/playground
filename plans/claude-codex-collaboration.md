@@ -125,7 +125,11 @@ and disagreements.
 
 ## Current work order
 
-Agreed with Codex (session 01a1651d); change it only by agreement.
+Agreed with Codex (sessions 01a165a3, 01a165a6); change it only by
+agreement.
 
-1. Merge FORGE PR #35 after review.
-2. Nothing else remains in the thin slice; #18 waits on Codex.
+1. Merge FORGE PR #35 once its suite passes.
+2. Nothing else remains in the thin slice. #18 waits on Codex
+   upstream. #36 (harness-research's reference load condition, a
+   warning) is deferred to the next justified self-verification,
+   because changing the skill makes the stored example stale.
