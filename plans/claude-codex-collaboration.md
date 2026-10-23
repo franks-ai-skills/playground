@@ -134,7 +134,7 @@ and disagreements.
 Agreed with Codex (sessions 01a16a23, 01a16a3c); change it only by
 agreement.
 
-1. Merge FORGE PR #40 once Codex agrees.
+1. Done: FORGE PR #40 merged (`703f8a2`, Codex session 01a16a68).
 2. Nothing else is open except #18, which waits on Codex upstream and
    on the owner: a release that shows the injected skill in
    `exec --json` is reported to the owner, not acted on.
