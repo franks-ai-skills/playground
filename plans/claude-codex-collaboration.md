@@ -125,11 +125,16 @@ and disagreements.
 
 ## Current work order
 
-Agreed with Codex (sessions 01a165a3, 01a165a6); change it only by
+Agreed with Codex (session 01a16a23, 2026-10-23); change it only by
 agreement.
 
-1. Merge FORGE PR #35 once its suite passes.
-2. Nothing else remains in the thin slice. #18 waits on Codex
-   upstream. #36 (harness-research's reference load condition, a
-   warning) is deferred to the next justified self-verification,
-   because changing the skill makes the stored example stale.
+1. Done: #18 checked again at codex-cli 0.164.0 (one probe; the stream
+   still names no injected skill). #18 stays open and the observer
+   stays: the owner does not want it removed now. A future release that
+   shows the skill in `exec --json` is reported to the owner, not acted
+   on.
+2. #36: fix harness-research's reference load condition, then one
+   self-verification run that records `examples/forge-self-verify/`
+   again at the new Forge head (owner's choice, 2026-10-23). Purpose
+   and estimate are agreed in #36's planning round.
+3. Nothing else is open.
