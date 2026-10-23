@@ -123,18 +123,18 @@ and disagreements.
   (PR #35): all four verified, one warning on C
   (`skills.references.load-conditions`).
 
+- Done on 2026-10-23: #18 checked again at codex-cli 0.164.0 (still no
+  injected skill in `exec --json`; the owner keeps the observer); #36
+  (PR #37) and #38 (PR #39, Forge environment rebuilt when its Python no
+  longer starts) merged; self-verification recorded again at `8b9bb91`
+  (PR #40): all four verified, no failed rule.
+
 ## Current work order
 
-Agreed with Codex (session 01a16a23, 2026-10-23); change it only by
+Agreed with Codex (sessions 01a16a23, 01a16a3c); change it only by
 agreement.
 
-1. Done: #18 checked again at codex-cli 0.164.0 (one probe; the stream
-   still names no injected skill). #18 stays open and the observer
-   stays: the owner does not want it removed now. A future release that
-   shows the skill in `exec --json` is reported to the owner, not acted
-   on.
-2. #36: fix harness-research's reference load condition, then one
-   self-verification run that records `examples/forge-self-verify/`
-   again at the new Forge head (owner's choice, 2026-10-23). Purpose
-   and estimate are agreed in #36's planning round.
-3. Nothing else is open.
+1. Merge FORGE PR #40 once Codex agrees.
+2. Nothing else is open except #18, which waits on Codex upstream and
+   on the owner: a release that shows the injected skill in
+   `exec --json` is reported to the owner, not acted on.

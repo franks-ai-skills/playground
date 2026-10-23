@@ -1570,9 +1570,13 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   run showed the gap), #30 (retry a review reply that validation
   rejects, PR #32) and #16 (a part-level requirements digest, PR #33).
   Recorded again at `4db8962` (FORGE PR #35): all four verified, no
-  failed error rule, one warning on C. #18 (remove the temporary Codex
-  rollout observer) stays open until Codex shows an injected skill in
-  `exec --json`; codex-cli 0.163.0 does not.
+  failed error rule, one warning on C. On 2026-10-23 that warning was
+  fixed (FORGE #36, PR #37), and so was a Forge environment whose Python
+  no longer starts (#38, PR #39); recorded again at `8b9bb91` (FORGE
+  PR #40): all four verified, no failed rule. #18 (remove the temporary
+  Codex rollout observer) stays open: codex-cli 0.164.0 still shows no
+  injected skill in `exec --json`, and the owner keeps the observer
+  for now.
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go
