@@ -1576,7 +1576,11 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   PR #40): all four verified, no failed rule. #18 (remove the temporary
   Codex rollout observer) stays open: codex-cli 0.164.0 still shows no
   injected skill in `exec --json`, and the owner keeps the observer
-  for now.
+  for now. On 2026-10-24 both repositories got releases
+  (agent-harness-kb #8, PR #9; FORGE #41, PR #42): Forge pins only a
+  released KB version, now KB `v0.2.0`, and Forge 0.2.0 is tagged
+  `harness-forge--v0.2.0`; recorded again at `f447609`: all four
+  verified, no failed rule.
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go

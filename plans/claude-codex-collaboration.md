@@ -50,7 +50,8 @@ whether you agree, for example "Agreed" or "Not agreed: …".
 
 Claude pushes, opens and updates PRs and merges without the owner. A
 merge needs the repository's required checks to pass (Forge's test
-suite, the KB's `tools/validate.py`), your review of the latest pushed
+suite, the KB's `tools/validate.py` and `tools/test_validate.py`), your
+review of the latest pushed
 head and both agents' agreement; any later push voids your approval.
 Forge and KB allow only merge commits. PR descriptions must match their
 content. Playground's `ai-stuff` branch is pushed directly, without a
@@ -129,12 +130,27 @@ and disagreements.
   longer starts) merged; self-verification recorded again at `8b9bb91`
   (PR #40): all four verified, no failed rule.
 
+- Done on 2026-10-24 (session 01a16a9b): releases. KB #8 (PR #9,
+  `c29ac28`): a change to the snapshot paths raises `kb_version` with a
+  dated `CHANGELOG.md` section and is released as tag `v<version>`;
+  `tools/validate.py` checks it, `tools/test_validate.py` tests it; tags
+  `v0.2.0` and `v0.1.0` (retrospective, `9a9063d`). FORGE #41 (PR #42,
+  `b00b8b8`): `pin_snapshot.py --pin` pins only a released KB version;
+  Forge pins KB `v0.2.0`; Forge 0.2.0 with `CHANGELOG.md`, tags
+  `harness-forge--v0.2.0` and `harness-forge--v0.1.0` (retrospective,
+  `05dd37b`); self-verification recorded again at `f447609` (sv7, two
+  turns): all four verified, no failed rule. Out of scope by agreement:
+  comparing a decision's own `kb_version` with the pin, and the
+  duplicate version field in the marketplace entry.
+
 ## Current work order
 
 Agreed with Codex (sessions 01a16a23, 01a16a3c); change it only by
 agreement.
 
-1. Done: FORGE PR #40 merged (`703f8a2`, Codex session 01a16a68).
+1. Done: FORGE PR #40 merged (`703f8a2`, Codex session 01a16a68);
+   KB PR #9 and FORGE PR #42 merged with their releases (session
+   01a16a9b).
 2. Nothing else is open except #18, which waits on Codex upstream and
    on the owner: a release that shows the injected skill in
    `exec --json` is reported to the owner, not acted on.

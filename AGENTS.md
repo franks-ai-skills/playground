@@ -82,8 +82,9 @@ review.
 **Pushes, PRs and merges.** Claude pushes branches, creates and updates
 PRs and merges without asking the owner. A merge requires the
 repository's required checks to pass (Forge's test suite, the KB's
-`tools/validate.py`), a Codex review of the latest pushed PR head, and both
-agents' explicit agreement that the PR is ready. Any push after Codex's
+`tools/validate.py` and `tools/test_validate.py`), a Codex review of
+the latest pushed PR head, and both agents' explicit agreement that the
+PR is ready. Any push after Codex's
 approval voids it and needs a new review. Respect branch protection and
 each repository's merge method: harness-forge and agent-harness-kb
 allow only merge commits. Keep each PR description in step with what
