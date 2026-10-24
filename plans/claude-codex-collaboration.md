@@ -151,15 +151,51 @@ and disagreements.
   supports such dependencies. KB PR #10, release `v0.3.0`: the plugin
   practice asks for that format only where dependency ranges need it.
   Forge stays pinned to KB `v0.2.0` until its next justified re-pin.
+- Owner hands-on test of Forge 0.2.0, 2026-10-24 (session 01a16a9b):
+  FORGE #44–#48 filed from the run. The owner published the built skill
+  as franks-ai-skills/prompt-me, had it reviewed and filed FORGE #49,
+  #50, #52–#55 from that review. FORGE #51 (trailing newlines), #57
+  (review against own requirements/allowlists), #58 (licensing note) and
+  KB #11 (security guidance) followed. The owner does not like the
+  printed contract and will explain why; no contract rework until then.
+- Owner decision, 2026-10-24: adopt fastjsonschema and ship every
+  runtime dependency inside the plugin (FORGE #56; evaluation in
+  `plans/2026-10-24-fastjsonschema-evaluation.md`). This reverses
+  `packaging/assessment.md` (2026-10-09). #46 is amended: no download
+  fallback; a standard-library check of Python and the bundle comes
+  first. Reporting the fastjsonschema reference bug upstream is
+  postponed by the owner and out of scope.
 
 ## Current work order
 
-Agreed with Codex (sessions 01a16a23, 01a16a3c); change it only by
-agreement.
+Agreed with Codex (session 01a16a9b, request 15); change it only by
+agreement. Each item: its own plan agreed with Codex, its own PR, the
+full suite, Codex review of the pushed head, merge. Intermediate Forge
+PRs stay unreleased; the stored self-verification example is stale
+until the final release PR records it again.
 
-1. Done: FORGE PR #40 merged (`703f8a2`, Codex session 01a16a68);
-   KB PR #9 and FORGE PR #42 merged with their releases (session
-   01a16a9b).
-2. Nothing else is open except #18, which waits on Codex upstream and
-   on the owner: a release that shows the injected skill in
-   `exec --json` is reported to the owner, not acted on.
+1. #44: show proposed content before asking for confirmation.
+2. #45: separate reuse choices from proposals drawn from findings.
+3. #57: review a built skill's procedure against its own requirements
+   and allowlists.
+4. #56 + #46: fastjsonschema, bundled dependencies, disclosure and the
+   first check. Prepare the Forge branch, validate and release the KB
+   schema copies against it, re-pin before the Forge PR merges.
+5. #51: audit the remaining trailing-newline acceptance.
+6. #47: one acceptance for unchanged, re-supported requirements.
+7. #50 + #53: linked Harness Forge name and reader-terms README
+   sections, writer and reader migrated together.
+8. #49: instruction-style Requirements section.
+9. #52 + #55: verifier and builder provenance.
+10. KB #11: finish, release and re-pin any security work not already
+    included (research starts alongside the smaller fixes; one combined
+    KB release with #56's schema copies if both are ready).
+11. #58: licensing-information note.
+12. #48: disclose retained tool-result files.
+13. Forge 0.3.0 release PR: version fields, changelog, targeted
+    self-verification (purpose and estimate agreed then), offline
+    reference validation.
+14. #54: behavior-test runner, after its design is agreed; a later
+    release. Feasibility and design work may start earlier.
+
+#18 waits on Codex upstream and on the owner, unchanged.
