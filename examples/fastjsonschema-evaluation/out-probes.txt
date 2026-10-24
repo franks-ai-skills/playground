@@ -1,0 +1,46 @@
+## 1. Forge's 18 converted schemas against the Draft-07 metaschema
+all pass
+
+## 2. Scope bug: a local $ref inside a schema reached through a reference (predicate's "#")
+open outer schema: invalid value accepted by jsonschema=False fastjsonschema=True with-workaround=False; valid value accepted by jsonschema=True fastjsonschema=True with-workaround=True
+closed outer schema: invalid value accepted by jsonschema=False fastjsonschema=False with-workaround=False; valid value accepted by jsonschema=True fastjsonschema=False with-workaround=True
+
+## 3. Schema definitions: (2020-12 check_schema, Draft-07 metaschema after conversion, compile alone)
+{"type": 5}                                                                 ('rejects', 'rejects', 'rejects')
+{"type": "strin"}                                                           ('rejects', 'rejects', 'rejects')
+{"properties": []}                                                          ('rejects', 'conversion refused (AttributeError)', '-')
+{"required": "x"}                                                           ('rejects', 'rejects', 'rejects')
+{"required": [1]}                                                           ('rejects', 'rejects', 'accepts')
+{"pattern": "("}                                                            ('rejects', 'rejects', 'rejects')
+{"minItems": -1}                                                            ('rejects', 'rejects', 'accepts')
+{"maxLength": "3"}                                                          ('rejects', 'rejects', 'rejects')
+{"additionalProperties": "no"}                                              ('rejects', 'rejects', 'accepts')
+{"items": 5}                                                                ('rejects', 'rejects', 'rejects')
+{"enum": "a"}                                                               ('rejects', 'rejects', 'rejects')
+{"$ref": 5}                                                                 ('rejects', 'conversion refused (AttributeError)', '-')
+{"properties": {"a": 5}}                                                    ('rejects', 'rejects', 'rejects')
+{"minimum": "1"}                                                            ('rejects', 'rejects', 'rejects')
+{"patternProperties": {"(": {}}}                                            ('rejects', 'rejects', 'rejects')
+{"uniqueItems": "yes"}                                                      ('rejects', 'rejects', 'accepts')
+{"oneOf": []}                                                               ('rejects', 'rejects', 'accepts')
+{"anyOf": {}}                                                               ('rejects', 'rejects', 'accepts')
+{"type": "object", "$defs": {"bad": {"required": [1]}}}                     ('rejects', 'rejects', 'accepts')
+{"type": "array", "items": {"$ref": "#/$defs/n"}, "$defs": {"n": {"minItems": -1}}} ('rejects', 'rejects', 'accepts')
+KB catalog parameter schemas: 14, all three accept: True
+
+## 4. References in the adoption configuration (LocalOnly): retrieval attempts and outcome
+urn:harness-forge:schema:predicate                   attempts=0 compiled
+urn:harness-forge:schema:predicate#/definitions/x    attempts=0 refused (JsonSchemaDefinitionException)
+urn:harness-forge:schema:nope                        attempts=0 refused (LookupError)
+urn:other:thing                                      attempts=0 refused (LookupError)
+http://example.invalid/s.json                        attempts=0 refused (LookupError)
+https://example.invalid/s.json                       attempts=0 refused (LookupError)
+file:///etc/hosts                                    attempts=0 refused (LookupError)
+ftp://example.invalid/x                              attempts=0 refused (LookupError)
+data:application/json,{}                             attempts=0 refused (LookupError)
+relative/other.json                                  attempts=0 refused (LookupError)
+//example.invalid/s                                  attempts=0 refused (LookupError)
+default handlers, urn reference: attempts=1 (fastjsonschema falls back to urlopen)
+
+## 5. Error reporting with fast_fail=False
+["data must contain ['c'] properties", 'data.a must be string', 'data.b must be integer', "data must not contain {'z'} properties"]

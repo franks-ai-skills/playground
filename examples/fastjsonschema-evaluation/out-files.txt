@@ -1,0 +1,33 @@
+{
+ "configuration": {
+  "absolutize": true,
+  "fast_fail": false,
+  "mutations": 300,
+  "corpus": [
+   {
+    "file": "corpus-files.jsonl",
+    "sha256": "7154c061174c4da9e8adf79a54e37b67e99ee02c8b3d7bae131c522ba08bfac8"
+   }
+  ]
+ },
+ "entries": 80,
+ "stats": {
+  "checked": 23550,
+  "base-valid": 6284,
+  "base-invalid": 17266,
+  "library": 1601,
+  "library-by-schema:urn:harness-forge:schema:decision": 530,
+  "library:newline:(True, True, False)": 1601,
+  "library-by-schema:urn:harness-forge:schema:report": 228,
+  "library-by-schema:urn:harness-forge:schema:research": 395,
+  "library-by-schema:urn:harness-forge:schema:revision": 311,
+  "library-by-schema:urn:harness-forge:schema:catalog": 8,
+  "library-by-schema:urn:harness-forge:schema:coverage": 21,
+  "library-by-schema:urn:harness-forge:schema:rules": 50,
+  "library-by-schema:urn:harness-forge:schema:selection": 21,
+  "library-by-schema:urn:harness-forge:schema:runtime-cases": 37
+ },
+ "inputs_changed_by_fjs": 0
+}
+compile errors: {}
+== library: 0 (first shown)

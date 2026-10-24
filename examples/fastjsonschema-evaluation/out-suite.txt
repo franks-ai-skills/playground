@@ -1,0 +1,45 @@
+{
+ "configuration": {
+  "absolutize": true,
+  "fast_fail": false,
+  "mutations": 60,
+  "corpus": [
+   {
+    "file": "corpus-suite.jsonl",
+    "sha256": "3e292f2e8ffe35525a49a5b6ccd56eed3e53a1f6efca6260f0cb96025aa2cee5"
+   }
+  ]
+ },
+ "entries": 1027,
+ "stats": {
+  "checked": 58889,
+  "base-valid": 18570,
+  "base-invalid": 40319,
+  "library": 2919,
+  "library-by-schema:urn:harness-forge:schema:rule": 568,
+  "library:newline:(True, True, False)": 2919,
+  "library-by-schema:urn:harness-forge:schema:rules": 44,
+  "library-by-schema:urn:harness-forge:schema:decision": 524,
+  "library-by-schema:urn:harness-forge:schema:worker-evidence": 26,
+  "library-by-schema:urn:harness-forge:schema:selection": 10,
+  "library-by-schema:urn:harness-forge:schema:worker-response": 324,
+  "library-by-schema:urn:harness-forge:schema:revision": 105,
+  "library-by-schema:urn:harness-forge:schema:review": 205,
+  "library-by-schema:urn:harness-forge:schema:worker-request": 205,
+  "library-by-schema:urn:harness-forge:schema:source-support": 25,
+  "library-by-schema:urn:harness-forge:schema:research": 226,
+  "library-by-schema:urn:harness-forge:schema:runtime-cases": 21,
+  "library-by-schema:urn:harness-forge:schema:runtime-result": 149,
+  "library-by-schema:urn:harness-forge:schema:report": 157,
+  "library-by-schema:urn:harness-forge:schema:override": 133,
+  "library-by-schema:(sub-schema dec2e243)": 161,
+  "library-by-schema:urn:harness-forge:schema:catalog": 3,
+  "library-by-schema:(sub-schema 12d183dc)": 9,
+  "library-by-schema:urn:harness-forge:schema:coverage": 21,
+  "library-by-schema:(sub-schema 8637680a)": 2,
+  "library-by-schema:(sub-schema 1a24a8be)": 1
+ },
+ "inputs_changed_by_fjs": 0
+}
+compile errors: {}
+== library: 0 (first shown)

@@ -1,0 +1,69 @@
+{
+ "configuration": {
+  "absolutize": false,
+  "fast_fail": true,
+  "mutations": 60,
+  "corpus": [
+   {
+    "file": "corpus-suite.jsonl",
+    "sha256": "3e292f2e8ffe35525a49a5b6ccd56eed3e53a1f6efca6260f0cb96025aa2cee5"
+   }
+  ]
+ },
+ "entries": 1027,
+ "stats": {
+  "checked": 58889,
+  "base-valid": 18570,
+  "base-invalid": 40319,
+  "library": 3858,
+  "library-by-schema:urn:harness-forge:schema:rule": 568,
+  "library:newline:(True, True, False)": 3111,
+  "library-by-schema:urn:harness-forge:schema:rules": 44,
+  "library-by-schema:urn:harness-forge:schema:decision": 524,
+  "library-by-schema:urn:harness-forge:schema:worker-evidence": 26,
+  "library-by-schema:urn:harness-forge:schema:selection": 10,
+  "library-by-schema:urn:harness-forge:schema:worker-response": 324,
+  "library-by-schema:urn:harness-forge:schema:revision": 105,
+  "library-by-schema:urn:harness-forge:schema:review": 205,
+  "library-by-schema:urn:harness-forge:schema:worker-request": 205,
+  "library-by-schema:urn:harness-forge:schema:source-support": 25,
+  "library-by-schema:urn:harness-forge:schema:research": 226,
+  "library-by-schema:urn:harness-forge:schema:runtime-cases": 21,
+  "library-by-schema:urn:harness-forge:schema:runtime-result": 149,
+  "library-by-schema:urn:harness-forge:schema:report": 157,
+  "library-by-schema:urn:harness-forge:schema:override": 133,
+  "library-by-schema:(sub-schema dec2e243)": 1030,
+  "library:recorded": 49,
+  "library:recorded:(True, True, False)": 49,
+  "library:int:(True, True, False)": 141,
+  "library:dup:(True, True, False)": 84,
+  "library:long:(True, True, False)": 194,
+  "library:drop:(True, True, False)": 27,
+  "library:empty:(True, True, False)": 163,
+  "library:str-bool:(True, True, False)": 42,
+  "library:int-bool:(True, True, False)": 46,
+  "library-by-schema:urn:harness-forge:schema:catalog": 3,
+  "library-by-schema:(sub-schema 12d183dc)": 48,
+  "library-by-schema:urn:harness-forge:schema:coverage": 21,
+  "library-by-schema:(sub-schema 8637680a)": 33,
+  "library:extra:(True, True, False)": 1,
+  "library-by-schema:(sub-schema 1a24a8be)": 1
+ },
+ "inputs_changed_by_fjs": 0
+}
+compile errors: {}
+== library: 400 (first shown)
+    105  (sub-schema dec2e243)  empty
+    100  (sub-schema dec2e243)  int
+     97  (sub-schema dec2e243)  long
+     28  (sub-schema dec2e243)  dup
+     22  (sub-schema dec2e243)  recorded
+     20  (sub-schema dec2e243)  int-bool
+     15  (sub-schema dec2e243)  str-bool
+      3  (sub-schema 12d183dc)  long
+      2  (sub-schema dec2e243)  drop
+      2  (sub-schema 12d183dc)  int
+      2  (sub-schema 12d183dc)  drop
+      2  (sub-schema 12d183dc)  empty
+      1  (sub-schema 12d183dc)  recorded
+      1  (sub-schema 12d183dc)  dup
