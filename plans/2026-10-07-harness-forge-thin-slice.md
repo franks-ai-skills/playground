@@ -1579,8 +1579,8 @@ Claude Opus 5.5 and Codex agreed on these divergences (Codex session
   for now. On 2026-10-24 both repositories got releases
   (agent-harness-kb #8, PR #9; FORGE #41, PR #42): Forge pins only a
   released KB version, now KB `v0.2.0`, and Forge 0.2.0 is tagged
-  `harness-forge--v0.2.0`; recorded again at `f447609`: all four
-  verified, no failed rule.
+  `v0.2.0` (FORGE PR #43 replaced the first `harness-forge--v*` tags);
+  recorded again at `f447609`: all four verified, no failed rule.
 - [x] **Research is about the idea, not the harness** (owner, 2026-10-15).
   Research looks into the user's idea and its domain: for a review skill,
   how good reviews are done, which review tools exist and where reviews go

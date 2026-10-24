@@ -137,11 +137,20 @@ and disagreements.
   `v0.2.0` and `v0.1.0` (retrospective, `9a9063d`). FORGE #41 (PR #42,
   `b00b8b8`): `pin_snapshot.py --pin` pins only a released KB version;
   Forge pins KB `v0.2.0`; Forge 0.2.0 with `CHANGELOG.md`, tags
-  `harness-forge--v0.2.0` and `harness-forge--v0.1.0` (retrospective,
-  `05dd37b`); self-verification recorded again at `f447609` (sv7, two
-  turns): all four verified, no failed rule. Out of scope by agreement:
-  comparing a decision's own `kb_version` with the pin, and the
-  duplicate version field in the marketplace entry.
+  `v0.2.0` and `v0.1.0` (retrospective, `05dd37b`); self-verification
+  recorded again at `f447609` (sv7, two turns): all four verified, no
+  failed rule. Out of scope by agreement: comparing a decision's own
+  `kb_version` with the pin, and the duplicate version field in the
+  marketplace entry.
+- Owner, 2026-10-24: Forge release tags are plain `v<version>`, as in
+  the KB. The first tags, `harness-forge--v0.1.0` and
+  `harness-forge--v0.2.0`, were replaced by `v0.1.0` and `v0.2.0` on
+  the same commits and deleted; the releases moved with them (FORGE PR
+  #43). A `harness-forge--v<version>` tag, the format Claude Code
+  resolves plugin dependency ranges against, is added only once Forge
+  supports such dependencies. KB PR #10, release `v0.3.0`: the plugin
+  practice asks for that format only where dependency ranges need it.
+  Forge stays pinned to KB `v0.2.0` until its next justified re-pin.
 
 ## Current work order
 
