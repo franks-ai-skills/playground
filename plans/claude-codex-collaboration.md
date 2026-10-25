@@ -165,6 +165,16 @@ and disagreements.
   fallback; a standard-library check of Python and the bundle comes
   first. Reporting the fastjsonschema reference bug upstream is
   postponed by the owner and out of scope.
+- Owner rule, 2026-10-25 (overrides the release-per-change practice
+  of the work order below): solve all fixable open issues before
+  creating new releases, in the KB and in Forge. An interim release is
+  allowed only for a good reason that Claude states and Codex agrees
+  with. Example: Forge pins only released KB versions, so a Forge fix
+  that needs a KB change can justify a KB release; batching several KB
+  changes into one release is better where the order allows it. Codex
+  argues against an interim release whose reason does not hold. KB
+  v0.4.0 (for #56) and v0.5.0 (for #51) were released before this
+  rule; the owner keeps both.
 
 ## Current work order
 
