@@ -206,10 +206,11 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     reference validation. In progress on `release/0.3.0`: the behavior
     probe passed in both CLIs; the self-verification found a CLI bug
     (verify crashed on behavior cases) and two issues, so (request 50):
-    a. the CLI fix as its own PR to main;
-    b. #72, harness-intake suggests answers in its questions;
+    a. the CLI fix as its own PR to main (done, PR #73);
+    b. #72, harness-intake suggests answers in its questions (done,
+       PR #74);
     c. #71, fetched text in the contract and drift issue in a container
-       it cannot end;
+       it cannot end (PR #75 in review);
     d. rebase the release branch, drop the duplicate CLI fix, refresh
        reuse pins and decision data;
     e. offline checks, then an agreed live budget and the combined
