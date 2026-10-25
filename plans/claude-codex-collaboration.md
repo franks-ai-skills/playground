@@ -203,7 +203,20 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
 13. #54: behavior-test runner, design agreed first.
 14. Forge 0.3.0 release PR: version fields, changelog, targeted
     self-verification (purpose and estimate agreed then), offline
-    reference validation. If #54 proves blocked or the owner defers it,
-    reassess the release then.
+    reference validation. In progress on `release/0.3.0`: the behavior
+    probe passed in both CLIs; the self-verification found a CLI bug
+    (verify crashed on behavior cases) and two issues, so (request 50):
+    a. the CLI fix as its own PR to main;
+    b. #72, harness-intake suggests answers in its questions;
+    c. #71, fetched text in the contract and drift issue in a container
+       it cannot end;
+    d. rebase the release branch, drop the duplicate CLI fix, refresh
+       reuse pins and decision data;
+    e. offline checks, then an agreed live budget and the combined
+       self-verification (the development user assesses the
+       not-applicable question for
+       `skills.invocation.side-effects-user-invoked` on the reviewer's
+       reasons);
+    f. release PR review, merge, tag, release.
 
 #18 waits on Codex upstream and on the owner, unchanged.
