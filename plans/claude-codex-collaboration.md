@@ -210,14 +210,19 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     b. #72, harness-intake suggests answers in its questions (done,
        PR #74);
     c. #71, fetched text in the contract and drift issue in a container
-       it cannot end (PR #75 in review);
+       it cannot end (done, PR #75);
     d. rebase the release branch, drop the duplicate CLI fix, refresh
-       reuse pins and decision data;
+       reuse pins and decision data (done: `release/0.3.0-rc2`
+       8f87dea, replacing `release/0.3.0` after a refused force-push);
     e. offline checks, then an agreed live budget and the combined
-       self-verification (the development user assesses the
-       not-applicable question for
-       `skills.invocation.side-effects-user-invoked` on the reviewer's
-       reasons);
+       self-verification (done, run 030b, 3 sessions: A-D verified,
+       one failed warning on C, `security.writes.within-boundary`);
+    e2. (request 55) #76, `drift-issue` follows a symlink at its
+       `--out` path: PR to main, merge, rebase rc2, offline checks and
+       suite, then run 030c with at most 3 sessions (exhausts the
+       budget); afterwards no further live run without a new
+       agreement, findings triaged offline; releasing with a known
+       fixable warning needs an owner exception;
     f. release PR review, merge, tag, release.
 
 #18 waits on Codex upstream and on the owner, unchanged.
