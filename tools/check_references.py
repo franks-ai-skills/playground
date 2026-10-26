@@ -61,6 +61,10 @@ PLAYGROUND = Path(__file__).resolve().parents[1]
 HARNESSES = ("claude-code", "codex")
 LABELS = ("harness_result", "goal_result")
 MAX_BYTES = 1024 * 1024
+# The reason Forge 0.3.0 and earlier gave a plugin skill's not-run case (FORGE #81 reworded it); reports that
+# recorded it stay readable.
+HISTORICAL_PLUGIN_RUNTIME = ("unavailable: runtime cases for a skill shipped in a plugin are not supported yet; "
+                             "its static checks and review still apply")
 
 
 def _forge(path: Path) -> dict:
@@ -122,7 +126,8 @@ def _unobservable(item, part: dict, harness: str, forge: dict) -> bool:
         return False
     if item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ()):
         return True
-    return item.reason == forge["runtime"].PLUGIN_RUNTIME and forge["verify"].skill_home(part) == "plugin"
+    return (item.reason in {forge["runtime"].PLUGIN_RUNTIME, HISTORICAL_PLUGIN_RUNTIME}
+            and forge["verify"].skill_home(part) == "plugin")
 
 
 def _recorded_verifier(data: dict, forge: dict) -> dict[str, str] | None:

@@ -551,13 +551,21 @@ class UnobservableCaseTest(unittest.TestCase):
     def test_a_plugin_skill_case_forge_does_not_run(self):
         plugin = self.reused(path=f"skills/{NAME}", skill_home="plugin")
         repository = self.reused(path=f".agents/skills/{NAME}")
-        not_run = self.item(self.forge["runtime"].PLUGIN_RUNTIME)
-        self.assertTrue(check_references._unobservable(not_run, plugin, "claude-code", self.forge))
-        self.assertFalse(check_references._unobservable(not_run, repository, "claude-code", self.forge),
-                         "a repository skill's cases run, so this reason does not excuse them")
+        for reason in (self.forge["runtime"].PLUGIN_RUNTIME, check_references.HISTORICAL_PLUGIN_RUNTIME):
+            with self.subTest(reason=reason):
+                not_run = self.item(reason)
+                self.assertTrue(check_references._unobservable(not_run, plugin, "claude-code", self.forge))
+                self.assertFalse(check_references._unobservable(not_run, repository, "claude-code", self.forge),
+                                 "a repository skill's cases run, so this reason does not excuse them")
+                self.assertFalse(check_references._unobservable(self.item(reason, "fail"), plugin, "claude-code",
+                                                                self.forge))
         self.assertFalse(check_references._unobservable(self.item("skipped"), plugin, "claude-code", self.forge))
-        self.assertFalse(check_references._unobservable(self.item(not_run.reason, "fail"), plugin, "claude-code",
-                                                        self.forge))
+
+    def test_the_historical_plugin_reason_is_the_one_forge_0_3_0_recorded(self):
+        # Frozen as a literal: Forge 0.3.0's self-verification report recorded exactly this reason (FORGE #81).
+        self.assertEqual(check_references.HISTORICAL_PLUGIN_RUNTIME,
+                         "unavailable: runtime cases for a skill shipped in a plugin are not supported yet; "
+                         "its static checks and review still apply")
 
     def test_a_case_codex_cannot_observe(self):
         codex = self.forge["runtime"].UNOBSERVABLE["codex"][0]
