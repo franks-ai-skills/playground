@@ -244,12 +244,18 @@ needs its own agreed plan, checks and review:
 1. #83: fix the run-input location guidance.
 2. #81: complete the remaining plugin-runtime wording cleanup and the
    coordinated playground reference-checker update.
-3. After those offline changes, separately agree whether and when to
+3. #84: short Markdown summary for confirmation, full details in a
+   file in #83's per-run directory (request 70/71).
+4. #85: replace "contract" in what Forge shows and asks the user;
+   internal identifiers, including `prepare-contract`, stay.
+5. After those offline changes, separately agree whether and when to
    record a self-verification, with its purpose and usage estimate.
    Keep #81 open until its agreed closing condition is met. No Forge
    release is required.
 
 #18 remains parked on Codex upstream and the owner, unchanged. No Codex
 live run is scheduled. No new KB issue or release follows from request
-68. Contract rework still awaits the owner's explanation; the
+68. The owner explained the contract dislikes on 2026-10-26 (wording,
+length, plain-text rendering, technical details mixed with decisions)
+and accepts a breaking change; #84 and #85 cover them. The
 fastjsonschema upstream report remains postponed.
