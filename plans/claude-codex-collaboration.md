@@ -238,26 +238,31 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     recorded self-verification, release or not, records a fresh `pass`
     for `skills.body.no-time-bound-statements` on harness-verify.
 
-Remaining work order (request 68, 2026-10-26). Each implementation task
-needs its own agreed plan, checks and review:
+Work order of request 68, done on 2026-10-26 (session e89159e4,
+requests 74–84), each with its agreed plan, full suite and Codex review
+of the pushed head:
 
-1. #83: run files in `.harness-forge/runs/<run id>/` at the root
-   holding `.harness/`, with `.harness-forge/.gitignore` (`*`) like
-   prompt-me's `.tmp/` (owner; rewritten in requests 72/73).
-2. #81: complete the remaining plugin-runtime wording cleanup and the
-   coordinated playground reference-checker update.
-3. #84: short Markdown summary for confirmation, full details in a
-   file in #83's per-run directory (request 70/71).
-4. #85: replace "contract" in what Forge shows and asks the user;
-   internal identifiers, including `prepare-contract`, stay.
-5. After those offline changes, separately agree whether and when to
-   record a self-verification, with its purpose and usage estimate.
-   Keep #81 open until its agreed closing condition is met. No Forge
-   release is required.
+1. #83 (PR #86): `run-dir` allocates `.harness-forge/runs/<run id>/`
+   with `.harness-forge/.gitignore` (`*`); protected reads and writes
+   below `.harness-forge/`; all four skills name the run files.
+2. #81 cleanup (PR #87): structural plugin-runtime reason and
+   diagnostic; playground accepts the historical reason (`05b74e4`).
+3. #84 (PR #88): `prepare-contract --run-dir` returns a Markdown
+   summary and writes a content-addressed details file; digest and
+   relay unchanged.
+4. #85 (PR #89): `--purpose research|configuration|verification`
+   names the research proposal, configuration proposal or
+   configuration summary; no user-facing "contract"; report label
+   "Confirmed configuration digest"; playground accepts the historical
+   label narrowly (`3958a9d`).
+5. Self-verification run 031 (request 83: 5 of 6 agreed sessions,
+   PR #90): A–D verified at `9ef3c77`, no failed or unresolved rule,
+   `skills.body.no-time-bound-statements` passes on all four; #81
+   closed. The playground replay of `forge-self-verify` passes again.
+   Confirmations were agent-played development evidence.
 
-#18 remains parked on Codex upstream and the owner, unchanged. No Codex
-live run is scheduled. No new KB issue or release follows from request
-68. The owner explained the contract dislikes on 2026-10-26 (wording,
-length, plain-text rendering, technical details mixed with decisions)
-and accepts a breaking change; #84 and #85 cover them. The
-fastjsonschema upstream report remains postponed.
+Remaining: none in the work order. #18 remains parked on Codex upstream
+and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
+or Forge release follows (owner rule). No Codex live run is scheduled.
+The fastjsonschema upstream report remains postponed; remind the owner
+of it after this implementation session.
