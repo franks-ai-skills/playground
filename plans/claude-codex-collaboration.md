@@ -241,7 +241,9 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
 Remaining work order (request 68, 2026-10-26). Each implementation task
 needs its own agreed plan, checks and review:
 
-1. #83: fix the run-input location guidance.
+1. #83: run files in `.harness-forge/runs/<run id>/` at the root
+   holding `.harness/`, with `.harness-forge/.gitignore` (`*`) like
+   prompt-me's `.tmp/` (owner; rewritten in requests 72/73).
 2. #81: complete the remaining plugin-runtime wording cleanup and the
    coordinated playground reference-checker update.
 3. #84: short Markdown summary for confirmation, full details in a
