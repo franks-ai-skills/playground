@@ -497,6 +497,23 @@ class CheckReferencesTest(unittest.TestCase):
         self.assertEqual(check_references._case_problems({}, cases)[0],
                          "case explicit names part A1, which the decision neither builds nor reuses locally")
 
+    def test_a_report_verified_by_an_earlier_checkout_replays_with_that_verifier(self):
+        """The replaying checkout is later than the verifying one; the code is checked by its hashes."""
+        recorded = {}
+
+        def earlier(data):
+            recorded.update(data["tool_versions"])
+            data["tool_versions"]["harness-forge-verifier-commit"] = "1" * 40
+
+        self.report(earlier)
+        path = self.root / REPORT
+        text = path.read_text(encoding="utf-8")
+        line = next(line for line in text.splitlines() if ") verifier: " in line)
+        shown = f"(checkout {recorded['harness-forge-verifier-commit'][:7]},"
+        self.assertIn(shown, line)
+        path.write_text(text.replace(line, line.replace(shown, "(checkout 1111111,")), encoding="utf-8")
+        self.assertEqual(self.problems(), [])
+
     def test_a_partial_review_report_is_not_a_reference_run(self):
         self.report(lambda data: data.update(scope_parts=["A1"]))
         self.refused("is a Review")
@@ -511,6 +528,38 @@ class CheckReferencesTest(unittest.TestCase):
         path.write_text(text.replace("- Review scope: First run: judged A1, A2\n", f"- Review scope: {label}\n"),
                         encoding="utf-8")
         self.assertEqual(self.problems(), [])
+
+
+class UnobservableCaseTest(unittest.TestCase):
+    """Which not-run cases a reference run may leave unpassed."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.forge = check_references._forge(FORGE)
+
+    def item(self, reason, result="not-run"):
+        return type("Item", (), {"result": result, "reason": reason})()
+
+    def reused(self, **reuse):
+        return part("A1", "Reuse a checklist skill", outcome="reuse", recommended="skills", chosen="skills",
+                    reuse={"name": NAME, **reuse})
+
+    def test_a_plugin_skill_case_forge_does_not_run(self):
+        plugin = self.reused(path=f"skills/{NAME}", skill_home="plugin")
+        repository = self.reused(path=f".agents/skills/{NAME}")
+        not_run = self.item(self.forge["runtime"].PLUGIN_RUNTIME)
+        self.assertTrue(check_references._unobservable(not_run, plugin, "claude-code", self.forge))
+        self.assertFalse(check_references._unobservable(not_run, repository, "claude-code", self.forge),
+                         "a repository skill's cases run, so this reason does not excuse them")
+        self.assertFalse(check_references._unobservable(self.item("skipped"), plugin, "claude-code", self.forge))
+        self.assertFalse(check_references._unobservable(self.item(not_run.reason, "fail"), plugin, "claude-code",
+                                                        self.forge))
+
+    def test_a_case_codex_cannot_observe(self):
+        codex = self.forge["runtime"].UNOBSERVABLE["codex"][0]
+        built = part("A1", "Write a checklist")
+        self.assertTrue(check_references._unobservable(self.item(codex), built, "codex", self.forge))
+        self.assertFalse(check_references._unobservable(self.item(codex), built, "claude-code", self.forge))
 
 
 if __name__ == "__main__":

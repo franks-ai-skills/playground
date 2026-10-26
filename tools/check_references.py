@@ -115,6 +115,16 @@ def _report_data(text: str, documents) -> dict:
     return data
 
 
+def _unobservable(item, part: dict, harness: str, forge: dict) -> bool:
+    """Whether a not-run case is one the run could not have passed: the harness cannot show its outcome, or
+    the part's skill ships in a plugin, for which Forge runs no runtime case."""
+    if item.result != "not-run":
+        return False
+    if item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ()):
+        return True
+    return item.reason == forge["runtime"].PLUGIN_RUNTIME and forge["verify"].skill_home(part) == "plugin"
+
+
 def _recorded_verifier(data: dict, forge: dict) -> dict[str, str] | None:
     """The verifying Forge copy the report names, for the replay: the replay checks the code by its hashes, and
     the checkout that replays it is later than the one that verified. None for a report from before provenance."""
@@ -400,11 +410,8 @@ def check_example(root: Path, forge: dict) -> list[str]:
                 problems.append(f"part {part_id}: case {item.case_id} activated through a tool the case does not "
                                 f"permit ({tool})")
             # A case the harness cannot observe, such as any near miss in Codex, says so and stays not-run.
-            # Not-run because the harness cannot show the outcome, or because Forge runs no case for a skill
-            # shipped in a plugin: neither is a case the run could have passed.
-            unobservable = item.result == "not-run" and (item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ())
-                                                         or item.reason == forge["runtime"].PLUGIN_RUNTIME)
-            if by_part[part_id].harness_result == "verified" and item.result != "pass" and not unobservable:
+            if (by_part[part_id].harness_result == "verified" and item.result != "pass"
+                    and not _unobservable(item, decision.part(part_id), harness, forge)):
                 problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
                                 "passes every case its harness can observe")
 
