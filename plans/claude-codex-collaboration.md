@@ -261,7 +261,13 @@ of the pushed head:
    closed. The playground replay of `forge-self-verify` passes again.
    Confirmations were agent-played development evidence.
 
-Remaining: none in the work order. #18 remains parked on Codex upstream
+Owner request, 2026-10-26 (requests 86/87): Forge offers to add its own
+license, AGPL-3.0-only, with "Yes, please" / "No, thanks", exactly and
+deterministically: FORGE #91 (agreed text). It is the sole active work
+item; implementation needs its own agreed plan, PR, full suite and
+review; Forge-only, no KB change, no release.
+
+Remaining otherwise: none in the work order. #18 remains parked on Codex upstream
 and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
 The fastjsonschema upstream report remains postponed; remind the owner
