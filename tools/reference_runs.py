@@ -26,11 +26,13 @@ import shutil
 import sys
 from pathlib import Path
 
-import yaml
 
 PLAYGROUND = Path(__file__).resolve().parents[1]
 FORGE = PLAYGROUND.parent / "harness-forge"
 sys.path[:0] = [str(FORGE / "src"), str(PLAYGROUND / "tools")]
+
+import harness_forge  # noqa: E402,F401  (activates Forge's bundled packages before yaml)
+import yaml  # noqa: E402
 
 import check_references  # noqa: E402
 from harness_forge.documents import safe_path  # noqa: E402
