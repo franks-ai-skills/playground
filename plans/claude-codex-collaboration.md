@@ -201,28 +201,14 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     and reasons resolved from the pin by control id, writer and reader
     migrated together with legacy recognition.
 13. #54: behavior-test runner, design agreed first.
-14. Forge 0.3.0 release PR: version fields, changelog, targeted
-    self-verification (purpose and estimate agreed then), offline
-    reference validation. In progress on `release/0.3.0`: the behavior
-    probe passed in both CLIs; the self-verification found a CLI bug
-    (verify crashed on behavior cases) and two issues, so (request 50):
-    a. the CLI fix as its own PR to main (done, PR #73);
-    b. #72, harness-intake suggests answers in its questions (done,
-       PR #74);
-    c. #71, fetched text in the contract and drift issue in a container
-       it cannot end (done, PR #75);
-    d. rebase the release branch, drop the duplicate CLI fix, refresh
-       reuse pins and decision data (done: `release/0.3.0-rc2`
-       8f87dea, replacing `release/0.3.0` after a refused force-push);
-    e. offline checks, then an agreed live budget and the combined
-       self-verification (done, run 030b, 3 sessions: A-D verified,
-       one failed warning on C, `security.writes.within-boundary`);
-    e2. (request 55) #76, `drift-issue` follows a symlink at its
-       `--out` path: PR to main, merge, rebase rc2, offline checks and
-       suite, then run 030c with at most 3 sessions (exhausts the
-       budget); afterwards no further live run without a new
-       agreement, findings triaged offline; releasing with a known
-       fixable warning needs an owner exception;
-    f. release PR review, merge, tag, release.
+14. Forge 0.3.0 release (done, 2026-10-26): PR #80 merged as
+    d175023, tag `v0.3.0`, GitHub release. Its self-verification found
+    and fixed #71, #72, #73 (PR #73), #76 and #78 first; the recorded
+    run `self-verify-fe9154a-verify-2026-10-26` verifies A-D with one
+    failed warning (D `skills.body.no-time-bound-statements`), released
+    under the owner's exception. Playground's reference checker accepts
+    a Review of every part (ai-stuff `f649442`, `6bfad8f`).
+15. #81: decide first whether that warning is valid, then reword or
+    record why not (a KB issue only if the rule is unclear).
 
 #18 waits on Codex upstream and on the owner, unchanged.
