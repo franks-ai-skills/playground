@@ -928,6 +928,20 @@ Each gets its own spec, plan and implementation, in this order.
    instructions, configuration, permissions, MCP and plugins.
 4. **CI and releases**: the snapshot sync between `agent-harness-kb`
    and `harness-forge`, and tagged releases.
+5. **Combined mechanisms within one part** (addendum, owner,
+   2026-10-26). Starts only after sub-project 3 provides a builder for
+   every mechanism. Selection now ends in nothing fits or outside
+   control when every standalone mechanism is ruled out for a part,
+   and says that combinations were not assessed
+   (`policy/selection.md`). This sub-project assesses such
+   combinations, for example a skill whose irreversible action an ask
+   rule guards: selection proposes a combination with the role of each
+   mechanism, the builders build it as one part, and verification
+   checks that the mechanisms together meet the part's goal and
+   requirements. Its spec decides whether a combination stays one part
+   or is recorded as linked parts, and adds reference ideas for both
+   harnesses. An idea divided into parts with one mechanism each is
+   already covered by the existing design.
 
 ## Out of scope for now
 

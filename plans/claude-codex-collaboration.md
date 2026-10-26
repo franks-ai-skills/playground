@@ -191,6 +191,9 @@ and disagreements.
     parts remain `decided` as local reuse. Report their verification
     result from the recorded report, not from decision status. No
     issue.
+- Owner, 2026-10-26 (request 69): combined mechanisms within one part
+  are design sub-project 5, after all builders exist; no issue and no
+  change to the current work order.
 
 ## Current work order
 
