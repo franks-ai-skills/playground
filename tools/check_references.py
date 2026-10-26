@@ -115,6 +115,14 @@ def _report_data(text: str, documents) -> dict:
     return data
 
 
+def _recorded_verifier(data: dict, forge: dict) -> dict[str, str] | None:
+    """The verifying Forge copy the report names, for the replay: the replay checks the code by its hashes, and
+    the checkout that replays it is later than the one that verified. None for a report from before provenance."""
+    prefix = forge["verify"].VERIFIER_PREFIX
+    recorded = {key[len(prefix):]: value for key, value in data.get("tool_versions", {}).items() if key.startswith(prefix)}
+    return recorded or None
+
+
 def _differences(recorded: dict, replayed: dict) -> list[str]:
     names = []
     for key in sorted(set(recorded) | set(replayed)):
@@ -283,13 +291,16 @@ def check_example(root: Path, forge: dict) -> list[str]:
     if problem:
         return problems + [f"report: {problem}"]
     data = _report_data(report_text, documents)
-    if data["scope_parts"] is not None:
+    # A Review that judges every part keeps nothing from an earlier report; a partial one would.
+    if data["scope_parts"] is not None and sorted(data["scope_parts"]) != sorted(every):
         return problems + ["the report is a Review, whose kept results rest on an earlier report; record a reference "
-                           "run as a first run or an Extensive review"]
+                           "run as a first run, an Extensive review or a Review of every part"]
     labels = {f"First run: judged {', '.join(sorted(every))}",
-              f"Extensive review (rarely needed): judged {', '.join(sorted(every))}"}
+              f"Extensive review (rarely needed): judged {', '.join(sorted(every))}",
+              f"Review (recommended): judged {', '.join(sorted(every))}"}
     if data["scope"] not in labels:
-        problems.append(f"the report's scope {data['scope']!r} is not a first run or an Extensive review of every part")
+        problems.append(f"the report's scope {data['scope']!r} is not a first run, an Extensive review or a Review "
+                        "of every part")
     if not data["contract_digest"]:
         problems.append("the report names no confirmed contract; a live verification always runs under one")
 
@@ -312,8 +323,9 @@ def check_example(root: Path, forge: dict) -> list[str]:
     problem, run = _refused(lambda: verify.prepare_run(
         decision, files, rules, confirmation, symlinks=symlinks, revision=revision, overrides=overrides,
         kb_version=cli._kb_version(), worker_evidence=approved,
+        scope=set(data["scope_parts"]) if data["scope_parts"] is not None else None,
         scope_label=data["scope"] if data["scope"] in labels else sorted(labels)[0], recorded_drift=drift,
-        cases=cases))
+        cases=cases, forge=_recorded_verifier(data, forge)))
     if problem:
         return problems + [f"forge cannot prepare the run: {problem}"]
     run.worker_violations = list(data["worker_violations"])
@@ -388,7 +400,10 @@ def check_example(root: Path, forge: dict) -> list[str]:
                 problems.append(f"part {part_id}: case {item.case_id} activated through a tool the case does not "
                                 f"permit ({tool})")
             # A case the harness cannot observe, such as any near miss in Codex, says so and stays not-run.
-            unobservable = item.result == "not-run" and item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ())
+            # Not-run because the harness cannot show the outcome, or because Forge runs no case for a skill
+            # shipped in a plugin: neither is a case the run could have passed.
+            unobservable = item.result == "not-run" and (item.reason in forge["runtime"].UNOBSERVABLE.get(harness, ())
+                                                         or item.reason == forge["runtime"].PLUGIN_RUNTIME)
             if by_part[part_id].harness_result == "verified" and item.result != "pass" and not unobservable:
                 problems.append(f"part {part_id}: verified with case {item.case_id} {item.result}; a reference run "
                                 "passes every case its harness can observe")

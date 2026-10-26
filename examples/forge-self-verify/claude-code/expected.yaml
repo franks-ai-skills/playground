@@ -14,3 +14,4 @@ parts:
     harness_result: verified
 repository: harness-forge
 slug: forge-self-verify
+cases: .harness/cases.yaml

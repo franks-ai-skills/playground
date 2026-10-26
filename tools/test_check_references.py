@@ -497,9 +497,20 @@ class CheckReferencesTest(unittest.TestCase):
         self.assertEqual(check_references._case_problems({}, cases)[0],
                          "case explicit names part A1, which the decision neither builds nor reuses locally")
 
-    def test_a_review_report_is_not_a_reference_run(self):
+    def test_a_partial_review_report_is_not_a_reference_run(self):
         self.report(lambda data: data.update(scope_parts=["A1"]))
         self.refused("is a Review")
+
+    def test_a_review_of_every_part_is_a_reference_run(self):
+        """It judged every part, so nothing in it rests on an earlier report."""
+        label = "Review (recommended): judged A1, A2"
+        self.report(lambda data: data.update(scope_parts=["A1", "A2"], scope=label))
+        path = self.root / REPORT
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("- Review scope: First run: judged A1, A2\n", text)
+        path.write_text(text.replace("- Review scope: First run: judged A1, A2\n", f"- Review scope: {label}\n"),
+                        encoding="utf-8")
+        self.assertEqual(self.problems(), [])
 
 
 if __name__ == "__main__":
