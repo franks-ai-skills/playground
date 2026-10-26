@@ -208,7 +208,8 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     failed warning (D `skills.body.no-time-bound-statements`), released
     under the owner's exception. Playground's reference checker accepts
     a Review of every part (ai-stuff `f649442`, `6bfad8f`).
-15. #81: decide first whether that warning is valid, then reword or
-    record why not (a KB issue only if the rule is unclear).
+15. #81: decided valid (request 66), reworded in PR #82 (5e07275); no
+    KB issue. #81 stays open until the next release's self-verification
+    passes the rule for harness-verify.
 
 #18 waits on Codex upstream and on the owner, unchanged.
