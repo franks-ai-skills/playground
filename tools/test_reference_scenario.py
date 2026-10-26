@@ -33,6 +33,10 @@ from harness_forge.contracts import load_decision, split_part, write_decision  #
 from harness_forge.runtime import BASELINE_PROMPT  # noqa: E402
 from tests.builders import decision, part  # noqa: E402
 from tests.test_cli_live import Cli  # noqa: E402
+try:  # where Forge's test CLI writes the agent's files: the run directory since FORGE #83, .scratch before
+    from tests.test_cli_live import SCRATCH  # noqa: E402
+except ImportError:
+    SCRATCH = Path(".scratch")
 from tests.test_adapters import FakeRunner, codex_stream  # noqa: E402
 from tests.test_pipeline import ScriptedRunner, staged_request  # noqa: E402
 from tests.test_runtime import claude_run  # noqa: E402
@@ -296,7 +300,7 @@ class ReferenceScenarioTest(unittest.TestCase):
         (self.root / ".env").write_text("TOKEN=not-for-the-example\n", encoding="utf-8")
         self.assertEqual(reference_runs.collect(self.root, example, harness="claude-code", slug=SLUG, cases=CASES), [])
         self.assertFalse((example / ".env").exists())
-        self.assertFalse((example / ".scratch" / "workers.json").exists(), "the agent's scratch files stay behind")
+        self.assertFalse((example / SCRATCH / "workers.json").exists(), "the agent's scratch files stay behind")
 
     def test_a_result_without_runtime_cases_is_collected_without_them(self):
         """A run that built nothing has no cases file; collected without one, a built part's missing cases show."""

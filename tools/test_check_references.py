@@ -38,11 +38,15 @@ from tests.test_adapters import FakeRunner, codex_stream  # noqa: E402
 from tests.test_pipeline import staged_request  # noqa: E402
 from tests.test_build_skill import DESCRIPTION, NAME, PROCEDURE  # noqa: E402
 from tests.test_cli_live import Cli  # noqa: E402
+try:  # where Forge's test CLI writes the agent's files: the run directory since FORGE #83, .scratch before
+    from tests.test_cli_live import SCRATCH  # noqa: E402
+except ImportError:
+    SCRATCH = Path(".scratch")
 from tests.test_workflow import ResearchRunner, finding  # noqa: E402
 
 REPORT = ".harness/reports/repro.md"
 DECISION = ".harness/decisions/2026-10-12-repro.md"
-CASES = ".scratch/cases.yaml"
+CASES = str(SCRATCH / "cases.yaml")
 
 
 def record_reference(root: Path) -> None:
