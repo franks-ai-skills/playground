@@ -383,6 +383,21 @@ class CheckReferencesTest(unittest.TestCase):
                         encoding="utf-8")
         self.refused("text is not what Forge renders")
 
+    def test_only_the_digest_lines_historical_label_may_differ(self):
+        digest = "a" * 64
+        current = f"# Report\n\n- {'Decision'} digest: {digest}\n- Confirmed configuration digest: {digest}\nend\n"
+        historical = current.replace("- Confirmed configuration digest: ", "- Contract digest: ")
+        self.assertTrue(check_references._rendered_matches(current, current))
+        self.assertTrue(check_references._rendered_matches(current, historical))
+        self.assertTrue(check_references._rendered_matches(historical, historical), "a Forge before the rename")
+        self.assertFalse(check_references._rendered_matches(current, historical.replace(f"digest: {digest}\nend",
+                                                                                        f"digest: {'b' * 64}\nend")),
+                         "the value must stay")
+        self.assertFalse(check_references._rendered_matches(current, historical.replace("end", "end, and great")))
+        self.assertFalse(check_references._rendered_matches(current, current.replace(
+            "- Confirmed configuration digest: ", "- Contract  digest: ")))
+        self.assertFalse(check_references._rendered_matches(historical, current), "only old stored text is accepted")
+
     def test_metadata_linked_from_outside_the_example(self):
         outside = Path(self.scratch.name) / "outside.yaml"
         outside.write_text('secret: "SYNTHETIC_PRIVATE_CANARY\n', encoding="utf-8")

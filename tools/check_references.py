@@ -119,6 +119,24 @@ def _report_data(text: str, documents) -> dict:
     return data
 
 
+# FORGE #85 renamed the report's digest line; a report recorded before keeps the historical label.
+DIGEST_LABEL = "- Confirmed configuration digest: "
+HISTORICAL_DIGEST_LABEL = "- Contract digest: "
+
+
+def _rendered_matches(rendered: str, stored: str) -> bool:
+    """Whether the stored report is Forge's rendering, or that rendering with the digest line's historical label:
+    only that one line's label may differ, never its value or any other byte."""
+    if rendered == stored:
+        return True
+    lines = rendered.split("\n")
+    labelled = [number for number, line in enumerate(lines) if line.startswith(DIGEST_LABEL)]
+    if len(labelled) != 1:
+        return False
+    lines[labelled[0]] = HISTORICAL_DIGEST_LABEL + lines[labelled[0]][len(DIGEST_LABEL):]
+    return "\n".join(lines) == stored
+
+
 def _unobservable(item, part: dict, harness: str, forge: dict) -> bool:
     """Whether a not-run case is one the run could not have passed: the harness cannot show its outcome, or
     the part's skill ships in a plugin, for which Forge runs no runtime case."""
@@ -369,7 +387,7 @@ def check_example(root: Path, forge: dict) -> list[str]:
     changed = _differences(data, replayed)
     if changed:
         problems.append(f"the report differs from Forge's replay of this repository: {', '.join(changed)}")
-    elif forge["report"].render_report(run, results) != report_text:
+    elif not _rendered_matches(forge["report"].render_report(run, results), report_text):
         problems.append("the report's text is not what Forge renders for its data")
 
     for result in results:
