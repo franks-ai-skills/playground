@@ -165,25 +165,42 @@ and disagreements.
   fallback; a standard-library check of Python and the bundle comes
   first. Reporting the fastjsonschema reference bug upstream is
   postponed by the owner and out of scope.
-- Owner rule, 2026-10-25 (overrides the release-per-change practice
-  of the work order below): solve all fixable open issues before
-  creating new releases, in the KB and in Forge. An interim release is
-  allowed only for a good reason that Claude states and Codex agrees
-  with. Example: Forge pins only released KB versions, so a Forge fix
-  that needs a KB change can justify a KB release; batching several KB
-  changes into one release is better where the order allows it. Codex
-  argues against an interim release whose reason does not hold. KB
-  v0.4.0 (for #56) and v0.5.0 (for #51) were released before this
-  rule; the owner keeps both.
+- Owner rule, 2026-10-26 (replaces 2026-10-25): no new Forge releases
+  for now. KB releases only when needed, after every other open issue
+  has been considered for fixing first. An interim KB release needs a
+  good reason Claude states and Codex agrees with. Example: Forge pins
+  only released KB versions, so a Forge fix that needs a KB change can
+  justify a KB release; batch compatible KB changes where the order
+  allows it. KB v0.4.0 and v0.5.0 remain as released. In this closing
+  session, document agreed remaining work in issues and playground
+  only; do not implement it.
+- Request 68 (2026-10-26, closing session of run 030d), dropped
+  without an issue:
+  - C3: retain judged applicability and user confirmation for
+    error-rule exclusions. No separate skills/security rule explicitly
+    cross-checks the files' actual external effects against the
+    confirmed answers. Fact-only applicability would remove that
+    independent check. Accept the additional confirmation and possible
+    review session; do not force a pass merely to avoid confirmation.
+    No KB or Forge issue.
+  - C5: Review and Extensive review covered A-D with 164 judged rules
+    and no kept results in both 030d scope calls. Retain the existing
+    question; no special case or issue.
+  - C6: verification status belongs to the bound report and command
+    result; verify does not update decision-record status. The 030d
+    parts remain `decided` as local reuse. Report their verification
+    result from the recorded report, not from decision status. No
+    issue.
 
 ## Current work order
 
 Agreed with Codex (session 01a16a9b, request 15, reordered in request
 30); change it only by agreement. Each item: its own plan agreed with
 Codex, its own PR, the full suite, Codex review of the pushed head,
-merge. Intermediate Forge PRs stay unreleased; the stored
-self-verification example is stale until the final release PR records
-it again.
+merge. Forge changes stay unreleased. The stored self-verification
+remains historical evidence and is stale against changed bound inputs
+until a separately agreed verification is recorded again; that
+recording need not accompany a release.
 
 Done: #44 (PR #59), #45 (PR #60), #57 (PR #61), #56 + #46 (PR #62, KB
 v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
@@ -207,9 +224,29 @@ v0.4.0), #51 (PR #63, KB v0.5.0), #47 (PR #64).
     run `self-verify-fe9154a-verify-2026-10-26` verifies A-D with one
     failed warning (D `skills.body.no-time-bound-statements`), released
     under the owner's exception. Playground's reference checker accepts
-    a Review of every part (ai-stuff `f649442`, `6bfad8f`).
+    a Review of every part (ai-stuff `f649442`, `6bfad8f`). The 0.3.0
+    self-verification session ran in Claude Code only. All plugin
+    runtime cases were not-run; this supplies no Codex live-behavior
+    evidence. A Codex run needs a separately agreed purpose and live
+    usage budget.
 15. #81: decided valid (request 66), reworded in PR #82 (5e07275); no
-    KB issue. #81 stays open until the next release's self-verification
-    passes the rule for harness-verify.
+    KB issue. Closing condition per request 68 (comment on #81): the
+    remaining plugin-runtime wording cleanup is merged and the next
+    recorded self-verification, release or not, records a fresh `pass`
+    for `skills.body.no-time-bound-statements` on harness-verify.
 
-#18 waits on Codex upstream and on the owner, unchanged.
+Remaining work order (request 68, 2026-10-26). Each implementation task
+needs its own agreed plan, checks and review:
+
+1. #83: fix the run-input location guidance.
+2. #81: complete the remaining plugin-runtime wording cleanup and the
+   coordinated playground reference-checker update.
+3. After those offline changes, separately agree whether and when to
+   record a self-verification, with its purpose and usage estimate.
+   Keep #81 open until its agreed closing condition is met. No Forge
+   release is required.
+
+#18 remains parked on Codex upstream and the owner, unchanged. No Codex
+live run is scheduled. No new KB issue or release follows from request
+68. Contract rework still awaits the owner's explanation; the
+fastjsonschema upstream report remains postponed.
