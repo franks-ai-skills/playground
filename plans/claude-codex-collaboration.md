@@ -300,7 +300,18 @@ only requirement acceptance. Reassess #105 against #101 when planning.
 The Codex verification of prompt-me waits until after the owner's next
 test run.
 
-Remaining: #99 to #108, not started (owner: issues only). The owner rule of 2026-10-26 (no new
+Done on 2026-10-27 (requests 101 to 103): prompt-me PR #12 was merged as
+`c1f8f0a`, closing prompt-me #1, #5, #6, #8 and #11. A read-only review
+of prompt-me at `c1f8f0a` filed Forge #109 ("Where the skills load"
+always plural; filing only, implementation waits for the owner like
+#99 to #108) and prompt-me #13 (`gh … --comments` drops title and body)
+and #14 (disclose the shell access the draft needs), and commented on
+prompt-me #10, #4, #2, #3, #7 and #9 (the regeneration record; closing
+#9 is the owner's). prompt-me #2, #3, #4, #7, #9, #10, #13 and #14 stay
+outside this work order: a later prompt-me regeneration through Forge
+takes #13, #14 and the #10 sentence, after the owner's next test run.
+
+Remaining: #99 to #109, not started (owner: issues only). The owner rule of 2026-10-26 (no new
 Forge releases without the owner) applies again after 0.4.0. #18 remains
 parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
