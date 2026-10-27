@@ -327,10 +327,39 @@ assertions, #113 Claude Code behavior cases with a sandboxed shell
 environment-needs issue (prompt-me #14 fixed locally) and a rule for
 terminal-dependent CLI output (#13 fixed locally). No KB issue.
 
-Remaining: #99 to #109, then #110, #111, #112, #113, not started
-(owner: issues only). Planning notes: #110 handles existing case files
-and report compatibility for its new field; #111 to #113 state in each
-report what the evidence establishes. The owner rule of 2026-10-26 (no new
+Owner, 2026-10-27 (f2 session bc949ad9): the hold is lifted. Fix all
+open Forge issues (and KB issues, if any) autonomously, merges included,
+with this workflow and both agents' agreement on every topic. Issues
+either agent finds are discussed, filed on agreement and fixed too. Only
+once all open issues are fixed as far as possible may both agree on a
+new Forge release, and on KB releases if needed. The owner's next test
+run, with the Codex verification of prompt-me, comes after this session.
+
+Current work order (request 107), each item with its own agreed plan,
+PR, full suite, self-review, Codex review of the pushed head and merge:
+
+1. #104 + #109 (one PR, one commit each).
+2. #101 + #105 (reassess #105 against the final #101 behavior).
+3. #99 summary hard limits.
+4. #100 requirement-acceptance binding.
+5. #106 verification attempt identity.
+6. #102 scope without a question.
+7. #107 keep file judgments when only cases change.
+8. #108 report changed verdicts on unchanged inputs.
+9. #103 per-harness runtime evidence.
+10. #110 case-authoring guidance and the checked-requirement field
+    (handles existing case files and report compatibility).
+11. #111 git-history and symbolic-link fixtures.
+12. #112 section-placement, file-tool path and recorded-output
+    assertions.
+13. #113 Claude Code behavior cases with a sandboxed shell.
+14. Release 0.5.0: a separate decision after 1-13 are merged, with its
+    live-run purpose and budget agreed then.
+
+#111 to #113 state in each report what the evidence establishes. #18
+stays parked (codex-cli 0.164.0; a help-text check alone does not meet
+its condition). No KB work is planned up front; revisit if an agreed
+fix needs it. The owner rule of 2026-10-26 (no new
 Forge releases without the owner) applies again after 0.4.0. #18 remains
 parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
