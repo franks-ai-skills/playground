@@ -306,9 +306,12 @@ of prompt-me at `c1f8f0a` filed Forge #109 ("Where the skills load"
 always plural; filing only, implementation waits for the owner like
 #99 to #108) and prompt-me #13 (`gh … --comments` drops title and body)
 and #14 (disclose the shell access the draft needs), and commented on
-prompt-me #10, #4, #2, #3, #7 and #9 (the regeneration record; closing
-#9 is the owner's). prompt-me #2, #3, #4, #7, #9, #10, #13 and #14 stay
-outside this work order: a later prompt-me regeneration through Forge
+prompt-me #10, #4, #2, #3, #7 and #9 (the regeneration record). The
+owner had #9 closed as completed on 2026-10-27, with a closing comment
+naming the unrun Codex cases as tracked in prompt-me #4 and Forge #103
+(posted without Codex agreement, by the owner's waiver for that action
+only). prompt-me #2, #3, #4, #7, #10, #13 and #14 stay outside this
+work order: a later prompt-me regeneration through Forge
 takes #13, #14 and the #10 sentence, after the owner's next test run.
 
 Remaining: #99 to #109, not started (owner: issues only). The owner rule of 2026-10-26 (no new
