@@ -314,7 +314,23 @@ only). prompt-me #2, #3, #4, #7, #10, #13 and #14 stay outside this
 work order: a later prompt-me regeneration through Forge
 takes #13, #14 and the #10 sentence, after the owner's next test run.
 
-Remaining: #99 to #109, not started (owner: issues only). The owner rule of 2026-10-26 (no new
+Done on 2026-10-27 (requests 104 to 106, f2 session bc949ad9): the
+owner asked that Forge and KB issues cover every prompt-me issue with a
+sufficient fix. The runner limits deferred in prompt-me #4 got Forge
+issues, reversing requests 88/89: #110 behavior cases may demand no more
+than their requirement and name it, #111 git history and symbolic-link
+fixtures, #112 section-placement, file-tool path and recorded-output
+assertions, #113 Claude Code behavior cases with a sandboxed shell
+(not run when the sandbox cannot enforce the boundary). prompt-me #7's
+"Done when" now names only observable evidence; comments on prompt-me
+#2, #3, #4, #7 link the new issues. Not filed: a general
+environment-needs issue (prompt-me #14 fixed locally) and a rule for
+terminal-dependent CLI output (#13 fixed locally). No KB issue.
+
+Remaining: #99 to #109, then #110, #111, #112, #113, not started
+(owner: issues only). Planning notes: #110 handles existing case files
+and report compatibility for its new field; #111 to #113 state in each
+report what the evidence establishes. The owner rule of 2026-10-26 (no new
 Forge releases without the owner) applies again after 0.4.0. #18 remains
 parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
