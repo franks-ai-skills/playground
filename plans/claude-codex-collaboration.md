@@ -291,6 +291,12 @@ repeated `--replace`, #106 distinct verification attempt identities,
 #107 keep file judgments when only cases change, #108 report changed
 judgments on unchanged inputs. Filing order only; implementation waits
 for the owner and a later agreed plan.
+Owner rulings (request 100): #102 now removes the scope question
+entirely; #101 replaces built files without asking (matching the
+recorded build or the committed version, otherwise a stop); #100 covers
+only requirement acceptance. Reassess #105 against #101 when planning.
+The Codex verification of prompt-me waits until after the owner's next
+test run.
 
 Remaining: #99 to #108, not started (owner: issues only). The owner rule of 2026-10-26 (no new
 Forge releases without the owner) applies again after 0.4.0. #18 remains
