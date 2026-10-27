@@ -278,7 +278,21 @@ head:
   GitHub release; still pinned to KB v0.6.0. Release live total: 13 of
   the agreed 14 sessions. #93, #95, #96 closed.
 
-Remaining: none in the work order. The owner rule of 2026-10-26 (no new
+Done on 2026-10-27 (request 99): the owner's prompt-me test of Forge
+0.4.0 (profile f2, session 3ca4b6ec) was reviewed. The owner set a hard
+limit for every confirmation summary: 27 lines, 265 words and 1,575
+characters, the last line linking the details file; it overrides the
+#84/#85 rule of listing every requirement in full. Filed, in this
+order: #99 summary limits, #100 binding acceptance and replacement to
+what was shown, #101 no replace question for unchanged Forge output,
+#102 scope question only when options differ, #103 per-harness evidence
+in the report, #104 `select` alternatives vs decision schema, #105
+repeated `--replace`, #106 distinct verification attempt identities,
+#107 keep file judgments when only cases change, #108 report changed
+judgments on unchanged inputs. Filing order only; implementation waits
+for the owner and a later agreed plan.
+
+Remaining: #99 to #108, not started (owner: issues only). The owner rule of 2026-10-26 (no new
 Forge releases without the owner) applies again after 0.4.0. #18 remains
 parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
