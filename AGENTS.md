@@ -48,9 +48,12 @@ handling every edge case. Skills, plugins, hooks and MCP servers make
 the environment non-deterministic: aim for determinism, but stop when
 further work yields little.
 
-**Roles.** Claude implements. Codex (`gpt-6.1-sol`, through
-`codex exec -s read-only`) plans with Claude and reviews; it changes no
-files. Every Codex call starts with
+**Roles.** Claude implements. Codex plans with Claude and reviews; it
+changes no files. From 2026-10-27 until the owner says otherwise, Codex
+is `gpt-6.1-terra` on high reasoning effort, and every call names both
+explicitly instead of relying on `~/.codex/config.toml`:
+`codex exec -m gpt-6.1-terra -c model_reasoning_effort="high" -s read-only`.
+Earlier calls used `gpt-6.1-sol`. Every Codex call starts with
 [the Codex brief](plans/claude-codex-collaboration.md): Codex cannot
 read Claude's memory, so the brief carries these rules, the project
 constraints, the decisions taken so far and the current work order.
