@@ -261,14 +261,26 @@ of the pushed head:
    closed. The playground replay of `forge-self-verify` passes again.
    Confirmations were agent-played development evidence.
 
-Owner request, 2026-10-26 (requests 86/87): Forge offers to add its own
-license, AGPL-3.0-only, with "Yes, please" / "No, thanks", exactly and
-deterministically: FORGE #91 (agreed text). It is the sole active work
-item; implementation needs its own agreed plan, PR, full suite and
-review; Forge-only, no KB change, no release.
+Done on 2026-10-26/27 (session e89159e4, requests 86–97), each with its
+agreed plan or issue text, full suite and Codex review of the pushed
+head:
 
-Remaining otherwise: none in the work order. #18 remains parked on Codex upstream
-and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
+- prompt-me #1, #4, #5 and #9 adjusted to what Forge can address
+  (requests 88–90): procedure fixes, accepted requirements and static
+  verification with explicit runtime gaps; deferred runtime scenarios and
+  runner limits in #4. #2, #3, #7 reported to the owner, unchanged.
+- #91 (PR #92): Forge offers its own license, AGPL-3.0-only, with "Yes,
+  please" / "No, thanks"; the `license` command adds it byte for byte.
+- Owner, 2026-10-26: release once all issues except #18 are fixed.
+  Release self-verification found #93 (run 032; PR #94) and #95, #96
+  (run 033; PR #97). Run 034 verified A–D with no failed or unresolved
+  rule. Forge 0.4.0 released: PR #98, merge `0c731c3`, tag `v0.4.0`,
+  GitHub release; still pinned to KB v0.6.0. Release live total: 13 of
+  the agreed 14 sessions. #93, #95, #96 closed.
+
+Remaining: none in the work order. The owner rule of 2026-10-26 (no new
+Forge releases without the owner) applies again after 0.4.0. #18 remains
+parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
 or Forge release follows (owner rule). No Codex live run is scheduled.
 The fastjsonschema upstream report remains postponed; remind the owner
 of it after this implementation session.
