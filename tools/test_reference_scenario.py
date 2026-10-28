@@ -234,7 +234,7 @@ class Scenario:
                        *extra, code=code)
 
     def verify(self, run_id, *extra, code=0, refresh=None):
-        """An Extensive review unless ``refresh`` gives the scope choice for the run's relay."""
+        """Forge chooses the scope (FORGE #102) unless ``extra`` names one; ``refresh`` adds options for the relay."""
         revision = self.root / REVISION
         cases = self.root / CASES
         if not cases.exists():
@@ -246,15 +246,12 @@ class Scenario:
                        code=code)
 
     def review_choice(self, relay, fixed):
-        """The scope question's Review option, as the user would choose it."""
-        options = self.ok("scope", "--harness", "claude-code", "--decision", self.decision, "--root", self.root,
+        """The Review Forge chooses for a fix, as its scope preview shows it before verify runs it."""
+        preview = self.ok("scope", "--harness", "claude-code", "--decision", self.decision, "--root", self.root,
                           "--revision", self.root / REVISION, "--evidence", self.workers, "--relay", relay,
-                          "--slug", SLUG, "--fixed", fixed, "--cases", self.root / CASES)["options"]
-        review = options[0]  # the Review option comes first, the Extensive review after it
-        self.reviewed_parts = review["parts"]
-        chosen = self.cli.write("scope.json", {"choice": "review", "displayed_digest": review["digest"],
-                                               "run_id": json.loads(Path(relay).read_text())["run_id"]})
-        return ["--scope", "review", "--fixed", fixed, "--scope-relay", chosen]
+                          "--slug", SLUG, "--fixed", fixed, "--cases", self.root / CASES)["scope"]
+        self.reviewed_parts = [item["part_id"] for item in preview["judged"]]
+        return ["--fixed", fixed]
 
 
 class ReferenceScenarioTest(unittest.TestCase):
@@ -294,7 +291,7 @@ class ReferenceScenarioTest(unittest.TestCase):
         self.assertLess(len(scenario.reviewed_parts), len(PARTS), "a Review keeps the parts the fix cannot affect")
 
         # The closing Extensive review judges every part again; the reference checker replays it.
-        closing = scenario.verify("verify-4")
+        closing = scenario.verify("verify-4", "--scope", "extensive")
         self.assertEqual((results(closing), closing["kept_parts"]), (EXPECTED, []))
         example = Path(self.directory.name) / "example"
         (self.root / ".env").write_text("TOKEN=not-for-the-example\n", encoding="utf-8")

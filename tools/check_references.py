@@ -43,7 +43,9 @@ own skills, with the expectations stored in playground.
 
 A Review report, which keeps earlier results the repository no longer
 holds, is refused: record a reference run as a first run or an Extensive
-review. Exit 0 when every example passes, 1 with each problem listed, 2
+review. Forge 0.5.0 chooses the scope itself and names why it judged
+every part ("Every part judged (<why>): <every part>"); such a report is
+a reference run too. Exit 0 when every example passes, 1 with each problem listed, 2
 without any example.
 """
 
@@ -331,6 +333,9 @@ def check_example(root: Path, forge: dict) -> list[str]:
     labels = {f"First run: judged {', '.join(sorted(every))}",
               f"Extensive review (rarely needed): judged {', '.join(sorted(every))}",
               f"Review (recommended): judged {', '.join(sorted(every))}"}
+    # Forge 0.5.0 chooses the scope itself (FORGE #102) and names why it judged every part.
+    if re.fullmatch(r"Every part judged \([^()]+\): " + re.escape(", ".join(sorted(every))), data["scope"]):
+        labels.add(data["scope"])
     if data["scope"] not in labels:
         problems.append(f"the report's scope {data['scope']!r} is not a first run, an Extensive review or a Review "
                         "of every part")
@@ -362,6 +367,8 @@ def check_example(root: Path, forge: dict) -> list[str]:
     if problem:
         return problems + [f"forge cannot prepare the run: {problem}"]
     run.worker_violations = list(data["worker_violations"])
+    # Only the live run knows its attempt (FORGE #106); reports from before it have none.
+    run.attempt_id = data.get("attempt_id")
     problem, review = _refused(verify.validate_review, run, _review(data, verify, run))
     if problem:
         return problems + [f"the report's verdicts are not ones the reviewer could return: {problem}"]
@@ -383,6 +390,9 @@ def check_example(root: Path, forge: dict) -> list[str]:
         cited=verify.selection_citations(decision, selection_rules)))
     if problem:
         return problems + [f"forge refuses the report's runtime results: {problem}"]
+    # Runtime evidence per target harness (FORGE #103), from the cases and the replayed results.
+    if hasattr(forge["report"], "runtime_evidence"):
+        run.runtime_evidence = forge["report"].runtime_evidence(run, cases, harness)
     replayed = forge["report"].report_data(run, results)
     changed = _differences(data, replayed)
     if changed:

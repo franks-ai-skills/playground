@@ -540,13 +540,29 @@ class CheckReferencesTest(unittest.TestCase):
     def test_a_review_of_every_part_is_a_reference_run(self):
         """It judged every part, so nothing in it rests on an earlier report."""
         label = "Review (recommended): judged A1, A2"
-        self.report(lambda data: data.update(scope_parts=["A1", "A2"], scope=label))
+        self.scope_label(label, scope_parts=["A1", "A2"])
+        self.assertEqual(self.problems(), [])
+
+    def test_forge_0_5_0_names_why_it_judged_every_part(self):
+        """FORGE #102: Forge chooses the scope; a label that judged every part is a reference run, a subset not."""
+        recorded = self.recorded_scope()
+        self.assertTrue(recorded.startswith("Every part judged (") and recorded.endswith("): A1, A2"), recorded)
+        self.scope_label("Every part judged (no report was recorded): A1, A2")
+        self.assertEqual(self.problems(), [])
+        self.scope_label("Every part judged (no report was recorded): A1")
+        self.refused("is not a first run, an Extensive review or a Review of every part")
+
+    def recorded_scope(self) -> str:
+        text = (self.root / REPORT).read_text(encoding="utf-8")
+        return re.search(r"^- Review scope: (.*)$", text, re.M).group(1)
+
+    def scope_label(self, label, **changes):
+        """The report's scope, in its data and in its text, as a report with that scope would hold it."""
+        current = self.recorded_scope()
+        self.report(lambda data: data.update(scope=label, **changes))
         path = self.root / REPORT
         text = path.read_text(encoding="utf-8")
-        self.assertIn("- Review scope: First run: judged A1, A2\n", text)
-        path.write_text(text.replace("- Review scope: First run: judged A1, A2\n", f"- Review scope: {label}\n"),
-                        encoding="utf-8")
-        self.assertEqual(self.problems(), [])
+        path.write_text(text.replace(f"- Review scope: {current}\n", f"- Review scope: {label}\n"), encoding="utf-8")
 
 
 class UnobservableCaseTest(unittest.TestCase):
