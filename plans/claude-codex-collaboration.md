@@ -370,3 +370,23 @@ Forge release happens without the owner; after that release the
 2026-10-26 rule applies again.
 The fastjsonschema upstream report remains postponed; remind the owner
 of it after this implementation session.
+
+Done on 2026-10-28 (requests 108 to 153, f2 session bc949ad9): items
+1-14 of the work order above. Forge PRs #114 to #126 closed #99 to
+#113. Release self-verification found #127 (run 035: the accepted
+overwrite requirement predated #101; PR #128, which also says in
+harness-verify's contract that only a built skill needs an observed
+activation) and #129 (run 036: report cells did not contain embedded
+text; PR #130). Run 037 ran at the release head with the owner's
+approval (Codex had required it after run 036's new failure). It
+verified A-D with no failed, errored or unresolved rule. Forge 0.5.0 was
+released: PR #131, merge `fae951e`, tag `v0.5.0`, GitHub release; still
+pinned to KB v0.6.0. Release live total: 11 sessions of the ceiling of
+12. Playground `800c135` lets `check_references.py` replay 0.5.0
+reports. #18 was rechecked at codex-cli 0.165.0 with one agreed probe:
+unchanged, comment posted; it stays parked. No open KB issue, and no KB
+release was needed. The one release the 2026-10-27 ruling allowed is
+used: the 2026-10-26 rule (no Forge release without the owner) applies
+again. Next: the owner's prompt-me test run of 0.5.0, then the Codex
+verification of prompt-me. Remind the owner of the fastjsonschema
+upstream report.
