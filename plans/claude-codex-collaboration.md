@@ -167,7 +167,8 @@ and disagreements.
   fallback; a standard-library check of Python and the bundle comes
   first. Reporting the fastjsonschema reference bug upstream is
   postponed by the owner and out of scope.
-- Owner rule, 2026-10-26 (replaces 2026-10-25): no new Forge releases
+- Owner rule, 2026-10-26 (replaces 2026-10-25; superseded for the next
+  release by the owner's ruling of 2026-10-27 in the work order below): no new Forge releases
   for now. KB releases only when needed, after every other open issue
   has been considered for fixing first. An interim KB release needs a
   good reason Claude states and Codex agrees with. Example: Forge pins
@@ -359,9 +360,13 @@ PR, full suite, self-review, Codex review of the pushed head and merge:
 #111 to #113 state in each report what the evidence establishes. #18
 stays parked (codex-cli 0.164.0; a help-text check alone does not meet
 its condition). No KB work is planned up front; revisit if an agreed
-fix needs it. The owner rule of 2026-10-26 (no new
-Forge releases without the owner) applies again after 0.4.0. #18 remains
-parked on Codex upstream and the owner, unchanged (codex-cli 0.164.0). No open KB issue; no KB
-or Forge release follows (owner rule). No Codex live run is scheduled.
+fix needs it. #18 remains parked on Codex upstream and the owner,
+unchanged (codex-cli 0.164.0). No open KB issue. Release authority: the
+owner's ruling of 2026-10-27 (f2 session bc949ad9, quoted above: "only
+when all open issues are fixed (as far as possible) you both may agree on
+creating a new release for harness-forge"; KB releases likewise when
+needed) supersedes, for this next release, the 2026-10-26 rule that no
+Forge release happens without the owner; after that release the
+2026-10-26 rule applies again.
 The fastjsonschema upstream report remains postponed; remind the owner
 of it after this implementation session.
