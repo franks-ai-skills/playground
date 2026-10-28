@@ -368,8 +368,8 @@ creating a new release for harness-forge"; KB releases likewise when
 needed) supersedes, for this next release, the 2026-10-26 rule that no
 Forge release happens without the owner; after that release the
 2026-10-26 rule applies again.
-The fastjsonschema upstream report remains postponed; remind the owner
-of it after this implementation session.
+The owner is handling the fastjsonschema upstream report (2026-10-28);
+no reminder is needed.
 
 Done on 2026-10-28 (requests 108 to 153, f2 session bc949ad9): items
 1-14 of the work order above. Forge PRs #114 to #126 closed #99 to
@@ -388,5 +388,4 @@ unchanged, comment posted; it stays parked. No open KB issue, and no KB
 release was needed. The one release the 2026-10-27 ruling allowed is
 used: the 2026-10-26 rule (no Forge release without the owner) applies
 again. Next: the owner's prompt-me test run of 0.5.0, then the Codex
-verification of prompt-me. Remind the owner of the fastjsonschema
-upstream report.
+verification of prompt-me.
