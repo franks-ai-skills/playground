@@ -436,3 +436,17 @@ every Codex verification, for explicit and behavior cases of
 user-invoked skills, with #18 as the tracking issue and the report
 saying which results rest on it. #135's body was rewritten to match,
 and a comment on #18 records the ruling.
+
+Done on 2026-10-29 (requests 158 to 172, owner: "go ahead for the next
+implementation session"): #132 and #134 (PR #138, merge `b934fef`), #133
+(PR #139, `b1214f8`), #135 (PR #140, `4b91d47`), #136 (PR #141,
+`0c12674`) and #137 (PR #142, `467b3e1`) are fixed and closed, each with
+an agreed plan, full suite, Codex review of the pushed head and a merge
+commit. Rebasing a pushed branch needs a force push, which this setup
+forbids, so each later branch merged main in instead (only the
+changelog conflicted). Open: Forge #18 only, the rollout observer's
+tracking issue, which #140 now uses by default for Codex cases of
+user-invoked skills. KB: no open issue. Playground tool tests: 43 OK
+against `467b3e1`. Not done, needs the owner: a 0.5.1 release (with its
+own self-verification run and budget) and the prompt-me rebuild on
+`fix/forge-0.5.0-regeneration` with Claude Code and Codex verification.
