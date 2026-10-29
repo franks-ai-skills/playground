@@ -462,3 +462,18 @@ rebuild on `fix/forge-0.5.0-regeneration` with 0.5.1, in Claude Code and
 Codex; installing 0.5.1 changes the plugin registry of the f2 profile
 and Codex's marketplace ref, so its exact steps go to the owner first
 (Codex's condition in 173).
+
+Done on 2026-10-29 (request 175): the owner's prompt-me rebuild with
+Forge 0.5.1. Claude Code: part A verified (`e8d1344`). Codex (`674e7d7`):
+not verified; explicit case and three behavior cases passed through the
+rollout observer (#135 works); two behavior cases failed: git could not
+run in Forge's Codex case sandbox on macOS (xcrun cache in `$TMPDIR` and
+the user's `.gitconfig` both blocked), and prompt-me's `.env` pattern
+matched a here-document that wrote the draft. Filed, filing only: Forge
+#144 (git in a Codex behavior case on macOS), #145 (how command
+patterns match), #146 (built requirements layout vs the judged
+load-conditions warning), prompt-me #15 (the two case defects). Work
+order: #144, #145, #146, then prompt-me #15 and a Codex re-verification;
+#18 stays parked. Each needs its own agreed plan; a 0.5.2 release needs
+the owner. The Codex verification did not pass; the Claude Code report
+stays evidence for its own run.
