@@ -450,3 +450,15 @@ user-invoked skills. KB: no open issue. Playground tool tests: 43 OK
 against `467b3e1`. Not done, needs the owner: a 0.5.1 release (with its
 own self-verification run and budget) and the prompt-me rebuild on
 `fix/forge-0.5.0-regeneration` with Claude Code and Codex verification.
+
+Done on 2026-10-29 (request 173 to 174, owner: "go ahead"): Forge 0.5.1
+released with the owner's authorization: PR #143, merge `68470fa`, tag
+`v0.5.1`, GitHub release "0.5.1 (2026-10-29)"; still pinned to KB
+v0.6.0. Release self-verification run 038 (Claude Code 2.1.312, 5
+sessions, the agreed cap): A-D verified after the known
+side-effects-user-invoked confirmation. The 2026-10-26 rule (no Forge
+release without the owner) still applies. Next: the owner's prompt-me
+rebuild on `fix/forge-0.5.0-regeneration` with 0.5.1, in Claude Code and
+Codex; installing 0.5.1 changes the plugin registry of the f2 profile
+and Codex's marketplace ref, so its exact steps go to the owner first
+(Codex's condition in 173).
