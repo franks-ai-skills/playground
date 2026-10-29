@@ -406,3 +406,21 @@ result-dependent sentence needs a new verification). Next: the owner's
 Codex verification of prompt-me in the same clone and branch (two
 activation and five behavior cases for Codex); its report replaces the
 file, and the Claude Code results stay in `ba6c24e`.
+
+Done on 2026-10-29 (request 156): the owner's Codex verification of
+prompt-me (codex-tui 0.165.0, session 01a18705, report `1e7be82` on the
+unpushed branch) ended not verified. Presentation was fine in Codex.
+Filed, filing only: #135 Codex does not reliably expose activation of
+a user-invoked skill (explicit case not run, 4 of 5 behavior cases
+unavailable; the owner's 2026-10-21 rollout ruling stands unless the
+owner changes it), #136 no help finding a supported Python when
+`python3` is too old, #137 a sandbox-blocked verification fails before
+the agent can prepare for it (and widens the retry's scope). A comment
+on #132 records that Codex presented correctly. No prompt-me issue:
+the three judged error failures (early-preflight, write-preflight,
+untrusted-block) are fixed by rebuilding part A on the branch, and the
+two warnings get reassessed then. Filing-only work order: #132, #133,
+#134, #135, #136, #137; #18 stays parked. Implementation needs the
+owner's authorization and an agreed plan per issue; a 0.5.1 release
+needs the owner. Keep both prompt-me reports (Claude Code `ba6c24e`,
+Codex `1e7be82`) as separate evidence.
