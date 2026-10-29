@@ -412,8 +412,7 @@ prompt-me (codex-tui 0.165.0, session 01a18705, report `1e7be82` on the
 unpushed branch) ended not verified. Presentation was fine in Codex.
 Filed, filing only: #135 Codex does not reliably expose activation of
 a user-invoked skill (explicit case not run, 4 of 5 behavior cases
-unavailable; the owner's 2026-10-21 rollout ruling stands unless the
-owner changes it), #136 no help finding a supported Python when
+unavailable), #136 no help finding a supported Python when
 `python3` is too old, #137 a sandbox-blocked verification fails before
 the agent can prepare for it (and widens the retry's scope). A comment
 on #132 records that Codex presented correctly. No prompt-me issue:
@@ -424,3 +423,16 @@ two warnings get reassessed then. Filing-only work order: #132, #133,
 owner's authorization and an agreed plan per issue; a 0.5.1 release
 needs the owner. Keep both prompt-me reports (Claude Code `ba6c24e`,
 Codex `1e7be82`) as separate evidence.
+
+Owner, 2026-10-29, two clarifications (request 157). (1) Forge never
+installs or updates the user's environment; stopping on a too-old Python
+is expected, and the accidental stop is not to become a test case. #136
+stays "find only": it gains a first "Done when" item that Forge never
+installs, downloads or updates Python, dependencies or other tools to
+resolve the problem. (2) "Temporary" for the Codex rollout observer
+(2026-10-21) means it may stay and be used as long as an open issue
+tracks it as a workaround; the owner chose that it is on by default in
+every Codex verification, for explicit and behavior cases of
+user-invoked skills, with #18 as the tracking issue and the report
+saying which results rest on it. #135's body was rewritten to match,
+and a comment on #18 records the ruling.
