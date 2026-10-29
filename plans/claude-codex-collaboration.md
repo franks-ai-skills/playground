@@ -389,3 +389,20 @@ release was needed. The one release the 2026-10-27 ruling allowed is
 used: the 2026-10-26 rule (no Forge release without the owner) applies
 again. Next: the owner's prompt-me test run of 0.5.0, then the Codex
 verification of prompt-me.
+
+Done on 2026-10-29 (request 155): the owner's prompt-me test of Forge
+0.5.0 (Claude Code, f2 session 1f5f7491, clone `prompt-me-forge-050`,
+branch `fix/forge-0.5.0-regeneration`, `5d56d01`..`ba6c24e`, unpushed)
+was reviewed. Forge returned correct summaries; the agent moved them
+into question previews, dropped or rewrote the details links, replaced
+one summary, and recorded three requirements and a goal as accepted
+without showing their text. Filed, filing only (owner: "don't fix just
+file issues"): #132 summaries in previews and the details link, #133
+acceptance without the text shown, #134 summaries that do not explain
+what is confirmed. Work order for these, implementation not yet
+planned or authorized: #132, #133, #134; #18 stays parked. No issue
+for the README re-verification (the README is a bound input; a
+result-dependent sentence needs a new verification). Next: the owner's
+Codex verification of prompt-me in the same clone and branch (two
+activation and five behavior cases for Codex); its report replaces the
+file, and the Claude Code results stay in `ba6c24e`.
