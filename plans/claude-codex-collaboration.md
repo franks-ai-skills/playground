@@ -477,3 +477,25 @@ order: #144, #145, #146, then prompt-me #15 and a Codex re-verification;
 #18 stays parked. Each needs its own agreed plan; a 0.5.2 release needs
 the owner. The Codex verification did not pass; the Claude Code report
 stays evidence for its own run.
+
+Done on 2026-10-29 to 2026-10-31 (requests 176 to 196; owner: fix the
+filed issues with Codex in the loop, then a release is allowed): #144
+(PR #147, merge `32d454a`), #145 (PR #148, `4dfaf25`), #146 (PR #149,
+`41d1aeb`), and #150 and #151 (PR #152, `4966eda`) are fixed and closed.
+#150 and #151 came from release self-verification run 039, which stopped
+on them. prompt-me #15's case edits are committed on the owner's branch,
+not pushed. Forge 0.5.2 released: PR #153, merge `a4fc8e7`, tag
+`v0.5.2`, GitHub release "0.5.2 (2026-10-30)"; still pinned to KB
+v0.6.0. Release self-verification run 040 (Claude Code 2.1.314, 3
+sessions of the owner's cap of 5): A-D verified in turn 2, no rule
+failed or unresolved, side-effects-user-invoked passed without a further
+turn. f2 hit its weekly limit (resets 2026-11-03) right after the
+verification was recorded, so the work moved to the claude-f1 profile
+(owner, 2026-10-30), which now matches f2; live runs use f1. The owner
+granted the merge on 2026-10-31 once both agents agreed. 0.5.2 is
+installed in the f1 and f2 Claude Code profiles and Codex's marketplace
+ref is v0.5.2, each checked against the tag. Open: Forge #18 only (the
+rollout observer's tracking issue); KB: no open issue. The 2026-10-26
+rule (no Forge release without the owner) applies again. Next: the
+owner's test run, including prompt-me #15 and its Codex
+re-verification.
