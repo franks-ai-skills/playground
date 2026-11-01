@@ -499,3 +499,19 @@ rollout observer's tracking issue); KB: no open issue. The 2026-10-26
 rule (no Forge release without the owner) applies again. Next: the
 owner's test run, including prompt-me #15 and its Codex
 re-verification.
+
+Done on 2026-11-01 (request 197): the owner's prompt-me test with Forge
+0.5.2 on `fix/forge-0.5.0-regeneration`. Claude Code (f1, session
+a63e83e6, started in build-skill): rebuild `7eb6c9c`, part A verified
+(`770ae78`), load-conditions passes on the #146 layout. Codex (rollout
+01a1974c): part A verified (`c11b2f6`), explicit and five behavior cases
+passed, near-miss not run. Filed, filing only: Forge #154 (no summary
+shown before either confirmation when a session starts in build-skill).
+Work order: #154; #18 stays parked; implementation and any release need
+separate agreement and authorization. prompt-me: the owner may push and
+open a PR after rewording `c11b2f6`, `674e7d7` and `1e7be82`, but not
+as ready to merge: README line 11 still says the Codex cases have not
+run, and correcting it (a bound input) needs a new verification. The PR
+keeps the Claude Code and Codex reports apart, states the Codex near-miss
+as not run and #15's "could not be verified" outcome as static review
+only, and qualifies the Claude Code confirmations (#154).
