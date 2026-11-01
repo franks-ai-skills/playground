@@ -515,3 +515,13 @@ run, and correcting it (a bound input) needs a new verification. The PR
 keeps the Claude Code and Codex reports apart, states the Codex near-miss
 as not run and #15's "could not be verified" outcome as static review
 only, and qualifies the Claude Code confirmations (#154).
+
+Done on 2026-11-01 (requests 198 and 199, owner: the stale README
+sentence "sounds like an issue in forge"): the 2026-10-28 note "No issue
+for the README re-verification" is reversed. Filed, filing only: Forge
+#155 (a part with outside controls binds the whole README, so any edit
+makes its verification stale, and results can't be stated there). Work
+order: #154, #155; #18 stays parked. Regenerating prompt-me's README
+was rejected: `forge.py readme` writes only Forge's sections, the
+hand-written introduction (#10, #14) and `License` would be lost, and
+both harnesses need re-verification anyway.
