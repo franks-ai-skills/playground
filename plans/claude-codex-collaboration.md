@@ -525,3 +525,24 @@ order: #154, #155; #18 stays parked. Regenerating prompt-me's README
 was rejected: `forge.py readme` writes only Forge's sections, the
 hand-written introduction (#10, #14) and `License` would be lost, and
 both harnesses need re-verification anyway.
+
+Done on 2026-11-01 and 2026-11-02 (requests 200 to 207): #154 fixed in
+PR #156 (merge `711bdf9`: build-skill confirms the configuration itself,
+shows the summary in full and verifies through harness-verify's
+procedure) and #155 in PR #157 (merge `edd50d6`: a part owning the README
+only for its hand-off binds the two Forge sections; kept results name
+their origin in `kept_from`). Unreleased; a release needs the owner. The
+three Codex-written prompt-me commits were reworded (now `4b6c2ff`,
+`1365f81`, `9094222`), not pushed. Test run 041 (Forge main by path,
+clone `t14-runs/prompt-me-041`): the README sentence now links the report
+(`a4f843a`); Claude Code rebuilt and verified A (`3231cfd`, `c20b868`),
+summaries shown in full; the README freshness check passed (intro edit
+keeps A, section edit judges it). Codex, run by the owner: summary shown
+in full, explicit and five behavior cases passed, but A is not verified
+(`c6e36a5`): the reviewer failed `read-only-allowlist` because
+requirement 3 says "while the skill runs" and step 13 continues inside
+the skill, text that ten earlier reviewers passed. No Forge issue: it is
+a tension in prompt-me's own goal and accepted requirement. The four
+commits stay off the owner's branch until the owner chooses: reword the
+continuation (intake), reword requirement 3 (research), or keep the text
+with the not-verified report. The prompt-me PR waits for the owner.
